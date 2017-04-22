@@ -1,12 +1,12 @@
 /**
- * Tetris ¼òµ¥½»»¥ÑùÀı³ÌĞò
+ * Tetris ç®€å•äº¤äº’æ ·ä¾‹ç¨‹åº
  * https://wiki.botzone.org/index.php?title=Tetris
- * ¸üĞÂÓÚ2017Äê4ÔÂ20ÈÕ£º
- * ĞŞÕıÁËrotationº¯Êı¡¢½«½»»¥·½Ê½ĞŞ¸ÄÎªĞÂ¹æÔòµÄ¸ñÊ½£¬»¹ÓĞtransferº¯ÊıÀï`if (h2 >= MAPHEIGHT)`¸ÄÎª`if (h2 > MAPHEIGHT)`
+ * æ›´æ–°äº2017å¹´4æœˆ20æ—¥ï¼š
+ * ä¿®æ­£äº†rotationå‡½æ•°ã€å°†äº¤äº’æ–¹å¼ä¿®æ”¹ä¸ºæ–°è§„åˆ™çš„æ ¼å¼ï¼Œè¿˜æœ‰transferå‡½æ•°é‡Œ`if (h2 >= MAPHEIGHT)`æ”¹ä¸º`if (h2 > MAPHEIGHT)`
  */
-// ×¢Òâ£ºxµÄ·¶Î§ÊÇ1~MAPWIDTH£¬yµÄ·¶Î§ÊÇ1~MAPHEIGHT
-// Êı×éÊÇÏÈĞĞ£¨y£©ºóÁĞ£¨c£©
-// ×ø±êÏµ£ºÔ­µãÔÚ×óÏÂ½Ç
+// æ³¨æ„ï¼šxçš„èŒƒå›´æ˜¯1~MAPWIDTHï¼Œyçš„èŒƒå›´æ˜¯1~MAPHEIGHT
+// æ•°ç»„æ˜¯å…ˆè¡Œï¼ˆyï¼‰ååˆ—ï¼ˆcï¼‰
+// åæ ‡ç³»ï¼šåŸç‚¹åœ¨å·¦ä¸‹è§’
  
 #include <iostream>
 #include <string>
@@ -19,30 +19,30 @@ using namespace std;
 #define MAPWIDTH 10
 #define MAPHEIGHT 20
  
-// ÎÒËùÔÚ¶ÓÎéµÄÑÕÉ«£¨0Îªºì£¬1ÎªÀ¶£¬½ö±íÊ¾¶ÓÎé£¬²»·ÖÏÈºó£©
+// æˆ‘æ‰€åœ¨é˜Ÿä¼çš„é¢œè‰²ï¼ˆ0ä¸ºçº¢ï¼Œ1ä¸ºè“ï¼Œä»…è¡¨ç¤ºé˜Ÿä¼ï¼Œä¸åˆ†å…ˆåï¼‰
 int currBotColor;
 int enemyColor;
  
-// ÏÈyºóx£¬¼ÇÂ¼µØÍ¼×´Ì¬£¬0Îª¿Õ£¬1ÎªÒÔÇ°·ÅÖÃ£¬2Îª¸Õ¸Õ·ÅÖÃ£¬¸ºÊıÎªÔ½½ç
-// £¨2ÓÃÓÚÔÚÇåĞĞºó½«×îºóÒ»²½³·ÏúÔÙËÍ¸ø¶Ô·½£©
+// å…ˆyåxï¼Œè®°å½•åœ°å›¾çŠ¶æ€ï¼Œ0ä¸ºç©ºï¼Œ1ä¸ºä»¥å‰æ”¾ç½®ï¼Œ2ä¸ºåˆšåˆšæ”¾ç½®ï¼Œè´Ÿæ•°ä¸ºè¶Šç•Œ
+// ï¼ˆ2ç”¨äºåœ¨æ¸…è¡Œåå°†æœ€åä¸€æ­¥æ’¤é”€å†é€ç»™å¯¹æ–¹ï¼‰
 int gridInfo[2][MAPHEIGHT + 2][MAPWIDTH + 2] = { 0 };
  
-// ´ú±í·Ö±ğÏò¶Ô·½×ªÒÆµÄĞĞ
+// ä»£è¡¨åˆ†åˆ«å‘å¯¹æ–¹è½¬ç§»çš„è¡Œ
 int trans[2][4][MAPWIDTH + 2] = { 0 };
  
-// ×ªÒÆĞĞÊı
+// è½¬ç§»è¡Œæ•°
 int transCount[2] = { 0 };
  
-// ÔËĞĞeliminateºóµÄµ±Ç°¸ß¶È
+// è¿è¡Œeliminateåçš„å½“å‰é«˜åº¦
 int maxHeight[2] = { 0 };
  
-// ×ÜÏûÈ¥ĞĞÊıµÄ·ÖÊıÖ®ºÍ
+// æ€»æ¶ˆå»è¡Œæ•°çš„åˆ†æ•°ä¹‹å’Œ
 int elimTotal[2] = { 0 };
  
-// Ò»´ÎĞÔÏûÈ¥ĞĞÊı¶ÔÓ¦·ÖÊı
+// ä¸€æ¬¡æ€§æ¶ˆå»è¡Œæ•°å¯¹åº”åˆ†æ•°
 const int elimBonus[4] = { 1, 3, 5, 7 };
  
-// ¸ø¶ÔÓ¦Íæ¼ÒµÄ¸÷Àà¿éµÄÊıÄ¿×Ü¼Æ
+// ç»™å¯¹åº”ç©å®¶çš„å„ç±»å—çš„æ•°ç›®æ€»è®¡
 int typeCountForColor[2][7] = { 0 };
  
 const int blockShape[7][4][8] = {
@@ -53,17 +53,17 @@ const int blockShape[7][4][8] = {
 	{ { 0,0,-1,0,0,1,1,0 },{ 0,0,0,-1,-1,0,0,1 },{ 0,0,1,0,0,-1,-1,0 },{ 0,0,0,1,1,0,0,-1 } },
 	{ { 0,0,0,-1,0,1,0,2 },{ 0,0,1,0,-1,0,-2,0 },{ 0,0,0,1,0,-1,0,-2 },{ 0,0,-1,0,1,0,2,0 } },
 	{ { 0,0,0,1,-1,0,-1,1 },{ 0,0,-1,0,0,-1,-1,-1 },{ 0,0,0,-1,1,-0,1,-1 },{ 0,0,1,0,0,1,1,1 } }
-};// 7ÖÖĞÎ×´(³¤L| ¶ÌL| ·´z| Õız| T| Ö±Ò»| Ìï¸ñ)£¬4ÖÖ³¯Ïò(ÉÏ×óÏÂÓÒ)£¬8:Ã¿ÏàÁÚµÄÁ½¸ö·Ö±ğÎªx£¬y
+};// 7ç§å½¢çŠ¶(é•¿L| çŸ­L| åz| æ­£z| T| ç›´ä¸€| ç”°æ ¼)ï¼Œ4ç§æœå‘(ä¸Šå·¦ä¸‹å³)ï¼Œ8:æ¯ç›¸é‚»çš„ä¸¤ä¸ªåˆ†åˆ«ä¸ºxï¼Œy
  
  
 class Tetris
 {
 public:
-	const int blockType;   // ±ê¼Ç·½¿éÀàĞÍµÄĞòºÅ 0~6
-	int blockX;            // Ğı×ªÖĞĞÄµÄxÖá×ø±ê
-	int blockY;            // Ğı×ªÖĞĞÄµÄyÖá×ø±ê
-	int orientation;       // ±ê¼Ç·½¿éµÄ³¯Ïò 0~3
-	const int(*shape)[8]; // µ±Ç°ÀàĞÍ·½¿éµÄĞÎ×´¶¨Òå
+	const int blockType;   // æ ‡è®°æ–¹å—ç±»å‹çš„åºå· 0~6
+	int blockX;            // æ—‹è½¬ä¸­å¿ƒçš„xè½´åæ ‡
+	int blockY;            // æ—‹è½¬ä¸­å¿ƒçš„yè½´åæ ‡
+	int orientation;       // æ ‡è®°æ–¹å—çš„æœå‘ 0~3
+	const int(*shape)[8]; // å½“å‰ç±»å‹æ–¹å—çš„å½¢çŠ¶å®šä¹‰
  
 	int color;
  
@@ -78,7 +78,7 @@ public:
 		return *this;
 	}
  
-	// ÅĞ¶Ïµ±Ç°Î»ÖÃÊÇ·ñºÏ·¨
+	// åˆ¤æ–­å½“å‰ä½ç½®æ˜¯å¦åˆæ³•
 	inline bool isValid(int x = -1, int y = -1, int o = -1)
 	{
 		x = x == -1 ? blockX : x;
@@ -100,7 +100,7 @@ public:
 		return true;
 	}
  
-	// ÅĞ¶ÏÊÇ·ñÂäµØ
+	// åˆ¤æ–­æ˜¯å¦è½åœ°
 	inline bool onGround()
 	{
 		if (isValid() && !isValid(-1, blockY - 1))
@@ -108,7 +108,7 @@ public:
 		return false;
 	}
  
-	// ½«·½¿é·ÅÖÃÔÚ³¡µØÉÏ
+	// å°†æ–¹å—æ”¾ç½®åœ¨åœºåœ°ä¸Š
 	inline bool place()
 	{
 		if (!onGround())
@@ -124,7 +124,7 @@ public:
 		return true;
 	}
  
-	// ¼ì²éÄÜ·ñÄæÊ±ÕëĞı×ª×Ô¼ºµ½o
+	// æ£€æŸ¥èƒ½å¦é€†æ—¶é’ˆæ—‹è½¬è‡ªå·±åˆ°o
 	inline bool rotation(int o)
 	{
 		if (o < 0 || o > 3)
@@ -148,7 +148,7 @@ public:
 	}
 };
  
-// Î§Ò»È¦»¤³ÇºÓ
+// å›´ä¸€åœˆæŠ¤åŸæ²³
 void init()
 {
 	int i;
@@ -167,7 +167,7 @@ void init()
 namespace Util
 {
  
-	// ¼ì²éÄÜ·ñ´Ó³¡µØ¶¥¶ËÖ±½ÓÂäµ½µ±Ç°Î»ÖÃ
+	// æ£€æŸ¥èƒ½å¦ä»åœºåœ°é¡¶ç«¯ç›´æ¥è½åˆ°å½“å‰ä½ç½®
 	inline bool checkDirectDropTo(int color, int blockType, int x, int y, int o)
 	{
 		auto &def = blockShape[blockType][o];
@@ -183,7 +183,7 @@ namespace Util
 		return true;
 	}
  
-	// ÏûÈ¥ĞĞ
+	// æ¶ˆå»è¡Œ
 	void eliminate(int color)
 	{
 		int &count = transCount[color] = 0;
@@ -204,7 +204,7 @@ namespace Util
 			{
 				for (j = 1; j <= MAPWIDTH; j++)
 				{
-					// ×¢ÒâÕâÀïÖ»×ªÒÆÒÔÇ°µÄ¿é£¬²»°üÀ¨×îºóÒ»´ÎÂäÏÂµÄ¿é£¨¡°³·Ïú×îºóÒ»²½¡±£©
+					// æ³¨æ„è¿™é‡Œåªè½¬ç§»ä»¥å‰çš„å—ï¼Œä¸åŒ…æ‹¬æœ€åä¸€æ¬¡è½ä¸‹çš„å—ï¼ˆâ€œæ’¤é”€æœ€åä¸€æ­¥â€ï¼‰
 					trans[color][count][j] = gridInfo[color][i][j] == 1 ? 1 : 0;
 					gridInfo[color][i][j] = 0;
 				}
@@ -228,7 +228,7 @@ namespace Util
 		elimTotal[color] += elimBonus[count];
 	}
  
-	// ×ªÒÆË«·½ÏûÈ¥µÄĞĞ£¬·µ»Ø-1±íÊ¾¼ÌĞø£¬·ñÔò·µ»ØÊäÕß
+	// è½¬ç§»åŒæ–¹æ¶ˆå»çš„è¡Œï¼Œè¿”å›-1è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™è¿”å›è¾“è€…
 	int transfer()
 	{
 		int color1 = 0, color2 = 1;
@@ -256,7 +256,7 @@ namespace Util
 		else
 		{
 			int h1, h2;
-			maxHeight[color1] = h1 = maxHeight[color1] + transCount[color2];//´Ócolor1´¦ÒÆ¶¯count1È¥color2
+			maxHeight[color1] = h1 = maxHeight[color1] + transCount[color2];//ä»color1å¤„ç§»åŠ¨count1å»color2
 			maxHeight[color2] = h2 = maxHeight[color2] + transCount[color1];
  
 			if (h1 > MAPHEIGHT) return color1;
@@ -283,7 +283,7 @@ namespace Util
 		}
 	}
  
-	// ÑÕÉ«·½»¹ÄÜ·ñ¼ÌĞøÓÎÏ·
+	// é¢œè‰²æ–¹è¿˜èƒ½å¦ç»§ç»­æ¸¸æˆ
 	inline bool canPut(int color, int blockType)
 	{
 		Tetris t(blockType, color);
@@ -298,7 +298,7 @@ namespace Util
 		return false;
 	}
  
-	// ´òÓ¡³¡µØÓÃÓÚµ÷ÊÔ
+	// æ‰“å°åœºåœ°ç”¨äºè°ƒè¯•
 	inline void printField()
 	{
 #ifndef _BOTZONE_ONLINE
@@ -309,7 +309,7 @@ namespace Util
 			"[]",
 			"##"
 		};
-		cout << "~~£ºÇ½£¬[]£º¿é£¬##£ºĞÂ¿é" << endl;
+		cout << "~~ï¼šå¢™ï¼Œ[]ï¼šå—ï¼Œ##ï¼šæ–°å—" << endl;
 		for (int y = MAPHEIGHT + 1; y >= 0; y--)
 		{
 			for (int x = 0; x <= MAPWIDTH + 1; x++)
@@ -325,7 +325,7 @@ namespace Util
  
 int main()
 {
-	// ¼ÓËÙÊäÈë
+	// åŠ é€Ÿè¾“å…¥
 	istream::sync_with_stdio(false);
 	srand(time(NULL));
 	init();
@@ -334,8 +334,8 @@ int main()
 	int nextTypeForColor[2];
 	cin >> turnID;
  
-	// ÏÈ¶ÁÈëµÚÒ»»ØºÏ£¬µÃµ½×Ô¼ºµÄÑÕÉ«
-	// Ë«·½µÄµÚÒ»¿é¿Ï¶¨ÊÇÒ»ÑùµÄ
+	// å…ˆè¯»å…¥ç¬¬ä¸€å›åˆï¼Œå¾—åˆ°è‡ªå·±çš„é¢œè‰²
+	// åŒæ–¹çš„ç¬¬ä¸€å—è‚¯å®šæ˜¯ä¸€æ ·çš„
 	cin >> blockType >> currBotColor;
 	enemyColor = 1 - currBotColor;
 	nextTypeForColor[0] = blockType;
@@ -343,58 +343,58 @@ int main()
 	typeCountForColor[0][blockType]++;
 	typeCountForColor[1][blockType]++;
  
-	// È»ºó·ÖÎöÒÔÇ°Ã¿»ØºÏµÄÊäÈëÊä³ö£¬²¢»Ö¸´×´Ì¬
-	// Ñ­»·ÖĞ£¬color ±íÊ¾µ±Ç°ÕâÒ»ĞĞÊÇ color µÄĞĞÎª
-	// Æ½Ì¨±£Ö¤ËùÓĞÊäÈë¶¼ÊÇºÏ·¨ÊäÈë
+	// ç„¶ååˆ†æä»¥å‰æ¯å›åˆçš„è¾“å…¥è¾“å‡ºï¼Œå¹¶æ¢å¤çŠ¶æ€
+	// å¾ªç¯ä¸­ï¼Œcolor è¡¨ç¤ºå½“å‰è¿™ä¸€è¡Œæ˜¯ color çš„è¡Œä¸º
+	// å¹³å°ä¿è¯æ‰€æœ‰è¾“å…¥éƒ½æ˜¯åˆæ³•è¾“å…¥
 	for (int i = 1; i < turnID; i++)
 	{
 		int currTypeForColor[2] = { nextTypeForColor[0], nextTypeForColor[1] };
 		int x, y, o;
-		// ¸ù¾İÕâĞ©ÊäÈëÊä³öÖğ½¥»Ö¸´×´Ì¬µ½µ±Ç°»ØºÏ
+		// æ ¹æ®è¿™äº›è¾“å…¥è¾“å‡ºé€æ¸æ¢å¤çŠ¶æ€åˆ°å½“å‰å›åˆ
  
-		// ÏÈ¶Á×Ô¼ºµÄÊä³ö£¬Ò²¾ÍÊÇ×Ô¼ºµÄĞĞÎª
-		// ×Ô¼ºµÄÊä³öÊÇ×Ô¼ºµÄ×îºóÒ»²½
-		// È»ºóÄ£Äâ×îºóÒ»²½·ÅÖÃ¿é
+		// å…ˆè¯»è‡ªå·±çš„è¾“å‡ºï¼Œä¹Ÿå°±æ˜¯è‡ªå·±çš„è¡Œä¸º
+		// è‡ªå·±çš„è¾“å‡ºæ˜¯è‡ªå·±çš„æœ€åä¸€æ­¥
+		// ç„¶åæ¨¡æ‹Ÿæœ€åä¸€æ­¥æ”¾ç½®å—
 		cin >> blockType >> x >> y >> o;
  
-		// ÎÒµ±Ê±°ÑÉÏÒ»¿éÂäµ½ÁË x y o£¡
+		// æˆ‘å½“æ—¶æŠŠä¸Šä¸€å—è½åˆ°äº† x y oï¼
 		Tetris myBlock(currTypeForColor[currBotColor], currBotColor);
 		myBlock.set(x, y, o).place();
  
-		// ÎÒ¸ø¶Ô·½Ê²Ã´¿éÀ´×Å£¿
+		// æˆ‘ç»™å¯¹æ–¹ä»€ä¹ˆå—æ¥ç€ï¼Ÿ
 		typeCountForColor[enemyColor][blockType]++;
 		nextTypeForColor[enemyColor] = blockType;
  
-		// È»ºó¶Á×Ô¼ºµÄÊäÈë£¬Ò²¾ÍÊÇ¶Ô·½µÄĞĞÎª
-		// ²ÃÅĞ¸ø×Ô¼ºµÄÊäÈëÊÇ¶Ô·½µÄ×îºóÒ»²½
+		// ç„¶åè¯»è‡ªå·±çš„è¾“å…¥ï¼Œä¹Ÿå°±æ˜¯å¯¹æ–¹çš„è¡Œä¸º
+		// è£åˆ¤ç»™è‡ªå·±çš„è¾“å…¥æ˜¯å¯¹æ–¹çš„æœ€åä¸€æ­¥
 		cin >> blockType >> x >> y >> o;
  
-		// ¶Ô·½µ±Ê±°ÑÉÏÒ»¿éÂäµ½ÁË x y o£¡
+		// å¯¹æ–¹å½“æ—¶æŠŠä¸Šä¸€å—è½åˆ°äº† x y oï¼
 		Tetris enemyBlock(currTypeForColor[enemyColor], enemyColor);
 		enemyBlock.set(x, y, o).place();
  
-		// ¶Ô·½¸øÎÒÊ²Ã´¿éÀ´×Å£¿
+		// å¯¹æ–¹ç»™æˆ‘ä»€ä¹ˆå—æ¥ç€ï¼Ÿ
 		typeCountForColor[currBotColor][blockType]++;
 		nextTypeForColor[currBotColor] = blockType;
  
-		// ¼ì²éÏûÈ¥
+		// æ£€æŸ¥æ¶ˆå»
 		Util::eliminate(0);
 		Util::eliminate(1);
  
-		// ½øĞĞ×ªÒÆ
+		// è¿›è¡Œè½¬ç§»
 		Util::transfer();
 	}
  
  
 	int blockForEnemy, finalX, finalY, finalO;
  
-	// ×ö³ö¾ö²ß£¨ÄãÖ»ĞèĞŞ¸ÄÒÔÏÂ²¿·Ö£©
+	// åšå‡ºå†³ç­–ï¼ˆä½ åªéœ€ä¿®æ”¹ä»¥ä¸‹éƒ¨åˆ†ï¼‰
  
-	// ÓöÊÂ²»¾öÏÈÊä³ö£¨Æ½Ì¨ÉÏ±àÒë²»»áÊä³ö£©
+	// é‡äº‹ä¸å†³å…ˆè¾“å‡ºï¼ˆå¹³å°ä¸Šç¼–è¯‘ä¸ä¼šè¾“å‡ºï¼‰
 	Util::printField();
  
-	// Ì°ĞÄ¾ö²ß
-	// ´ÓÏÂÍùÉÏÒÔ¸÷ÖÖ×ËÌ¬ÕÒµ½µÚÒ»¸öÎ»ÖÃ£¬ÒªÇóÄÜ¹»Ö±×ÅÂäÏÂ
+	// è´ªå¿ƒå†³ç­–
+	// ä»ä¸‹å¾€ä¸Šä»¥å„ç§å§¿æ€æ‰¾åˆ°ç¬¬ä¸€ä¸ªä½ç½®ï¼Œè¦æ±‚èƒ½å¤Ÿç›´ç€è½ä¸‹
 	Tetris block(nextTypeForColor[currBotColor], currBotColor);
 	for (int y = 1; y <= MAPHEIGHT; y++)
 		for (int x = 1; x <= MAPWIDTH; x++)
@@ -411,7 +411,7 @@ int main()
 			}
  
 determined:
-	// ÔÙ¿´¿´¸ø¶Ô·½Ê²Ã´ºÃ
+	// å†çœ‹çœ‹ç»™å¯¹æ–¹ä»€ä¹ˆå¥½
  
 	int maxCount = 0, minCount = 99;
 	for (int i = 0; i < 7; i++)
@@ -423,7 +423,7 @@ determined:
 	}
 	if (maxCount - minCount == 2)
 	{
-		// Î£ÏÕ£¬ÕÒÒ»¸ö²»ÊÇ×î´óµÄ¿é¸ø¶Ô·½°É
+		// å±é™©ï¼Œæ‰¾ä¸€ä¸ªä¸æ˜¯æœ€å¤§çš„å—ç»™å¯¹æ–¹å§
 		for (blockForEnemy = 0; blockForEnemy < 7; blockForEnemy++)
 			if (typeCountForColor[enemyColor][blockForEnemy] != maxCount)
 				break;
@@ -433,7 +433,7 @@ determined:
 		blockForEnemy = rand() % 7;
 	}
  
-	// ¾ö²ß½áÊø£¬Êä³ö½á¹û£¨ÄãÖ»ĞèĞŞ¸ÄÒÔÉÏ²¿·Ö£©
+	// å†³ç­–ç»“æŸï¼Œè¾“å‡ºç»“æœï¼ˆä½ åªéœ€ä¿®æ”¹ä»¥ä¸Šéƒ¨åˆ†ï¼‰
  
 	cout << blockForEnemy << " " << finalX << " " << finalY << " " << finalO;
  
