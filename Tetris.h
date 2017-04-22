@@ -27,11 +27,11 @@ public:
     // 将方块放置在场地上
     INLINE bool place();
 
-private:
+
     // 判断是否落地
-    inline bool onGround();
+    INLINE bool onGround();
     // 检查能否逆时针旋转自己到o
-    inline bool rotation(int o);
+    INLINE bool rotation(int o);
 };
 
 #endif //TETRIS_TETRIS_H
