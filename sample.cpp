@@ -9,10 +9,6 @@
 // 坐标系：原点在左下角
  
 #include <iostream>
-#include <string>
-#include <cmath>
-#include <algorithm>
-#include <cstdlib>
 #include <ctime>
 using namespace std;
  
@@ -40,12 +36,12 @@ int maxHeight[2] = { 0 };
 int elimTotal[2] = { 0 };
  
 // 一次性消去行数对应分数
-const int elimBonus[4] = { 1, 3, 5, 7 };
+constexpr int elimBonus[4] = { 1, 3, 5, 7 };
  
 // 给对应玩家的各类块的数目总计
 int typeCountForColor[2][7] = { 0 };
  
-const int blockShape[7][4][8] = {
+constexpr int blockShape[7][4][8] = {
 	{ { 0,0,1,0,-1,0,-1,-1 },{ 0,0,0,1,0,-1,1,-1 },{ 0,0,-1,0,1,0,1,1 },{ 0,0,0,-1,0,1,-1,1 } },
 	{ { 0,0,-1,0,1,0,1,-1 },{ 0,0,0,-1,0,1,1,1 },{ 0,0,1,0,-1,0,-1,1 },{ 0,0,0,1,0,-1,-1,-1 } },
 	{ { 0,0,1,0,0,-1,-1,-1 },{ 0,0,0,1,1,0,1,-1 },{ 0,0,-1,0,0,1,1,1 },{ 0,0,0,-1,-1,0,-1,1 } },
@@ -299,7 +295,7 @@ namespace Util
 	}
  
 	// 打印场地用于调试
-	inline void printField()
+	void printField()
 	{
 #ifndef _BOTZONE_ONLINE
 		static const char *i2s[] = {
@@ -309,14 +305,14 @@ namespace Util
 			"[]",
 			"##"
 		};
-		cout << "~~：墙，[]：块，##：新块" << endl;
+		clog << "~~：墙，[]：块，##：新块" << endl;
 		for (int y = MAPHEIGHT + 1; y >= 0; y--)
 		{
 			for (int x = 0; x <= MAPWIDTH + 1; x++)
-				cout << i2s[gridInfo[0][y][x] + 2];
+				clog << i2s[gridInfo[0][y][x] + 2];
 			for (int x = 0; x <= MAPWIDTH + 1; x++)
-				cout << i2s[gridInfo[1][y][x] + 2];
-			cout << endl;
+				clog << i2s[gridInfo[1][y][x] + 2];
+			clog << endl;
 		}
 #endif
 	}
@@ -392,7 +388,7 @@ int main()
  
 	// 遇事不决先输出（平台上编译不会输出）
 	Util::printField();
- 
+
 	// 贪心决策
 	// 从下往上以各种姿态找到第一个位置，要求能够直着落下
 	Tetris block(nextTypeForColor[currBotColor], currBotColor);
