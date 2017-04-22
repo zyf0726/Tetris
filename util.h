@@ -4,7 +4,9 @@
 
 #ifndef TETRIS_UTIL_H
 #define TETRIS_UTIL_H
+#ifndef SINGLEFILE
 #include "shared.h"
+#endif
 namespace Util
 {
 

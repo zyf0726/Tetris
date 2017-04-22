@@ -23,7 +23,7 @@ constexpr int blockShape[7][4][8] = {
 };// 7种形状(长L| 短L| 反z| 正z| T| 直一| 田格)，4种朝向(上左下右)，8:每相邻的两个分别为x，y
 
 constexpr int elimBonus[4] = { 1, 3, 5, 7 };
-#ifdef SINGLE
+#ifdef SINGLEFILE
 #define INLINE inline
 #else
 #define INLINE

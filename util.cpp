@@ -2,8 +2,10 @@
 // Created by prwang on 2017/4/22.
 //
 
+#ifndef SINGLEFILE
 #include "util.h"
 #include "Tetris.h"
+#endif
 namespace Util
 {
 // 代表分别向对方转移的行

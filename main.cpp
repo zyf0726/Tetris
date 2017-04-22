@@ -1,10 +1,11 @@
 //
 // Created by prwang on 2017/4/22.
 //
-
+#ifndef SINGLEFILE
 #include "main.h"
 #include "Tetris.h"
 #include "util.h"
+#endif
 
 int currBotColor;
 int enemyColor;
@@ -25,65 +26,6 @@ inline void init() {
     }
 }
 
-int weird_evaluation(Tetris &currBlock) {
-    int i, tmpX, tmpY;
-    int tempGrid[MAPHEIGHT + 2][MAPWIDTH + 2] = {0};
-    for (int i = 0; i < MAPHEIGHT + 2; i++)
-        for (int j = 0; j < MAPWIDTH + 2; j++)
-            tempGrid[i][j] = gridInfo[currBlock.color][i][j];
-    for (i = 0; i < 4; i++) {
-        tmpX = currBlock.blockX + currBlock.shape[currBlock.orientation][2 * i];
-        tmpY = currBlock.blockY + currBlock.shape[currBlock.orientation][2 * i + 1];
-        tempGrid[tmpY][tmpX] = 2;
-    }
-
-    int maxHeight = 0;
-    int ttlMass = 0;
-    int blockCount = 0;
-    int elimCount = 0;
-    int weirdGridCount = 0;
-    for (int i = 1; i <= MAPHEIGHT; i++) {
-        bool lineElimFlag = true;
-        for (int j = 1; j <= MAPWIDTH; j++)
-            if ((tempGrid[i][j] != 1) && (tempGrid[i][j] != 2))
-                lineElimFlag = false;
-        if (lineElimFlag) {
-            elimCount++;
-            for (int k = i; k <= MAPWIDTH - 1; k++)
-                for (int j = 1; j <= MAPWIDTH; j++) {
-                    tempGrid[k][j] = tempGrid[k + 1][j];
-                    tempGrid[k + 1][j] = 0;
-                };
-        };
-    };
-    for (int i = 1; i <= MAPHEIGHT; i++) {
-        for (int j = 1; j <= MAPWIDTH; j++) {
-            if ((tempGrid[i][j] == 1) || (tempGrid[i][j] == 2)) {
-                maxHeight = i;
-                ttlMass += i;
-                blockCount++;
-            };
-
-            if (tempGrid[i][j] == 0)
-                if (tempGrid[i + 1][j] != 0) {
-                    weirdGridCount += 8;
-                    if (tempGrid[i + 1][j - 1] != 0)
-                        weirdGridCount += 4;
-                    if (tempGrid[i + 1][j + 1] != 0)
-                        weirdGridCount += 4;
-                    if ((tempGrid[i + 1][j - 1] != 0) && (tempGrid[i + 1][j + 1] != 0))
-                        weirdGridCount += 8;
-                    if ((j == 1) || (j == MAPWIDTH))
-                        weirdGridCount += 4;
-                };
-        };
-    };
-    return
-            -elimCount * (768 + maxHeight * maxHeight / 4)
-            + ttlMass * 2
-            + (8 + maxHeight) * (4 + maxHeight) * maxHeight
-            + weirdGridCount * (400 - maxHeight * maxHeight) / 48;
-};
 
 int main() {
     // 加速输入
@@ -162,7 +104,7 @@ int main() {
                 if (block.set(x, y, o).isValid() &&
                     block.set(x, y, o).onGround() &&
                     Util::checkDirectDropTo(currBotColor, block.blockType, x, y, o)) {
-                    int currWeird = weird_evaluation(block.set(x, y, o));
+                    int currWeird = block.set(x, y, o).evaluate();
                     if (currWeird < minWeird) {
                         finalX = x;
                         finalY = y;
@@ -172,7 +114,7 @@ int main() {
                 }
             }
 
-    determined:
+determined:
     // 再看看给对方什么好
 
     int maxCount = 0, minCount = 99;
