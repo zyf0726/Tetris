@@ -95,7 +95,7 @@ int main() {
     // 遇事不决先输出（平台上编译不会输出）
     Util::printField();
 
-    int minWeird = 33554432;
+    int minWeird = 2147483647;
 
     Tetris block(nextTypeForColor[currBotColor], currBotColor);
     for (int y = 1; y <= MAPHEIGHT; y++)

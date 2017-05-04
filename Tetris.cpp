@@ -85,50 +85,45 @@ int Tetris::evaluate() {
         tempGrid[tmpY][tmpX] = 2;
     }
 
-    int maxHeight = 0;
-    int ttlMass = 0;
-    int blockCount = 0;
+    int maxHeight[MAPWIDTH+1];
+    int totalHeight=0;
+    int difference=0;
     int elimCount = 0;
     int weirdGridCount = 0;
+
     for (int i = 1; i <= MAPHEIGHT; i++) {
         bool lineElimFlag = true;
         for (int j = 1; j <= MAPWIDTH; j++)
             if ((tempGrid[i][j] != 1) && (tempGrid[i][j] != 2))
                 lineElimFlag = false;
-        if (lineElimFlag) {
+        if (lineElimFlag)
             elimCount++;
-            for (int k = i; k <= MAPWIDTH - 1; k++)
-                for (int j = 1; j <= MAPWIDTH; j++) {
-                    tempGrid[k][j] = tempGrid[k + 1][j];
-                    tempGrid[k + 1][j] = 0;
-                };
-        };
     };
-    for (int i = 1; i <= MAPHEIGHT; i++) {
-        for (int j = 1; j <= MAPWIDTH; j++) {
-            if ((tempGrid[i][j] == 1) || (tempGrid[i][j] == 2)) {
-                maxHeight = i;
-                ttlMass += i;
-                blockCount++;
-            };
 
-            if (tempGrid[i][j] == 0)
-                if (tempGrid[i + 1][j] != 0) {
-                    weirdGridCount += 8;
-                    if (tempGrid[i + 1][j - 1] != 0)
-                        weirdGridCount += 4;
-                    if (tempGrid[i + 1][j + 1] != 0)
-                        weirdGridCount += 4;
-                    if ((tempGrid[i + 1][j - 1] != 0) && (tempGrid[i + 1][j + 1] != 0))
-                        weirdGridCount += 8;
-                    if ((j == 1) || (j == MAPWIDTH))
-                        weirdGridCount += 4;
-                };
-        };
+    for (int j=1;j<=MAPWIDTH;j++){
+        maxHeight[j]=0;
+        for(int i=1;i<=MAPHEIGHT;i++)
+            if ((tempGrid[i][j] == 1) || (tempGrid[i][j] == 2))
+                maxHeight[j] = i;
+        totalHeight+=maxHeight[j];
     };
+
+    for (int j=2;j<=MAPWIDTH;j++)
+        difference+=abs(maxHeight[j]-maxHeight[j-1]);
+
+    for (int j=1;j<=MAPWIDTH;j++)
+        for (int i=1;i<=maxHeight[j];i++)
+            if(tempGrid[i][j]==0)
+                weirdGridCount++;
+
+#define TTL_H_MULTI 5101
+#define DIFF_MULTI 1845
+#define ELIM_COUNT_MULTI -7607
+#define WEIRD_COUNT_MULTI 3566
+
     return
-            -elimCount * (768 + maxHeight * maxHeight / 4)
-            + ttlMass * 2
-            + (8 + maxHeight) * (4 + maxHeight) * maxHeight
-            + weirdGridCount * (400 - maxHeight * maxHeight) / 48;
+        TTL_H_MULTI*totalHeight
+        +DIFF_MULTI*difference
+        +ELIM_COUNT_MULTI*elimCount
+        +WEIRD_COUNT_MULTI*weirdGridCount;
 };
