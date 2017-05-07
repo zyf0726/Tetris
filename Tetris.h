@@ -15,7 +15,7 @@ public:
     const int blockType;   // 标记方块类型的序号 0~6
     Tetris(int t, int color) : blockType(t), shape(blockShape[t]), color(color) { }
 
-    INLINE int evaluate();
+    INLINE int evaluate(int);
     INLINE Tetris &set(int x = -1, int y = -1, int o = -1);
 
     // 判断当前位置是否合法

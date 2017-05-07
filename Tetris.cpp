@@ -73,7 +73,7 @@ bool Tetris::rotation(int o) {
     }
     return true;
 }
-int Tetris::evaluate() {
+int Tetris::evaluate(int _curHeight) {
     int  tmpX, tmpY;
     int tempGrid[MAPHEIGHT + 2][MAPWIDTH + 2] = {0};
     for (int i = 0; i < MAPHEIGHT + 2; i++)
@@ -85,45 +85,96 @@ int Tetris::evaluate() {
         tempGrid[tmpY][tmpX] = 2;
     }
 
-    int maxHeight[MAPWIDTH+1];
-    int totalHeight=0;
-    int difference=0;
+
+    int curHeight=_curHeight;
+    int maxHeight=0;
     int elimCount = 0;
-    int weirdGridCount = 0;
+    int rowDifference=0;
+    int columnDifference=0;
+    int holeCount=0;
+    int wellCount=0;
 
     for (int i = 1; i <= MAPHEIGHT; i++) {
         bool lineElimFlag = true;
         for (int j = 1; j <= MAPWIDTH; j++)
             if ((tempGrid[i][j] != 1) && (tempGrid[i][j] != 2))
                 lineElimFlag = false;
-        if (lineElimFlag)
+        if (lineElimFlag) {
             elimCount++;
+            for(int t=i;t<MAPHEIGHT;t++)
+                for(int j=1;j<=MAPWIDTH;j++) {
+                    tempGrid[t][j] = tempGrid[t][j + 1];
+                    tempGrid[t][j + 1] = 0;
+                };
+        }
     };
 
-    for (int j=1;j<=MAPWIDTH;j++){
-        maxHeight[j]=0;
-        for(int i=1;i<=MAPHEIGHT;i++)
-            if ((tempGrid[i][j] == 1) || (tempGrid[i][j] == 2))
-                maxHeight[j] = i;
-        totalHeight+=maxHeight[j];
-    };
 
-    for (int j=2;j<=MAPWIDTH;j++)
-        difference+=abs(maxHeight[j]-maxHeight[j-1]);
+    for(int i=1;i<=MAPHEIGHT;i++)
+        for(int j=1;j<MAPWIDTH;j++) {
+            if ((tempGrid[i][j] == 0) xor (tempGrid[i][j + 1] == 0))
+                rowDifference++;
+            if(tempGrid[i][j])
+                maxHeight=i;
+        };
 
-    for (int j=1;j<=MAPWIDTH;j++)
-        for (int i=1;i<=maxHeight[j];i++)
-            if(tempGrid[i][j]==0)
-                weirdGridCount++;
+    for(int j=1;j<=MAPWIDTH;j++)
+        for(int i=1;i<MAPHEIGHT;i++)
+            if((tempGrid[i][j]==0)xor(tempGrid[i+1][j]==0))
+                columnDifference++;
 
-#define TTL_H_MULTI 5101
-#define DIFF_MULTI 1845
-#define ELIM_COUNT_MULTI -7607
-#define WEIRD_COUNT_MULTI 3566
+    for(int j=1;j<=MAPWIDTH;j++){
+        bool startCount=false;
+        for(int i=MAPHEIGHT;i>=1;i--){
+            if(tempGrid[i][j])
+                startCount=true;
+            if(startCount&&(tempGrid[i][j]==0))
+                holeCount++;
+        }
+    }
+
+    for(int j=2;j<MAPWIDTH;j++) {
+        bool startCount=false;
+        for (int i = MAPHEIGHT; i >= 1; i--) {
+            if (tempGrid[i][j]) break;
+            if ((tempGrid[i][j - 1] == 0) && (tempGrid[i][j + 1] == 0)) startCount=true;
+            if(startCount) wellCount++;
+        }
+    }
+    {
+        bool startCount=false;
+        for (int i = MAPHEIGHT; i >= 1; i--) {
+            if (tempGrid[i][1]) break;
+            if (tempGrid[i][2] == 0) startCount=true;
+            if(startCount) wellCount++;
+        }
+    }
+
+    {
+        bool startCount=false;
+        for (int i = MAPHEIGHT; i >= 1; i--) {
+            if (tempGrid[i][MAPWIDTH]) break;
+            if (tempGrid[i][MAPWIDTH - 1] == 0) startCount=true;
+            if(startCount) wellCount++;
+        }
+    }
+
+#define CUR_H_W 4500
+#define ELIM_C_W -5418
+#define ELIM_C_H_W -71
+#define ROW_DIFF_W 3218
+#define COL_DIFF_W 9439
+#define HOLE_C_W 7899
+#define WELL_C_W 3386
 
     return
-        TTL_H_MULTI*totalHeight
-        +DIFF_MULTI*difference
-        +ELIM_COUNT_MULTI*elimCount
-        +WEIRD_COUNT_MULTI*weirdGridCount;
+        CUR_H_W*curHeight+
+        ELIM_C_W*elimCount+
+        (ELIM_C_H_W*maxHeight*maxHeight)*elimCount+
+        ROW_DIFF_W*rowDifference+
+        COL_DIFF_W*columnDifference+
+        HOLE_C_W*holeCount+
+        WELL_C_W*wellCount;
+
+
 };

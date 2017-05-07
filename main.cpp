@@ -104,7 +104,7 @@ int main() {
                 if (block.set(x, y, o).isValid() &&
                     block.set(x, y, o).onGround() &&
                     Util::checkDirectDropTo(currBotColor, block.blockType, x, y, o)) {
-                    int currWeird = block.set(x, y, o).evaluate();
+                    int currWeird = block.set(x, y, o).evaluate(y+blockHeight[nextTypeForColor[currBotColor]][o]);
                     if (currWeird < minWeird) {
                         finalX = x;
                         finalY = y;
