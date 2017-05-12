@@ -25,7 +25,7 @@ const int linesClearedReward=10;
  * 以下常量用于遗传算法
  * */
 const int populationMax = 2000; // 种群规模
-const int split_size = 100;
+const int split_size = 800;
 const int popRemainRankPercent = 4; // 前4%名完全保留，不发生突变
 const int popAbandonRankPercent = 70; // 没进前70%的全部淘汰
 const int popMutationPossible = 8; // 每8个只有一个能发生变异
@@ -213,9 +213,14 @@ void satellite_interface(sockaddr_in subject, Iter begin, Iter end)
     }
     fflush(fp);
     for (Iter x = begin; x != end; ++x)
-        fscanf(fp, "%d%d%d",&x->lifeMove,&x->lineCleared,&x->fitness);
-
+    {
+        //FIXME fp eof!难道是关闭了socket这里才进来?
+        //TODO 改成二进制以及send/recv试试
+        fscanf(fp, "%d%d%d", &x->lifeMove, &x->lineCleared, &x->fitness);
+        cerr << x->lifeMove << x->lineCleared << x->fitness << endl;
+    }
     fclose(fp);
+    que.V(subject);
 }
 int main()
 {
