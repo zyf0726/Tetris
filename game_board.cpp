@@ -161,10 +161,10 @@ bool element::rotation(const game_board& gb, int o) {
  *
  * */
 int game_board::evaluate(int _curHeight) {
-    bool blocks[MAPHEIGHT + 2][MAPWIDTH + 2] = {};
-    for (int i = 0; i < MAPHEIGHT + 2; i++)
-        for (int j = 0; j < MAPWIDTH + 2; j++)
-            blocks[i][j] = (gridInfo[i][j]>0);
+    bool blocks[MAPHEIGHT][MAPWIDTH] = {};
+    for (int i = 0; i < MAPHEIGHT ; i++)
+        for (int j = 0; j < MAPWIDTH ; j++)
+            blocks[i][j] = (gridInfo[i + 1][j + 1]>0);
     int features[6];
     fill(features, features + 6, 0);
     //计算消去的行（第2维）
