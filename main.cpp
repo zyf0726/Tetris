@@ -12,7 +12,7 @@ mt19937 RAND((random_device()) ());
 
 
 int main() {
-
+    cerr << sizeof(game_manager) << endl;
     // 加速输入
     istream::sync_with_stdio(false);
     int turnID, blockType;

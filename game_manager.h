@@ -14,6 +14,7 @@ public:
     INLINE void printField();
     INLINE void fixup() { gb[0].eliminate(); gb[1].eliminate(); transfer(); }
     INLINE int worst_for_enemy(int player);
+    friend int main();
 };
 
 
