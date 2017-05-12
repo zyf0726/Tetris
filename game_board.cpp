@@ -19,7 +19,7 @@ bool game_board::checkDirectDropTo(int blockType, int x, int y, int o)
     for (; y <= MAPHEIGHT; y++)
         for (int i = 0; i < 4; i++)
         {
-            int _x = def[i * 2] + x, _y = def[i * 2 + 1] + y;
+            int _x = def[i].x + x, _y = def[i].y + y;
             if (_y > MAPHEIGHT)
                 continue;
             if (_y < 1 || _x < 1 || _x > MAPWIDTH || gridInfo[_y][_x])
@@ -88,7 +88,7 @@ INLINE bool game_board::canPut(int blockType)
 }
 
 
-tuple<int, int, int> game_board::get_decision(int ty) {
+tuple<int, int, int, int> game_board::get_decision(int ty) {
 
     int  finalX(-1), finalY(-1), finalO(-1);
     int minWeird = 2147483647;
@@ -109,18 +109,18 @@ tuple<int, int, int> game_board::get_decision(int ty) {
                     }
                 }
             }
-    return tie(finalX, finalY, finalO);
+    return tie(finalX, finalY, finalO, minWeird);
 }
 bool game_board::is_valid(int ty, int x, int y, int o) const {
 
-    const int (*shape)[8] = blockShape[ty];
+    auto &shape = blockShape[ty];
     if (o < 0 || o > 3)
         return false;
 
     int i, tmpX, tmpY;
     for (i = 0; i < 4; i++) {
-        tmpX = x + shape[o][2 * i];
-        tmpY = y + shape[o][2 * i + 1];
+        tmpX = x + shape[o][i].x;
+        tmpY = y + shape[o][i].y;
         if (tmpX < 1 || tmpX > MAPWIDTH ||
             tmpY < 1 || tmpY > MAPHEIGHT ||
             gridInfo[tmpY][tmpX] != 0)
@@ -136,11 +136,11 @@ bool game_board::place(int ty, int x, int y, int o)
 {
     if (!is_on_ground(ty, x, y, o))
         return false;
-    const int (*shape)[8] = blockShape[ty];
+    auto& shape = blockShape[ty];
     int i, tmpX, tmpY;
     for (i = 0; i < 4; i++) {
-        tmpX = x + shape[o][2 * i];
-        tmpY = y + shape[o][2 * i + 1];
+        tmpX = x + shape[o][i].x;
+        tmpY = y + shape[o][i].y;
         gridInfo[tmpY][tmpX] = 2;
     }
     return true;

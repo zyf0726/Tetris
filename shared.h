@@ -13,7 +13,8 @@ using namespace std;
 constexpr int MAPWIDTH =  10;
 constexpr int  MAPHEIGHT =  20;
 
-constexpr int blockShape[7][4][8] = {
+struct __cord { int x, y; };
+constexpr __cord blockShape[7][4][4] = {
         { { 0,0,1,0,-1,0,-1,-1 },{ 0,0,0,1,0,-1,1,-1 },{ 0,0,-1,0,1,0,1,1 },{ 0,0,0,-1,0,1,-1,1 } },
         { { 0,0,-1,0,1,0,1,-1 },{ 0,0,0,-1,0,1,1,1 },{ 0,0,1,0,-1,0,-1,1 },{ 0,0,0,1,0,-1,-1,-1 } },
         { { 0,0,1,0,0,-1,-1,-1 },{ 0,0,0,1,1,0,1,-1 },{ 0,0,-1,0,0,1,1,1 },{ 0,0,0,-1,-1,0,-1,1 } },
@@ -34,6 +35,10 @@ constexpr int blockHeight[7][4]={
 };
 
 constexpr int elimBonus[4] = { 1, 3, 5, 7 };
+typedef unsigned char ubyte;
+typedef signed char sbyte;
+template<class T> inline void mint(T& a, T b) { if (a > b) a = b; }
+template<class T> inline void maxt(T& a, T b) { if (a < b) a = b; }
 #ifdef SINGLEFILE
 #define INLINE inline
 #else

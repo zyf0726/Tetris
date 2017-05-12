@@ -24,7 +24,7 @@ class game_board
 // 总消去行数的分数之和
     int elimTotal;
 public:
-    INLINE tuple<int, int, int> get_decision(int ty);
+    INLINE tuple<int, int, int, int> get_decision(int ty);
     INLINE game_board();
     // 消去行
     INLINE void eliminate();
