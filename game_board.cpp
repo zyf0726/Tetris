@@ -1,5 +1,7 @@
 #ifndef SINGLEFILE
+
 #include "game_board.h"
+
 #endif
 
 INLINE game_board::game_board() {
@@ -12,13 +14,12 @@ INLINE game_board::game_board() {
         gridInfo[0][i] = gridInfo[MAPHEIGHT + 1][i] = -2;
     }
 }
+
 // 检查能否从场地顶端直接落到当前位置
-bool game_board::checkDirectDropTo(int blockType, int x, int y, int o)
-{
+bool game_board::checkDirectDropTo(int blockType, int x, int y, int o) {
     auto &def = blockShape[blockType][o];
     for (; y <= MAPHEIGHT; y++)
-        for (int i = 0; i < 4; i++)
-        {
+        for (int i = 0; i < 4; i++) {
             int _x = def[i].x + x, _y = def[i].y + y;
             if (_y > MAPHEIGHT)
                 continue;
@@ -29,40 +30,31 @@ bool game_board::checkDirectDropTo(int blockType, int x, int y, int o)
 }
 
 // 消去行
-void game_board::eliminate()
-{
+void game_board::eliminate() {
     int &count = transCount = 0;
     int i, j, emptyFlag, fullFlag;
     maxHeight = MAPHEIGHT;
-    for (i = 1; i <= MAPHEIGHT; i++)
-    {
+    for (i = 1; i <= MAPHEIGHT; i++) {
         emptyFlag = 1;
         fullFlag = 1;
-        for (j = 1; j <= MAPWIDTH; j++)
-        {
+        for (j = 1; j <= MAPWIDTH; j++) {
             if (gridInfo[i][j] == 0)
                 fullFlag = 0;
             else
                 emptyFlag = 0;
         }
-        if (fullFlag)
-        {
-            for (j = 1; j <= MAPWIDTH; j++)
-            {
+        if (fullFlag) {
+            for (j = 1; j <= MAPWIDTH; j++) {
                 // 注意这里只转移以前的块，不包括最后一次落下的块（“撤销最后一步”）
                 trans[count][j] = gridInfo[i][j] == 1 ? 1 : 0;
                 gridInfo[i][j] = 0;
             }
             count++;
-        }
-        else if (emptyFlag)
-        {
+        } else if (emptyFlag) {
             maxHeight = i - 1;
             break;
-        }
-        else
-            for (j = 1; j <= MAPWIDTH; j++)
-            {
+        } else
+            for (j = 1; j <= MAPWIDTH; j++) {
                 gridInfo[i - count][j] =
                         gridInfo[i][j] > 0 ? 1 : gridInfo[i][j];
                 if (count)
@@ -75,12 +67,10 @@ void game_board::eliminate()
 
 
 // 颜色方还能否继续游戏
-INLINE bool game_board::canPut(int blockType)
-{
+INLINE bool game_board::canPut(int blockType) {
     for (int y = MAPHEIGHT; y >= 1; y--)
         for (int x = 1; x <= MAPWIDTH; x++)
-            for (int o = 0; o < 4; o++)
-            {
+            for (int o = 0; o < 4; o++) {
                 if (is_valid(blockType, x, y, o) && checkDirectDropTo(blockType, x, y, o))
                     return true;
             }
@@ -90,13 +80,13 @@ INLINE bool game_board::canPut(int blockType)
 
 tuple<int, int, int, int> game_board::get_decision(int ty) {
 
-    int  finalX(-1), finalY(-1), finalO(-1);
+    int finalX(-1), finalY(-1), finalO(-1);
     int minWeird = 2147483647;
     for (int y = 1; y <= MAPHEIGHT; y++)
         for (int x = 1; x <= MAPWIDTH; x++)
             for (int o = 0; o < 4; o++) {
                 if (is_valid(ty, x, y, o) &&
-                    is_on_ground(ty, x, y, o)&&
+                    is_on_ground(ty, x, y, o) &&
                     checkDirectDropTo(ty, x, y, o)) {
                     game_board copy(*this);
                     copy.place(ty, x, y, o);
@@ -111,6 +101,7 @@ tuple<int, int, int, int> game_board::get_decision(int ty) {
             }
     return tie(finalX, finalY, finalO, minWeird);
 }
+
 bool game_board::is_valid(int ty, int x, int y, int o) const {
 
     auto &shape = blockShape[ty];
@@ -128,15 +119,15 @@ bool game_board::is_valid(int ty, int x, int y, int o) const {
     }
     return true;
 }
-bool game_board::is_on_ground(int ty, int x, int y, int o) const
-{
+
+bool game_board::is_on_ground(int ty, int x, int y, int o) const {
     return is_valid(ty, x, y, o) && !is_valid(ty, x, y - 1, o);
 }
-bool game_board::place(int ty, int x, int y, int o)
-{
+
+bool game_board::place(int ty, int x, int y, int o) {
     if (!is_on_ground(ty, x, y, o))
         return false;
-    auto& shape = blockShape[ty];
+    auto &shape = blockShape[ty];
     int i, tmpX, tmpY;
     for (i = 0; i < 4; i++) {
         tmpX = x + shape[o][i].x;
@@ -145,6 +136,7 @@ bool game_board::place(int ty, int x, int y, int o)
     }
     return true;
 }
+
 /*
 
 bool element::rotation(const game_board& gb, int o) {
@@ -169,101 +161,107 @@ bool element::rotation(const game_board& gb, int o) {
  *
  * */
 int game_board::evaluate(int _curHeight) {
-    int tempGrid[MAPHEIGHT + 2][MAPWIDTH + 2] = {0};
+    bool blocks[MAPHEIGHT + 2][MAPWIDTH + 2] = {};
     for (int i = 0; i < MAPHEIGHT + 2; i++)
         for (int j = 0; j < MAPWIDTH + 2; j++)
-            tempGrid[i][j] = gridInfo[i][j];
-
-
-    int curHeight=_curHeight;
-    int maxHeight=0;
-    int elimCount = 0;
-    int rowDifference=0;
-    int columnDifference=0;
-    int holeCount=0;
-    int wellCount=0;
-
-    for (int i = 1; i <= MAPHEIGHT; i++) {
-        bool lineElimFlag = true;
-        for (int j = 1; j <= MAPWIDTH; j++)
-            if ((tempGrid[i][j] != 1) && (tempGrid[i][j] != 2))
-                lineElimFlag = false;
-        if (lineElimFlag) {
-            elimCount++;
-            for(int t=i;t<MAPHEIGHT;t++)
-                for(int j=1;j<=MAPWIDTH;j++) {
-                    tempGrid[t][j] = tempGrid[t][j + 1];
-                    tempGrid[t][j + 1] = 0;
+            blocks[i][j] = (gridInfo[i][j]>0);
+    int features[6];
+    fill(features, features + 6, 0);
+    //计算消去的行（第2维）
+    for (int i = 0; i < 20; i++) {
+        bool clearFlag = true;
+        for (int j = 0; j < 10; j++)
+            if (!blocks[i][j]) {
+                clearFlag = false;
+                break;
+            };
+        if (clearFlag) {
+            features[2]++;
+            for (int k = i; k < 19; k++)
+                for (int j = 0; j < 10; j++) {
+                    blocks[k][j] = blocks[k + 1][j];
+                    blocks[k + 1][j] = 0;
                 };
-        }
-    };
-
-
-    for(int i=1;i<=MAPHEIGHT;i++)
-        for(int j=1;j<MAPWIDTH;j++) {
-            if ((tempGrid[i][j] == 0) xor (tempGrid[i][j + 1] == 0))
-                rowDifference++;
-            if(tempGrid[i][j])
-                maxHeight=i;
         };
-
-    for(int j=1;j<=MAPWIDTH;j++)
-        for(int i=1;i<MAPHEIGHT;i++)
-            if((tempGrid[i][j]==0)xor(tempGrid[i+1][j]==0))
-                columnDifference++;
-
-    for(int j=1;j<=MAPWIDTH;j++){
-        bool startCount=false;
-        for(int i=MAPHEIGHT;i>=1;i--){
-            if(tempGrid[i][j])
-                startCount=true;
-            if(startCount&&(tempGrid[i][j]==0))
-                holeCount++;
-        }
+    };
+    //计算高度加权和（第0维）
+    for (int i = 0; i < 20; i++)
+        for (int j = 0; j < 10; j++)
+            if (blocks[i][j])
+                features[0] += i;
+    //计算洞的数目（第1维）
+    for (int i = 0; i < 19; i++) {
+        for (int j = 0; j < 10; j++)
+            if ((!blocks[i][j]) && (blocks[i + 1][j]))
+                features[1]++;
     }
-
-    for(int j=2;j<MAPWIDTH;j++) {
-        bool startCount=false;
-        for (int i = MAPHEIGHT; i >= 1; i--) {
-            if (tempGrid[i][j]) break;
-            if ((tempGrid[i][j - 1] == 0) && (tempGrid[i][j + 1] == 0)) startCount=true;
-            if(startCount) wellCount++;
-        }
+    //计算相邻高度差的平方（第3维）
+    int maxHeight[10];
+    for (int j = 0; j < 10; j++) {
+        for (maxHeight[j] = 19; maxHeight[j] >= 0; maxHeight[j]--)
+            if (blocks[maxHeight[j]][j])
+                break;
+        if (j > 0)
+            features[3] += (maxHeight[j] - maxHeight[j - 1]) * (maxHeight[j] - maxHeight[j - 1]);
     }
-    {
-        bool startCount=false;
-        for (int i = MAPHEIGHT; i >= 1; i--) {
-            if (tempGrid[i][1]) break;
-            if (tempGrid[i][2] == 0) startCount=true;
-            if(startCount) wellCount++;
-        }
+    features[3] += maxHeight[0] * maxHeight[0];
+    features[3] += maxHeight[10] * maxHeight[10];
+    //计算最深的井（第4维）
+    features[4] = 0;
+    for (int j = 1; j < 9; j++) {
+        for (int i = 19; i >= 0; i--)
+            if (blocks[i][j - 1] && blocks[i][j + 1] && (!blocks[i][j])) {
+                int curWell = 1;
+                for (int k = i - 1; k > 0; k--) {
+                    if (blocks[k][j]) break;
+                    curWell++;
+                };
+                if (curWell > features[4]) features[4] = curWell;
+                break;
+            }
     }
-
-    {
-        bool startCount=false;
-        for (int i = MAPHEIGHT; i >= 1; i--) {
-            if (tempGrid[i][MAPWIDTH]) break;
-            if (tempGrid[i][MAPWIDTH - 1] == 0) startCount=true;
-            if(startCount) wellCount++;
+    for (int i = 19; i >= 0; i--)
+        if (blocks[i][1] && (!blocks[i][0])) {
+            int curWell = 1;
+            for (int k = i - 1; k >= 0; k--) {
+                if (blocks[k][0]) break;
+                curWell++;
+            }
+            if (curWell > features[4]) features[4] = curWell;
+            break;
         }
+    for (int i = 19; i >= 0; i--)
+        if (blocks[i][8] && (!blocks[i][9])) {
+            int curWell = 1;
+            for (int k = i - 1; k >= 0; k--) {
+                if (blocks[k][9]) break;
+                curWell++;
+            }
+            if (curWell > features[4]) features[4] = curWell;
+            break;
+        }
+    //计算有洞的列计数（第5维）
+    features[5] = 0;
+    for (int j = 0; j < 10; j++) {
+        int flag = false;
+        for (int i = 0; i < maxHeight[j]; i++)
+            if (!blocks[i][j]) {
+                flag = true;
+                break;
+            }
+        if (flag) features[5]++;
     }
+    //以下操作是尽量保证规模上统一
+    features[1] *= 16;
+    features[2] *= 256;
+    features[4] *= 64;
+    features[5] *= 32;
 
-#define CUR_H_W 4500
-#define ELIM_C_W -5418
-#define ELIM_C_H_W -71
-#define ROW_DIFF_W 3218
-#define COL_DIFF_W 9439
-#define HOLE_C_W 7899
-#define WELL_C_W 3386
-
-    return
-            CUR_H_W*curHeight+
-            ELIM_C_W*elimCount+
-            (ELIM_C_H_W*maxHeight*maxHeight)*elimCount+
-            ROW_DIFF_W*rowDifference+
-            COL_DIFF_W*columnDifference+
-            HOLE_C_W*holeCount+
-            WELL_C_W*wellCount;
+    int weight[6]={3408, 2147, -281, 167, 1423, -26};
+    int ans=0;
+    for(int i=0;i<6;i++)
+        ans+=features[i]*weight[i];
+    return ans;
 
 
 }
