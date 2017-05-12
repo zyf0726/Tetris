@@ -15,7 +15,7 @@ class game_board
 // 代表分别向对方转移的行
     int trans[4][MAPWIDTH + 2] = {  };
 
-// 转移行数
+// 转移行g
     int transCount;
 
 // 运行eliminate后的当前高度

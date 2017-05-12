@@ -5,6 +5,15 @@
 #ifndef TETRIS_SHARED_H
 #define TETRIS_SHARED_H
 #include <iostream>
+#include <cassert>
+#include <cstdio>
+#include <thread>
+#include <condition_variable>
+#include <mutex>
+#include <atomic>
+#include <queue>
+#include <cstring>
+#include <vector>
 #include <tuple>
 #include <algorithm>
 #include <cstdlib>

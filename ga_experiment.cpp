@@ -13,13 +13,10 @@ Fitness:
 TotalLinesCleared*10-(TotalHeightIncreased*TotalHeightIncreased-RoundRemaining*RoundRemaining)
 
 */
-
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <cmath>
-#include <vector>
-#include <algorithm>
+#include "shared.h"
+#include<sys/socket.h>
+#include<unistd.h>
+#include<netinet/in.h>
 
 using namespace std;
 
@@ -37,16 +34,6 @@ const int popCrossPossible = 6; // 每6个只有一个能与某一个发生重�
 const int gameRound = 2500; // 每次实验的移动次数
 const int iterationCount = 1000000; // 迭代步数
 
-const int blockShape[7][4][8] = {
-        {{0, 0, 1,  0,  -1, 0,  -1, -1}, {0, 0, 0,  1,  0,  -1, 1,  -1}, {0, 0, -1, 0,  1,  0,  1,  1},  {0, 0, 0,  -1, 0,  1,  -1, 1}},
-        {{0, 0, -1, 0,  1,  0,  1,  -1}, {0, 0, 0,  -1, 0,  1,  1,  1},  {0, 0, 1,  0,  -1, 0,  -1, 1},  {0, 0, 0,  1,  0,  -1, -1, -1}},
-        {{0, 0, 1,  0,  0,  -1, -1, -1}, {0, 0, 0,  1,  1,  0,  1,  -1}, {0, 0, -1, 0,  0,  1,  1,  1},  {0, 0, 0,  -1, -1, 0,  -1, 1}},
-        {{0, 0, -1, 0,  0,  -1, 1,  -1}, {0, 0, 0,  -1, 1,  0,  1,  1},  {0, 0, 1,  0,  0,  1,  -1, 1},  {0, 0, 0,  1,  -1, 0,  -1, -1}},
-        {{0, 0, -1, 0,  0,  1,  1,  0},  {0, 0, 0,  -1, -1, 0,  0,  1},  {0, 0, 1,  0,  0,  -1, -1, 0},  {0, 0, 0,  1,  1,  0,  0,  -1}},
-        {{0, 0, 0,  -1, 0,  1,  0,  2},  {0, 0, 1,  0,  -1, 0,  -2, 0},  {0, 0, 0,  1,  0,  -1, 0,  -2}, {0, 0, -1, 0,  1,  0,  2,  0}},
-        {{0, 0, 0,  1,  -1, 0,  -1, 1},  {0, 0, -1, 0,  0,  -1, -1, -1}, {0, 0, 0,  -1, 1,  -0, 1,  -1}, {0, 0, 1,  0,  0,  1,  1,  1}}
-};
-
 //随机数生成器，可能要重写
 inline int get_int_random(int mod) {
     return rand() % mod;
@@ -54,21 +41,10 @@ inline int get_int_random(int mod) {
 
 class CBlock {
 public:
-    bool blocks[20][10];
-    int features[6];
+    bool blocks[20][10]{};
+    int features[6]{};
 
-    CBlock() {
-        memset(blocks, 0, sizeof(blocks));
-        memset(features, 0, sizeof(features));
-    };
 
-    CBlock(CBlock &another) {
-        for (int i = 0; i < 20; i++)
-            for (int j = 0; j < 10; j++)
-                blocks[i][j] = another.blocks[i][j];
-        for (int i = 0; i < 6; i++)
-            features[i] = another.features[i];
-    }
 
     void get_feature() {
         //获得特征
@@ -165,11 +141,11 @@ public:
 
     bool can_insert(int t, int x, int y, int o) {
         for (int i = 0; i < 4; i++) {
-            if (x + blockShape[t][o][2 * i] < 0) return false;
-            if (x + blockShape[t][o][2 * i] >= 20) return false;
-            if (y + blockShape[t][o][2 * i + 1] < 0) return false;
-            if (y + blockShape[t][o][2 * i + 1] >= 10) return false;
-            if (blocks[x + blockShape[t][o][2 * i]][y + blockShape[t][o][2 * i + 1]])
+            if (x + blockShape[t][o][i].x < 0) return false;
+            if (x + blockShape[t][o][i].x >= 20) return false;
+            if (y + blockShape[t][o][i].y < 0) return false;
+            if (y + blockShape[t][o][i].y >= 10) return false;
+            if (blocks[x + blockShape[t][o][i].x][y + blockShape[t][o][i].y])
                 return false;
         }
         return true;
@@ -181,8 +157,8 @@ public:
 
         // 判定合法性的还需要改正
         for (int i = 0; i < 4; i++) {
-            int curX = x + blockShape[t][o][2 * i];
-            int curY = y + blockShape[t][o][2 * i + 1];
+            int curX = x + blockShape[t][o][i].x;
+            int curY = y + blockShape[t][o][i].y;
             for (int h = curX; h < 20; h++)
                 if (blocks[h][curY])
                     return false;
@@ -192,7 +168,7 @@ public:
 
     void puts(int t, int x, int y, int o) {
         for (int i = 0; i < 4; i++)
-            blocks[x + blockShape[t][o][2 * i]][y + blockShape[t][o][2 * i + 1]] = true;
+            blocks[x + blockShape[t][o][i].x][y + blockShape[t][o][i].y] = true;
     }
 
     /*
@@ -270,117 +246,180 @@ public:
 bool cmp(const CGen &s1, const CGen &s2) {
     return s1.fitness > s2.fitness;
 }
+namespace network
+{
+    int ser_sockfd, cli_sockfd;
+    int err, n;
+    struct sockaddr_in ser_addr;
+    struct sockaddr_in cli_addr;
 
-int main() {
-    FILE* infp=fopen("input.txt","r");
-    FILE* fp=fopen("experiment.txt","w");
+    int init(uint16_t PORT)
+    {
+        ser_sockfd = socket(AF_INET, SOCK_STREAM, 0);
+        if (ser_sockfd == -1)
+        {
+            printf("socket error:%s\n",
+                   strerror(errno)
+            );
+            return -1;
+        }
 
-    int ttlPopulation;
+        bzero(&ser_addr,
+              sizeof(ser_addr));
+        ser_addr.
+                sin_family = AF_INET;
+        ser_addr.sin_addr.
+                s_addr = htonl(INADDR_ANY);
+        ser_addr.
+                sin_port = htons(PORT);
+        err = bind(ser_sockfd, (struct sockaddr *) &ser_addr, sizeof(ser_addr));
+        if (err == -1)
+        {
+            printf("bind error:%s\n",
+                   strerror(errno)
+            );
+            return -1;
+        }
 
-    //文件第一行：进行实验的种群规模
-    fscanf(infp,"%d",&ttlPopulation);
+        err = listen(ser_sockfd, 5);
+        if (err == -1)
+        {
+            printf("listen error\n");
+            return -1;
+        }
 
-    vector<CGen> popSet;
-    for (int i = 0; i < ttlPopulation; i++) {
-        CGen curGen;
-        for(int j=0;j<6;j++)
-            fscanf(infp,"%d",&curGen.weight[j]);
-        popSet.push_back(curGen);
+        printf("listen the port:\n");
+        return 0;
     }
 
+    FILE* open()
+    {
+        unsigned addlen = sizeof(struct sockaddr);
+        cli_sockfd = accept(ser_sockfd, (struct sockaddr *) &cli_addr, &addlen);
+        if (cli_sockfd == -1)
+        {
+            printf("accept error\n");
+        }
+        return fdopen(cli_sockfd, "r+b");
+    }
 
-    // 对每个待选估价进行俄罗斯方块试验
-    for (int popID = 0; popID < ttlPopulation; popID++) {
+    void final(){
+        close(ser_sockfd);
+    }
+}
+int main(int argc, char** argv) {
+    assert(argc == 2);
+    if (network::init(atoi(argv[1])) == -1) return -1;
+    int n = 1;
+    while (n < 50000000)
+    {
+        FILE* fp=network::open();
+        int ttlPopulation;
+
+        //文件第一行：进行实验的种群规模
+        fscanf(fp,"%d",&ttlPopulation);
+
+        vector<CGen> popSet;
+        for (int i = 0; i < ttlPopulation; i++) {
+            CGen curGen;
+            for(int j=0;j<6;j++)
+                fscanf(fp,"%d",&curGen.weight[j]);
+            popSet.push_back(curGen);
+        }
 
 
-        CBlock curBlock;
-        popSet[popID].fitness = 0;
-        popSet[popID].lineCleared = 0;
-        for (int curGame = 0; curGame < gameRound; curGame++) {
-            // 随机分配当前方块
-            int curTet = get_int_random(7);
-            // 枚举可能的位置，利用最佳的估价进行操作
-            int finalX, finalY, finalO = -1;
-            int bestEvaluate = -2147483648;
-            for (int x = 0; x < 20; x++)
-                for (int y = 0; y < 10; y++)
-                    for (int o = 0; o < 4; o++) {
-                        if (curBlock.is_valid(curTet, x, y, o)) {
-                            CBlock tempBlock(curBlock);
-                            tempBlock.puts(curTet, x, y, o);
-                            tempBlock.get_feature();
-                            int ee = popSet[popID].evaluate(tempBlock);
-                            if (ee > bestEvaluate) {
-                                finalX = x;
-                                finalY = y;
-                                finalO = o;
-                                bestEvaluate = ee;
+        // 对每个待选估价进行俄罗斯方块试验
+        for (int popID = 0; popID < ttlPopulation; popID++) {
+
+
+            CBlock curBlock;
+            popSet[popID].fitness = 0;
+            popSet[popID].lineCleared = 0;
+            for (int curGame = 0; curGame < gameRound; curGame++) {
+                // 随机分配当前方块
+                int curTet = get_int_random(7);
+                // 枚举可能的位置，利用最佳的估价进行操作
+                int finalX, finalY, finalO = -1;
+                int bestEvaluate = -2147483648;
+                for (int x = 0; x < 20; x++)
+                    for (int y = 0; y < 10; y++)
+                        for (int o = 0; o < 4; o++) {
+                            if (curBlock.is_valid(curTet, x, y, o)) {
+                                CBlock tempBlock(curBlock);
+                                tempBlock.puts(curTet, x, y, o);
+                                tempBlock.get_feature();
+                                int ee = popSet[popID].evaluate(tempBlock);
+                                if (ee > bestEvaluate) {
+                                    finalX = x;
+                                    finalY = y;
+                                    finalO = o;
+                                    bestEvaluate = ee;
+                                };
                             };
                         };
-                    };
 
-            //找不到合法位置
-            popSet[popID].lifeMove = curGame;
-            if (finalO == -1) {
-                popSet[popID].fitness -= (gameRound*gameRound - curGame*curGame);
-                break;
-            }
+                //找不到合法位置
+                popSet[popID].lifeMove = curGame;
+                if (finalO == -1) {
+                    popSet[popID].fitness -= (gameRound*gameRound - curGame*curGame);
+                    break;
+                }
 
-            //获得摆放之前的最大高度
-            int maxHeight = 0;
-            for (int i = 19; i >= 0; i--)
-                for (int j = 0; j < 10; j++)
-                    if (curBlock.blocks[i][j]) {
-                        maxHeight = i;
-                        goto mHend;
-                    }
-
-            mHend:
-
-            // 根据最佳的估价摆放方块
-            curBlock.puts(curTet, finalX, finalY, finalO);
-
-
-            //计算fitness函数
-            //统计高度增加量
-
-            int newMaxHeight = 0;
-            for (int i = 19; i >= 0; i--)
-                for (int j = 0; j < 10; j++)
-                    if (curBlock.blocks[i][j]) {
-                        newMaxHeight = i;
-                        goto mHend2;
-                    }
-            mHend2:
-            popSet[popID].fitness += (maxHeight - newMaxHeight<0)?maxHeight - newMaxHeight:0;
-
-            //统计消去的行数
-            for (int i = 0; i < 20; i++) {
-                bool lineClearFlag = true;
-                for (int j = 0; j < 10; j++)
-                    if (!curBlock.blocks[i][j]) {
-                        lineClearFlag = false;
-                        break;
-                    }
-                if (lineClearFlag) {
-                    popSet[popID].fitness += linesClearedReward;
-                    popSet[popID].lineCleared += 1;
-                    for (int k = i; k < 20; k++)
-                        for (int j = 0; j < 10; j++) {
-                            curBlock.blocks[k][j] = (k == 19) ? false : curBlock.blocks[k + 1][j];
-                            if (k != 19) curBlock.blocks[k + 1][j] = false;
+                //获得摆放之前的最大高度
+                int maxHeight = 0;
+                for (int i = 19; i >= 0; i--)
+                    for (int j = 0; j < 10; j++)
+                        if (curBlock.blocks[i][j]) {
+                            maxHeight = i;
+                            goto mHend;
                         }
+
+                mHend:
+
+                // 根据最佳的估价摆放方块
+                curBlock.puts(curTet, finalX, finalY, finalO);
+
+
+                //计算fitness函数
+                //统计高度增加量
+
+                int newMaxHeight = 0;
+                for (int i = 19; i >= 0; i--)
+                    for (int j = 0; j < 10; j++)
+                        if (curBlock.blocks[i][j]) {
+                            newMaxHeight = i;
+                            goto mHend2;
+                        }
+                mHend2:
+                popSet[popID].fitness += (maxHeight - newMaxHeight<0)?maxHeight - newMaxHeight:0;
+
+                //统计消去的行数
+                for (int i = 0; i < 20; i++) {
+                    bool lineClearFlag = true;
+                    for (int j = 0; j < 10; j++)
+                        if (!curBlock.blocks[i][j]) {
+                            lineClearFlag = false;
+                            break;
+                        }
+                    if (lineClearFlag) {
+                        popSet[popID].fitness += linesClearedReward;
+                        popSet[popID].lineCleared += 1;
+                        for (int k = i; k < 20; k++)
+                            for (int j = 0; j < 10; j++) {
+                                curBlock.blocks[k][j] = (k == 19) ? false : curBlock.blocks[k + 1][j];
+                                if (k != 19) curBlock.blocks[k + 1][j] = false;
+                            }
+                    }
                 }
             }
         }
+
+        //输出实验结果
+        for(int i=0;i<ttlPopulation;i++){
+            fprintf(fp,"%d %d %d\n",popSet[i].lifeMove,popSet[i].lineCleared,popSet[i].fitness);
+        }
+        fflush(fp);
+        fclose(fp);
     }
-
-    //输出实验结果
-    for(int i=0;i<ttlPopulation;i++){
-        for(int j=0;j<6;j++)
-            fprintf(fp,"%d ",popSet[i].weight[i]);
-        fprintf(fp,"%d %d %d\n",popSet[i].lifeMove,popSet[i].lineCleared,popSet[i].fitness);
-
-
-    }
+    network::final();
 }

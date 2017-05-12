@@ -278,12 +278,13 @@ int main() {
         popSet.push_back(CGen(1));
 
     // 主迭代
-    for (int iteration = 0; iteration < iterationCount; iteration++) {
+    for (int iteration = 0; iteration < iterationCount; iteration++)
+    {
 
         // 对每个待选估价进行俄罗斯方块试验
         printf("Iteration #%d:\n", iteration);
-        for (int popID = 0; popID < populationMax; popID++) {
-
+        for (int popID = 0; popID < populationMax; popID++)
+        {
 
             CBlock curBlock;
             popSet[popID].fitness = 0;
