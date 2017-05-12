@@ -95,12 +95,6 @@ public:
             for (int j = 0; j < 10; j++)
                 if (blocks[i][j])
                     features[0] += i;
-        //计算洞的数目（第1维）
-        for (int i = 0; i < 19; i++) {
-            for (int j = 0; j < 10; j++)
-                if ((!blocks[i][j]) && (blocks[i + 1][j]))
-                    features[1]++;
-        }
         //计算相邻高度差的平方（第3维）
         int maxHeight[10];
         for (int j = 0; j < 10; j++) {
@@ -112,6 +106,12 @@ public:
         }
         features[3] += maxHeight[0] * maxHeight[0];
         features[3] += maxHeight[10] * maxHeight[10];
+        //计算洞的数目（第1维）
+        for (int j = 0; j < 10; j++) {
+            for (int i = 0; i < maxHeight[i]; i++)
+                if (!blocks[i][j])
+                    features[1]++;
+        }
         //计算最深的井（第4维）
         features[4] = 0;
         for (int j = 1; j < 9; j++) {
