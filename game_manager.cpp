@@ -91,7 +91,7 @@ int game_manager::worst_for_enemy(int player)
 
     vector<tuple<int, int> > de; de.reserve(8);
     for (int i = 0; i < 7; ++i)
-        if (count[i] < M || m >= M - 2)
+        if (count[i] < M || m > M - 2)
         {
             int x, y, o, w; tie(x, y, o, w) = game_board(gb[!player]).get_decision(i);
             de.emplace_back(w, i);

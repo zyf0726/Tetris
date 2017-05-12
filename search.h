@@ -1,5 +1,5 @@
 #pragma once
-#ifndef SINGLE_FILE
+#ifndef SINGLEFILE
 #include "shared.h"
-#endif //TETRIS_SEARCH_H
+#endif
 
