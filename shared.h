@@ -5,12 +5,13 @@
 #ifndef TETRIS_SHARED_H
 #define TETRIS_SHARED_H
 #include <iostream>
+#include <tuple>
+#include <algorithm>
 #include <cstdlib>
 #include <random>
 using namespace std;
-#define MAPWIDTH 10
-#define MAPHEIGHT 20
-extern int gridInfo[2][MAPHEIGHT + 2][MAPWIDTH + 2];
+constexpr int MAPWIDTH =  10;
+constexpr int  MAPHEIGHT =  20;
 
 constexpr int blockShape[7][4][8] = {
         { { 0,0,1,0,-1,0,-1,-1 },{ 0,0,0,1,0,-1,1,-1 },{ 0,0,-1,0,1,0,1,1 },{ 0,0,0,-1,0,1,-1,1 } },

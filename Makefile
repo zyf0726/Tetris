@@ -1,2 +1,4 @@
-Submit.cc: main.cpp main.h Tetris.cpp Tetris.h util.cpp util.h shared.h
-	cat S.h shared.h main.h Tetris.h util.h  main.cpp Tetris.cpp  util.cpp > Submit.cc
+$(headers) = shared.h   game_board.h game_manager.h search.h main.h
+$(imp_files) = main.cpp  game_manager.cpp game_board.cpp search.cpp main.cpp
+Submit.cc: $(headers) $(imp_files)
+    cat S.h $(headers) $(imp_files) > Submit.cc

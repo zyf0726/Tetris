@@ -1,15 +1,10 @@
-//
-// Created by prwang on 2017/4/22.
-//
-
+#pragma once
 #ifndef TETRIS_MAIN_H
 #define TETRIS_MAIN_H
 
 #ifndef SINGLEFILE
 #include "shared.h"
+#include "game_manager.h"
 #endif
-
-#define MAPWIDTH 10
-#define MAPHEIGHT 20
 
 #endif //TETRIS_MAIN_H
