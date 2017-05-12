@@ -95,17 +95,15 @@ public:
             for (int j = 0; j < 10; j++)
                 if (blocks[i][j])
                     features[0] += i;
-        //计算相邻高度差的平方（第3维）
+        //计算相邻高度差（第3维）
         int maxHeight[10];
         for (int j = 0; j < 10; j++) {
             for (maxHeight[j] = 19; maxHeight[j] >= 0; maxHeight[j]--)
                 if (blocks[maxHeight[j]][j])
                     break;
             if (j > 0)
-                features[3] += (maxHeight[j] - maxHeight[j - 1]) * (maxHeight[j] - maxHeight[j - 1]);
+                features[3] += abs(maxHeight[j] - maxHeight[j - 1]);
         }
-        features[3] += maxHeight[0] * maxHeight[0];
-        features[3] += maxHeight[10] * maxHeight[10];
         //计算洞的数目（第1维）
         for (int j = 0; j < 10; j++) {
             for (int i = 0; i < maxHeight[i]; i++)
@@ -160,6 +158,7 @@ public:
         //以下操作是尽量保证规模上统一
         features[1] *= 16;
         features[2] *= 256;
+        features[3] *= 128;
         features[4] *= 64;
         features[5] *= 32;
     }
