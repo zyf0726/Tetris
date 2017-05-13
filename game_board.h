@@ -11,15 +11,15 @@ class game_board
     // 颜色方还能否继续游戏
     INLINE bool canPut(int blockType);
 
-    int gridInfo[MAPHEIGHT + 2][MAPWIDTH + 2] = {};
+    sbyte gridInfo[MAPHEIGHT + 2][MAPWIDTH + 2] = {};
 // 代表分别向对方转移的行
-    int trans[4][MAPWIDTH + 2] = {  };
+    sbyte trans[4][MAPWIDTH + 2] = {  };
 
 // 转移行g
-    int transCount;
+    sbyte transCount;
 
 // 运行eliminate后的当前高度
-    int maxHeight;
+    sbyte maxHeight;
 
 // 总消去行数的分数之和
     int elimTotal;
@@ -29,7 +29,7 @@ public:
     // 消去行
     INLINE void eliminate();
     // 转移双方消去的行，返回-1表示继续，否则返回输者
-    INLINE int evaluate(int);
+    INLINE int evaluate();
     // 判断当前位置是否合法
     INLINE bool is_valid(int ty, int x, int y, int o) const ;
     INLINE bool is_on_ground(int ty, int x, int y, int o) const ;
