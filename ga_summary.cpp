@@ -25,8 +25,8 @@ const int linesClearedReward=10;
 /*
  * 以下常量用于遗传算法
  * */
-const int populationMax = 2000; // 种群规模
-const int split_size = 800;
+const int populationMax = 3200; // 种群规模
+const int split_size = 25;
 const int popRemainRankPercent = 4; // 前4%名完全保留，不发生突变
 const int popAbandonRankPercent = 70; // 没进前70%的全部淘汰
 const int popMutationPossible = 8; // 每8个只有一个能发生变异
@@ -67,7 +67,7 @@ public:
         for (int i = 0; i < featureDimensions; i++)
             squareSum += weight[i] * weight[i];
         for (int i = 0; i < featureDimensions; i++) {
-            weight[i] = int(10000 * (weight[i] / sqrt(double(squareSum)))) - 5000;
+            weight[i] = int(10000 * (weight[i] / sqrt(double(squareSum))));
         }
     }
 
@@ -78,11 +78,12 @@ public:
         if (_in == 1) {
             int squareSum = 0;
             for (int i = 0; i < featureDimensions; i++) {
-                weight[i] = get_int_random(7031);
+                weight[i] = get_int_random(70313);
                 squareSum += weight[i] * weight[i];
             }
             for (int i = 0; i < featureDimensions; i++) {
-                weight[i] = int(10000 * (weight[i] / sqrt(double(squareSum)))) - 5000;
+                weight[i] = int(10000 * (weight[i] / sqrt(double(squareSum))));
+                if(i==2) weight[i]=-weight[i];
             }
         }
     }
