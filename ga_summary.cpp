@@ -83,7 +83,7 @@ public:
             }
             for (int i = 0; i < featureDimensions; i++) {
                 weight[i] = int(10000 * (weight[i] / sqrt(double(squareSum))));
-                if(i==2) weight[i]=-weight[i];
+                if(i!=2) weight[i]=-weight[i];
             }
         }
     }
