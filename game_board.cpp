@@ -165,8 +165,8 @@ int game_board::evaluate() {
     for (int i = 0; i < MAPHEIGHT ; i++)
         for (int j = 0; j < MAPWIDTH ; j++)
             blocks[i][j] = (gridInfo[i + 1][j + 1]>0);
-    int features[6];
-    fill(features, features + 6, 0);
+    int features[7];
+    fill(features, features + 7, 0);
     //计算消去的行（第2维）
     for (int i = 0; i < 20; i++) {
         bool clearFlag = true;
@@ -249,16 +249,23 @@ int game_board::evaluate() {
             }
         if (flag) features[5]++;
     }
+    features[6]=0;
+    for (int j=0;j<10;j++){
+        if(maxHeight[j]>features[6])
+            features[6]=maxHeight[j];
+    }
+    features[6]*=features[6];
     //以下操作是尽量保证规模上统一
     features[1] *= 16;
     features[2] *= 256;
     features[3] *= 128;
     features[4] *= 64;
     features[5] *= 32;
+    features[6] *= 4;
 
-    int weight[6]={3408, 2147, -281, 167, 1423, -26};
+    int weight[7]={3408, 2147, -281, 167, 1423, 126,224};
     int ans=0;
-    for(int i=0;i<6;i++)
+    for(int i=0;i<7;i++)
         ans+=features[i]*weight[i];
     return ans;
 

@@ -34,9 +34,11 @@ const int popCrossPossible = 7; // 每6个只有一个能与某一个发生重�
 const int gameRound = 2500; // 每次实验的移动次数
 const int iterationCount = 1000000; // 迭代步数
 
+#include <random>
+mt19937 RAND((random_device())());
 //随机数生成器，可能要重写
 inline int get_int_random(int mod) {
-    return rand() % mod;
+    return RAND() % mod;
 }
 
 class CBlock {
