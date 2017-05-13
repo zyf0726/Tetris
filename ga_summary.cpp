@@ -205,7 +205,7 @@ void satellite_interface(sockaddr_in subject, Iter begin, Iter end)
         throw 233;
     }
     int n = end - begin;
-    send(sockfd, &n, 4, MSG_CONFIRM);
+    send(sockfd, &n, 4, 0);
 
     unique_ptr<int> buf(new int[n * 6]);
     int cnt = 0;
@@ -215,13 +215,11 @@ void satellite_interface(sockaddr_in subject, Iter begin, Iter end)
             buf.get()[cnt + j] =  x->weight[j];
         cnt += 6;
     }
-    send(sockfd, buf.get(), sizeof(int) * n * 6, MSG_CONFIRM);
+    send(sockfd, buf.get(), sizeof(int) * n * 6, 0);
     recv(sockfd, buf.get(), sizeof(int) * n * 3, MSG_WAITALL);
     cnt = 0;
     for (Iter x = begin; x != end; ++x)
     {
-        //FIXME fp eof!难道是关闭了socket这里才进来?
-        //TODO 改成二进制以及send/recv试试
         x->lifeMove = buf.get()[cnt];
         x->lineCleared = buf.get()[cnt + 1];
         x->fitness = buf.get()[cnt + 2];
