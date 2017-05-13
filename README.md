@@ -9,9 +9,11 @@
 * 确定估价函数
 
 catch: pw384已完成
+* 重写
+
+catch: include<Tetris-ea>
 
 * 加入搜索
-* 重写Tetris和util
 
 ## 估价函数第一次实验
 

@@ -23,6 +23,12 @@
 using namespace std;
 constexpr int MAPWIDTH =  10;
 constexpr int  MAPHEIGHT =  20;
+
+#define N_FEATURES 32
+
+#define BOARD_WIDTH 10
+#define BOARD_HEIGHT 20
+
 constexpr int featureDimensions = 7;
 struct __cord { int x, y; };
 constexpr __cord blockShape[7][4][4] = {
@@ -44,7 +50,7 @@ constexpr int blockHeight[7][4]={
         {2,0,1,0},
         {1,0,0,1}
 };
-
+extern mt19937_64 RAND;
 constexpr int elimBonus[4] = { 1, 3, 5, 7 };
 typedef unsigned char ubyte;
 typedef signed char sbyte;

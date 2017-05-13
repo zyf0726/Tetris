@@ -77,30 +77,30 @@ vector<CGen> round( vector<CGen> popSet, FILE* fp = stdout){
         int curLuck = get_int_random(popMutationPossible * 10);
         //发生突变
         if (curLuck < 10) {
-            CGen tempPop(popSet[i]);
+            CGen tPop(popSet[i]);
             int changeFeature = get_int_random(featureDimensions);
-            tempPop.weight[changeFeature] += get_int_random(1000) - 500;
-            tempPop.unit();
-            nextPopSet.push_back(tempPop);
+            tPop.weight[changeFeature] += get_int_random(1000) - 500;
+            tPop.unit();
+            nextPopSet.push_back(tPop);
         }
         curLuck = get_int_random(popCrossPossible * 10);
         //发生交叉遗传
         if (curLuck < 10) {
-            CGen tempPop(popSet[i]);
+            CGen tPop(popSet[i]);
             int rawGen = get_int_random(popAbandonRank);
             for (int featureID = 0; featureID < featureDimensions; featureID++) {
                 int featureChange = get_int_random(2);
                 if (featureChange == 1) {
-                    tempPop.weight[featureID] = popSet[rawGen].weight[featureID];
+                    tPop.weight[featureID] = popSet[rawGen].weight[featureID];
                 }
             }
-            tempPop.unit();
-            nextPopSet.push_back(tempPop);
+            tPop.unit();
+            nextPopSet.push_back(tPop);
         }
     }
 
     //更新估价集合
-    for (int i = nextPopSet.size(); i < populationMax; i++)
+    for (int i = (int)nextPopSet.size(); i < populationMax; i++)
         nextPopSet.push_back(CGen(1));
     if (nextPopSet.size() > populationMax) nextPopSet.resize(populationMax);
     popSet = nextPopSet;
@@ -125,11 +125,11 @@ vector<CGen> round( vector<CGen> popSet, FILE* fp = stdout){
     //输出本轮迭代的信息
     printf("\nThe best one in current iteration provides weight:\n");
     for (int i = 0; i < featureDimensions; i++)
-        printf("%d ", nextPopSet[0].weight[i]);
+        printf("%.0f ", nextPopSet[0].weight[i]);
     printf("\n");
-    printf("Its fitness is %d\n", nextPopSet[0].fitness);
-    printf("Its life time is %d\n", nextPopSet[0].lifeMove);
-    printf("The number of lines it cleared is %d\n", nextPopSet[0].lineCleared);
+    printf("Its fitness is %.0f\n", nextPopSet[0].fitness);
+    printf("Its life time is %.0f\n", nextPopSet[0].lifeMove);
+    printf("The number of lines it cleared is %.0f\n", nextPopSet[0].lineCleared);
     return nextPopSet;
 }
 struct queue_t

@@ -7,7 +7,6 @@
 
 int currBotColor;
 int enemyColor;
-mt19937 RAND((random_device()) ());
 
 
 
