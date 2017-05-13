@@ -40,54 +40,8 @@ mt19937 RAND((random_device())());
 inline int get_int_random(int mod) {
     return RAND() % mod;
 }
-class CGen {
-public:
-    double weight[featureDimensions]; // 权重
-    int fitness; // 评价函数
-    int lineCleared; // 仅用于输出
-    int lifeMove; // 仅用于输出
 
-    CGen() {
-        memset(weight, 0, sizeof(weight));
-        fitness = 0;
-    }
-
-    CGen(const CGen &another) {
-        fitness = another.fitness;
-        lineCleared = another.lineCleared;
-        lifeMove = another.lifeMove;
-        for (int i = 0; i < featureDimensions; i++)
-            weight[i] = another.weight[i];
-    }
-
-    void unit() {
-        // 单位化
-
-        double squareSum = 0;
-        for (int i = 0; i < featureDimensions; i++)
-            squareSum += weight[i] * weight[i];
-        for (int i = 0; i < featureDimensions; i++) {
-            weight[i] = 1000 * (weight[i] / sqrt(squareSum));
-        }
-    }
-
-    CGen(int _in) {
-        // 用于产生新的物种
-
-        fitness = lineCleared = lifeMove = 0;
-        if (_in == 1) {
-            double squareSum = 0;
-            for (int i = 0; i < featureDimensions; i++) {
-                weight[i] = get_int_random(7031);
-                squareSum += weight[i] * weight[i];
-            }
-            for (int i = 0; i < featureDimensions; i++) {
-                weight[i] = 1000 * (weight[i] / sqrt(squareSum));
-                if(i!=2) weight[i]=-weight[i];
-            }
-        }
-    }
-};
+#include "CGen.h"
 
 bool cmp(const CGen &s1, const CGen &s2) {
     return s1.fitness > s2.fitness;
@@ -154,17 +108,17 @@ vector<CGen> round( vector<CGen> popSet, FILE* fp = stdout){
     //输出本轮迭代的信息
     printf("\nThe best one in current iteration provides weight:\n");
     for (int i = 0; i < featureDimensions; i++)
-        printf("%d ", nextPopSet[0].weight[i]);
+        printf("%.0f ", nextPopSet[0].weight[i]);
     printf("\n");
-    printf("Its fitness is %d\n", nextPopSet[0].fitness);
-    printf("Its life time is %d\n", nextPopSet[0].lifeMove);
-    printf("The number of lines it cleared is %d\n", nextPopSet[0].lineCleared);
+    printf("Its fitness is %.0f\n", nextPopSet[0].fitness);
+    printf("Its life time is %.0f\n", nextPopSet[0].lifeMove);
+    printf("The number of lines it cleared is %.0f\n", nextPopSet[0].lineCleared);
 
     //输出本轮迭代最优者
     for(int i=0;i<popRemainRank;i++) {
         for (int j = 0; j < featureDimensions; j++)
-            fprintf(fp, "%d ", nextPopSet[i].weight[j]);
-        fprintf(fp, "%d %d\n", nextPopSet[i].lifeMove, nextPopSet[i].lineCleared);
+            fprintf(fp, "%.0f ", nextPopSet[i].weight[j]);
+        fprintf(fp, "%.0f %.0f\n", nextPopSet[i].lifeMove, nextPopSet[i].lineCleared);
         fflush(fp);
     }
 

@@ -195,65 +195,7 @@ public:
      */
 };
 
-class CGen {
-public:
-    double weight[featureDimensions]; // 权重
-    int fitness; // 评价函数
-    int lineCleared; // 仅用于输出
-    int lifeMove; // 仅用于输出
-
-    CGen() {
-        memset(weight, 0, sizeof(weight));
-        fitness = 0;
-    }
-
-    CGen(const CGen &another) {
-        fitness = another.fitness;
-        lineCleared = another.lineCleared;
-        lifeMove = another.lifeMove;
-        for (int i = 0; i < featureDimensions; i++)
-            weight[i] = another.weight[i];
-    }
-
-    void unit() {
-        // 单位化
-
-        double squareSum = 0;
-        for (int i = 0; i < featureDimensions; i++)
-            squareSum += weight[i] * weight[i];
-        for (int i = 0; i < featureDimensions; i++) {
-            weight[i] = 1000 * (weight[i] / sqrt(squareSum));
-        }
-    }
-
-    CGen(int _in) {
-        // 用于产生新的物种
-
-        fitness = lineCleared = lifeMove = 0;
-        if (_in == 1) {
-            double squareSum = 0;
-            for (int i = 0; i < featureDimensions; i++) {
-                weight[i] = get_int_random(7031);
-                squareSum += weight[i] * weight[i];
-            }
-            for (int i = 0; i < featureDimensions; i++) {
-                weight[i] = 1000 * (weight[i] / sqrt(squareSum));
-                if(i!=2) weight[i]=-weight[i];
-            }
-        }
-    }
-
-
-    int evaluate(CBlock &tempBlock) {
-        // 获得估价
-
-        tempBlock.get_feature();
-        double ans = 0;
-        for (int i = 0; i < featureDimensions; i++)
-            ans += weight[i] * tempBlock.features[i];
-        return int(ans);
-    }
-};
+#include "CGen.h"
 
 bool cmp(const CGen &s1, const CGen &s2) {
     return s1.fitness > s2.fitness;
@@ -326,8 +268,8 @@ int main(int argc, char** argv) {
         recv(fd, &ttlPopulation, 4, MSG_WAITALL);
 
         vector<CGen> popSet;
-        unique_ptr<int> buf (new int[ttlPopulation * featureDimensions]);
-        recv(fd, (void*)buf.get(), ttlPopulation * 4 * featureDimensions, MSG_WAITALL);
+        unique_ptr<double> buf (new double[ttlPopulation * featureDimensions]);
+        recv(fd, (void*)buf.get(), ttlPopulation * sizeof(double) * featureDimensions, MSG_WAITALL);
 
         for (int i = 0; i < ttlPopulation; i++) {
             CGen curGen;
@@ -348,7 +290,7 @@ int main(int argc, char** argv) {
                 int curTet = get_int_random(7);
                 // 枚举可能的位置，利用最佳的估价进行操作
                 int finalX, finalY, finalO = -1;
-                int bestEvaluate = -2147483648;
+                double bestEvaluate = -DBL_MAX;
                 for (int x = 0; x < 20; x++)
                     for (int y = 0; y < 10; y++)
                         for (int o = 0; o < 4; o++) {
@@ -356,7 +298,7 @@ int main(int argc, char** argv) {
                                 CBlock tempBlock(curBlock);
                                 tempBlock.puts(curTet, x, y, o);
                                 tempBlock.get_feature();
-                                int ee = popSet[popID].evaluate(tempBlock);
+                                double ee = popSet[popID].evaluate(tempBlock);
                                 if (ee > bestEvaluate) {
                                     finalX = x;
                                     finalY = y;
@@ -429,7 +371,7 @@ int main(int argc, char** argv) {
             buf.get()[i * 3 + 1] = popSet[i].lineCleared;
             buf.get()[i * 3 + 2] = popSet[i].fitness;
         }
-        send(fd, (void*)buf.get(), ttlPopulation * 3 * 4, 0);
+        send(fd, (void*)buf.get(), ttlPopulation * 3 * sizeof(double), 0);
         close(fd);
     }
     network::final();

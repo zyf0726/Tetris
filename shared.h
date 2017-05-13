@@ -17,6 +17,8 @@
 #include <tuple>
 #include <algorithm>
 #include <cstdlib>
+#include <climits>
+#include <cfloat>
 #include <random>
 using namespace std;
 constexpr int MAPWIDTH =  10;
