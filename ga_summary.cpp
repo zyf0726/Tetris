@@ -26,7 +26,7 @@ const int linesClearedReward=10;
  * 以下常量用于遗传算法
  * */
 const int populationMax = 3200; // 种群规模
-const int split_size = 25;
+const int split_size = 50;
 const int popRemainRankPercent = 4; // 前4%名完全保留，不发生突变
 const int popAbandonRankPercent = 70; // 没进前70%的全部淘汰
 const int popMutationPossible = 8; // 每8个只有一个能发生变异
@@ -42,7 +42,7 @@ inline int get_int_random(int mod) {
 }
 class CGen {
 public:
-    int weight[featureDimensions]; // 权重
+    double weight[featureDimensions]; // 权重
     int fitness; // 评价函数
     int lineCleared; // 仅用于输出
     int lifeMove; // 仅用于输出
@@ -63,11 +63,11 @@ public:
     void unit() {
         // 单位化
 
-        int squareSum = 0;
+        double squareSum = 0;
         for (int i = 0; i < featureDimensions; i++)
             squareSum += weight[i] * weight[i];
         for (int i = 0; i < featureDimensions; i++) {
-            weight[i] = int(10000 * (weight[i] / sqrt(double(squareSum))));
+            weight[i] = 1000 * (weight[i] / sqrt(squareSum));
         }
     }
 
@@ -76,13 +76,13 @@ public:
 
         fitness = lineCleared = lifeMove = 0;
         if (_in == 1) {
-            int squareSum = 0;
+            double squareSum = 0;
             for (int i = 0; i < featureDimensions; i++) {
-                weight[i] = get_int_random(70313);
+                weight[i] = get_int_random(7031);
                 squareSum += weight[i] * weight[i];
             }
             for (int i = 0; i < featureDimensions; i++) {
-                weight[i] = int(10000 * (weight[i] / sqrt(double(squareSum))));
+                weight[i] = 1000 * (weight[i] / sqrt(squareSum));
                 if(i!=2) weight[i]=-weight[i];
             }
         }
@@ -106,6 +106,18 @@ vector<CGen> round( vector<CGen> popSet, FILE* fp = stdout){
     for (int i = 0; i < popAbandonRank; i++)
         nextPopSet.push_back(popSet[i]);
 
+    // 表现最好的取平均值加入（前n名的平均值都加，n=1,2,...）
+    CGen tempPop;
+    tempPop.lineCleared=tempPop.fitness=0;
+    for (int i=0;i<popRemainRank;i++){
+        for(int j=0;j<featureDimensions;j++)
+            tempPop.weight[j]+=popSet[i].weight[j];
+        CGen curPop(tempPop);
+        for(int j=0;j<featureDimensions;j++)
+            curPop.weight[j]/=(i+1);
+        nextPopSet.push_back(curPop);
+    }
+
     // 表现不是最好也不是最差的有机会发生突变
     for (int i = popRemainRank; i < popAbandonRank; i++) {
         int curLuck = get_int_random(popMutationPossible * 10);
@@ -113,7 +125,7 @@ vector<CGen> round( vector<CGen> popSet, FILE* fp = stdout){
         if (curLuck < 10) {
             CGen tempPop(popSet[i]);
             int changeFeature = get_int_random(featureDimensions);
-            tempPop.weight[changeFeature] += get_int_random(2000) - 1000;
+            tempPop.weight[changeFeature] += get_int_random(1000) - 500;
             tempPop.unit();
             nextPopSet.push_back(tempPop);
         }

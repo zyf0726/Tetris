@@ -197,7 +197,7 @@ public:
 
 class CGen {
 public:
-    int weight[featureDimensions]; // 权重
+    double weight[featureDimensions]; // 权重
     int fitness; // 评价函数
     int lineCleared; // 仅用于输出
     int lifeMove; // 仅用于输出
@@ -218,11 +218,11 @@ public:
     void unit() {
         // 单位化
 
-        int squareSum = 0;
+        double squareSum = 0;
         for (int i = 0; i < featureDimensions; i++)
             squareSum += weight[i] * weight[i];
         for (int i = 0; i < featureDimensions; i++) {
-            weight[i] = int(10000 * (weight[i] / sqrt(double(squareSum)))) - 5000;
+            weight[i] = 1000 * (weight[i] / sqrt(squareSum));
         }
     }
 
@@ -231,25 +231,27 @@ public:
 
         fitness = lineCleared = lifeMove = 0;
         if (_in == 1) {
-            int squareSum = 0;
+            double squareSum = 0;
             for (int i = 0; i < featureDimensions; i++) {
                 weight[i] = get_int_random(7031);
                 squareSum += weight[i] * weight[i];
             }
             for (int i = 0; i < featureDimensions; i++) {
-                weight[i] = int(10000 * (weight[i] / sqrt(double(squareSum)))) - 5000;
+                weight[i] = 1000 * (weight[i] / sqrt(squareSum));
+                if(i!=2) weight[i]=-weight[i];
             }
         }
     }
+
 
     int evaluate(CBlock &tempBlock) {
         // 获得估价
 
         tempBlock.get_feature();
-        int ans = 0;
+        double ans = 0;
         for (int i = 0; i < featureDimensions; i++)
             ans += weight[i] * tempBlock.features[i];
-        return ans;
+        return int(ans);
     }
 };
 
