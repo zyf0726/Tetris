@@ -31,7 +31,7 @@ bool game_board::checkDirectDropTo(int blockType, int x, int y, int o) {
 
 // 消去行
 void game_board::eliminate() {
-    int &count = transCount = 0;
+    sbyte &count = transCount = 0;
     int i, j, emptyFlag, fullFlag;
     maxHeight = MAPHEIGHT;
     for (i = 1; i <= MAPHEIGHT; i++) {
@@ -90,7 +90,7 @@ tuple<int, int, int, int> game_board::get_decision(int ty) {
                     checkDirectDropTo(ty, x, y, o)) {
                     game_board copy(*this);
                     copy.place(ty, x, y, o);
-                    int currWeird = copy.evaluate(y + blockHeight[ty][o]);
+                    int currWeird = copy.evaluate();
                     if (currWeird < minWeird) {
                         finalX = x;
                         finalY = y;
@@ -160,7 +160,7 @@ bool element::rotation(const game_board& gb, int o) {
 }
  *
  * */
-int game_board::evaluate(int _curHeight) {
+int game_board::evaluate() {
     bool blocks[MAPHEIGHT][MAPWIDTH] = {};
     for (int i = 0; i < MAPHEIGHT ; i++)
         for (int j = 0; j < MAPWIDTH ; j++)
