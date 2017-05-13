@@ -50,6 +50,13 @@ constexpr int blockHeight[7][4]={
         {2,0,1,0},
         {1,0,0,1}
 };
+
+enum selection {
+    TOURNAMENT,
+    SUS,
+    SIGMA,
+};
+
 extern mt19937_64 RAND;
 constexpr int elimBonus[4] = { 1, 3, 5, 7 };
 typedef unsigned char ubyte;

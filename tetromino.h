@@ -9,6 +9,7 @@ struct tetromino {
 
     uint16_t lines[4];
 };
+extern tetromino tetrominos[19];
 struct t_last_placement {
     struct tetromino * tetromino;
     int x;

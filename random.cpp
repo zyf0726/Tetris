@@ -17,6 +17,5 @@ float f_rand (struct options * opt) {
     return (std::uniform_real_distribution<float>()).operator()(RAND);
 }
 
-int seed () { }
 mt19937_64 RAND((random_device())());
 void initalize_rng (struct options* ) { }
