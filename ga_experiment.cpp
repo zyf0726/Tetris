@@ -30,7 +30,7 @@ const int populationMax = 2000; // 种群规模
 const int popRemainRankPercent = 4; // 前4%名完全保留，不发生突变
 const int popAbandonRankPercent = 70; // 没进前70%的全部淘汰
 const int popMutationPossible = 8; // 每8个只有一个能发生变异
-const int popCrossPossible = 6; // 每6个只有一个能与某一个发生重组
+const int popCrossPossible = 7; // 每6个只有一个能与某一个发生重组
 const int gameRound = 2500; // 每次实验的移动次数
 const int iterationCount = 1000000; // 迭代步数
 
@@ -42,13 +42,14 @@ inline int get_int_random(int mod) {
 class CBlock {
 public:
     bool blocks[20][10]{};
-    int features[6]{};
+    int features[featureDimensions]{};
 
 
 
     void get_feature() {
         //获得特征
 
+        memset(features,0,sizeof(features));
         //计算消去的行（第2维）
         for (int i = 0; i < 20; i++) {
             bool clearFlag = true;
@@ -131,12 +132,19 @@ public:
                 }
             if (flag) features[5]++;
         }
+        features[6]=0;
+        for (int j=0;j<10;j++){
+            if(maxHeight[j]>features[6])
+                features[6]=maxHeight[j];
+        }
+        features[6]*=features[6];
         //以下操作是尽量保证规模上统一
         features[1] *= 16;
         features[2] *= 256;
         features[3] *= 128;
         features[4] *= 64;
         features[5] *= 32;
+        features[6] *= 4;
     }
 
     bool can_insert(int t, int x, int y, int o) {
@@ -187,7 +195,7 @@ public:
 
 class CGen {
 public:
-    int weight[6]; // 权重
+    int weight[featureDimensions]; // 权重
     int fitness; // 评价函数
     int lineCleared; // 仅用于输出
     int lifeMove; // 仅用于输出
@@ -201,7 +209,7 @@ public:
         fitness = another.fitness;
         lineCleared = another.lineCleared;
         lifeMove = another.lifeMove;
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < featureDimensions; i++)
             weight[i] = another.weight[i];
     }
 
@@ -209,9 +217,9 @@ public:
         // 单位化
 
         int squareSum = 0;
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < featureDimensions; i++)
             squareSum += weight[i] * weight[i];
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < featureDimensions; i++) {
             weight[i] = int(10000 * (weight[i] / sqrt(double(squareSum)))) - 5000;
         }
     }
@@ -222,11 +230,11 @@ public:
         fitness = lineCleared = lifeMove = 0;
         if (_in == 1) {
             int squareSum = 0;
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < featureDimensions; i++) {
                 weight[i] = get_int_random(7031);
                 squareSum += weight[i] * weight[i];
             }
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < featureDimensions; i++) {
                 weight[i] = int(10000 * (weight[i] / sqrt(double(squareSum)))) - 5000;
             }
         }
@@ -237,7 +245,7 @@ public:
 
         tempBlock.get_feature();
         int ans = 0;
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < featureDimensions; i++)
             ans += weight[i] * tempBlock.features[i];
         return ans;
     }
@@ -314,12 +322,12 @@ int main(int argc, char** argv) {
         recv(fd, &ttlPopulation, 4, MSG_WAITALL);
 
         vector<CGen> popSet;
-        unique_ptr<int> buf (new int[ttlPopulation * 6]);
-        recv(fd, (void*)buf.get(), ttlPopulation * 4 * 6, MSG_WAITALL);
+        unique_ptr<int> buf (new int[ttlPopulation * featureDimensions]);
+        recv(fd, (void*)buf.get(), ttlPopulation * 4 * featureDimensions, MSG_WAITALL);
 
         for (int i = 0; i < ttlPopulation; i++) {
             CGen curGen;
-            for(int j=0;j<6;j++) curGen.weight[j] = buf.get()[i * 6 + j];
+            for(int j=0;j<featureDimensions;j++) curGen.weight[j] = buf.get()[i * featureDimensions + j];
             popSet.push_back(curGen);
         }
 

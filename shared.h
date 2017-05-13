@@ -21,7 +21,7 @@
 using namespace std;
 constexpr int MAPWIDTH =  10;
 constexpr int  MAPHEIGHT =  20;
-
+constexpr int featureDimensions = 7;
 struct __cord { int x, y; };
 constexpr __cord blockShape[7][4][4] = {
         { { 0,0,1,0,-1,0,-1,-1 },{ 0,0,0,1,0,-1,1,-1 },{ 0,0,-1,0,1,0,1,1 },{ 0,0,0,-1,0,1,-1,1 } },

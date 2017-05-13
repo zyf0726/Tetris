@@ -30,7 +30,7 @@ const int split_size = 800;
 const int popRemainRankPercent = 4; // 前4%名完全保留，不发生突变
 const int popAbandonRankPercent = 70; // 没进前70%的全部淘汰
 const int popMutationPossible = 8; // 每8个只有一个能发生变异
-const int popCrossPossible = 6; // 每6个只有一个能与某一个发生重组
+const int popCrossPossible = 7; // 每6个只有一个能与某一个发生重组
 const int gameRound = 2500; // 每次实验的移动次数
 const int iterationCount = 1000000; // 迭代步数
 
@@ -41,7 +41,7 @@ inline int get_int_random(int mod) {
 }
 class CGen {
 public:
-    int weight[6]; // 权重
+    int weight[featureDimensions]; // 权重
     int fitness; // 评价函数
     int lineCleared; // 仅用于输出
     int lifeMove; // 仅用于输出
@@ -55,7 +55,7 @@ public:
         fitness = another.fitness;
         lineCleared = another.lineCleared;
         lifeMove = another.lifeMove;
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < featureDimensions; i++)
             weight[i] = another.weight[i];
     }
 
@@ -63,9 +63,9 @@ public:
         // 单位化
 
         int squareSum = 0;
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < featureDimensions; i++)
             squareSum += weight[i] * weight[i];
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < featureDimensions; i++) {
             weight[i] = int(10000 * (weight[i] / sqrt(double(squareSum)))) - 5000;
         }
     }
@@ -76,11 +76,11 @@ public:
         fitness = lineCleared = lifeMove = 0;
         if (_in == 1) {
             int squareSum = 0;
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < featureDimensions; i++) {
                 weight[i] = get_int_random(7031);
                 squareSum += weight[i] * weight[i];
             }
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < featureDimensions; i++) {
                 weight[i] = int(10000 * (weight[i] / sqrt(double(squareSum)))) - 5000;
             }
         }
@@ -110,7 +110,7 @@ vector<CGen> round( vector<CGen> popSet, FILE* fp = stdout){
         //发生突变
         if (curLuck < 10) {
             CGen tempPop(popSet[i]);
-            int changeFeature = get_int_random(6);
+            int changeFeature = get_int_random(featureDimensions);
             tempPop.weight[changeFeature] += get_int_random(2000) - 1000;
             tempPop.unit();
             nextPopSet.push_back(tempPop);
@@ -120,7 +120,7 @@ vector<CGen> round( vector<CGen> popSet, FILE* fp = stdout){
         if (curLuck < 10) {
             CGen tempPop(popSet[i]);
             int rawGen = get_int_random(popAbandonRank);
-            for (int featureID = 0; featureID < 6; featureID++) {
+            for (int featureID = 0; featureID < featureDimensions; featureID++) {
                 int featureChange = get_int_random(2);
                 if (featureChange == 1) {
                     tempPop.weight[featureID] = popSet[rawGen].weight[featureID];
@@ -139,7 +139,7 @@ vector<CGen> round( vector<CGen> popSet, FILE* fp = stdout){
 
     //输出本轮迭代的信息
     printf("\nThe best one in current iteration provides weight:\n");
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < featureDimensions; i++)
         printf("%d ", nextPopSet[0].weight[i]);
     printf("\n");
     printf("Its fitness is %d\n", nextPopSet[0].fitness);
@@ -148,7 +148,7 @@ vector<CGen> round( vector<CGen> popSet, FILE* fp = stdout){
 
     //输出本轮迭代最优者
     for(int i=0;i<popRemainRank;i++) {
-        for (int j = 0; j < 6; j++)
+        for (int j = 0; j < featureDimensions; j++)
             fprintf(fp, "%d ", nextPopSet[i].weight[j]);
         fprintf(fp, "%d %d\n", nextPopSet[i].lifeMove, nextPopSet[i].lineCleared);
         fflush(fp);
@@ -156,7 +156,7 @@ vector<CGen> round( vector<CGen> popSet, FILE* fp = stdout){
 
     //输出本轮迭代的信息
     printf("\nThe best one in current iteration provides weight:\n");
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < featureDimensions; i++)
         printf("%d ", nextPopSet[0].weight[i]);
     printf("\n");
     printf("Its fitness is %d\n", nextPopSet[0].fitness);
@@ -207,15 +207,15 @@ void satellite_interface(sockaddr_in subject, Iter begin, Iter end)
     int n = end - begin;
     send(sockfd, &n, 4, 0);
 
-    unique_ptr<int> buf(new int[n * 6]);
+    unique_ptr<int> buf(new int[n * featureDimensions]);
     int cnt = 0;
     for (Iter x = begin; x != end; ++x)
     {
-        for (int j = 0; j < 6; ++j)
+        for (int j = 0; j < featureDimensions; ++j)
             buf.get()[cnt + j] =  x->weight[j];
-        cnt += 6;
+        cnt += featureDimensions;
     }
-    send(sockfd, buf.get(), sizeof(int) * n * 6, 0);
+    send(sockfd, buf.get(), sizeof(int) * n * featureDimensions, 0);
     recv(sockfd, buf.get(), sizeof(int) * n * 3, MSG_WAITALL);
     cnt = 0;
     for (Iter x = begin; x != end; ++x)
