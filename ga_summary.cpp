@@ -225,7 +225,6 @@ void satellite_interface(sockaddr_in subject, Iter begin, Iter end)
         x->lifeMove = buf.get()[cnt];
         x->lineCleared = buf.get()[cnt + 1];
         x->fitness = buf.get()[cnt + 2];
-        cerr << x->lifeMove << x->lineCleared << x->fitness << endl;
         cnt += 3;
     }
     close(sockfd);
@@ -238,7 +237,11 @@ int main()
     {
         string s;  uint16_t p;
         cin >> s >> p;
-        que.V(sockaddr_in{AF_INET, htons(p), inet_addr(s.c_str()) });
+        sockaddr_in addr;
+        addr.sin_family = AF_INET;
+        addr.sin_port = htons(p);
+        addr.sin_addr.s_addr = inet_addr(s.c_str());
+        que.V(addr);
     }
 
     // 随机选取若干个估价

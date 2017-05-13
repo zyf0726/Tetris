@@ -268,7 +268,7 @@ namespace network
         ser_addr. sin_family = AF_INET;
         ser_addr.sin_addr. s_addr = htonl(INADDR_ANY);
         ser_addr. sin_port = htons(PORT);
-        err = bind(ser_sockfd, (struct sockaddr *) &ser_addr, sizeof(ser_addr));
+        err = bind(ser_sockfd, (const struct sockaddr *) &ser_addr, (socklen_t)sizeof(ser_addr));
         if (err == -1)
         {
             printf("bind error:%s\n", strerror(errno) );
@@ -417,7 +417,7 @@ int main(int argc, char** argv) {
             buf.get()[i * 3 + 1] = popSet[i].lineCleared;
             buf.get()[i * 3 + 2] = popSet[i].fitness;
         }
-        send(fd, (void*)buf.get(), ttlPopulation * 3 * 4, MSG_CONFIRM);
+        send(fd, (void*)buf.get(), ttlPopulation * 3 * 4, 0);
         close(fd);
     }
     network::final();
