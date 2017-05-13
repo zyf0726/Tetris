@@ -18,6 +18,7 @@ TotalLinesCleared*10-(TotalHeightIncreased*TotalHeightIncreased-RoundRemaining*R
 #include<sys/socket.h>
 #include<netinet/in.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 const int linesClearedReward=10;
 
@@ -196,30 +197,38 @@ void satellite_interface(sockaddr_in subject, Iter begin, Iter end)
         throw 233;
     }
 
+
     int err=connect(sockfd,(struct sockaddr *)&subject, sizeof(subject));
     if(err==-1)
     {
         printf("connect error\n");
         throw 233;
     }
-    FILE* fp = fdopen(sockfd, "r+");
     int n = end - begin;
-    fprintf(fp, "%d\n", n);
+    send(sockfd, &n, 4, MSG_CONFIRM);
+
+    unique_ptr<int> buf(new int[n * 6]);
+    int cnt = 0;
     for (Iter x = begin; x != end; ++x)
     {
         for (int j = 0; j < 6; ++j)
-            fprintf(fp, "%d ", x->weight[j]);
-        fprintf(fp, "\n");
+            buf.get()[cnt + j] =  x->weight[j];
+        cnt += 6;
     }
-    fflush(fp);
+    send(sockfd, buf.get(), sizeof(int) * n * 6, MSG_CONFIRM);
+    recv(sockfd, buf.get(), sizeof(int) * n * 3, MSG_WAITALL);
+    cnt = 0;
     for (Iter x = begin; x != end; ++x)
     {
         //FIXME fp eof!难道是关闭了socket这里才进来?
         //TODO 改成二进制以及send/recv试试
-        fscanf(fp, "%d%d%d", &x->lifeMove, &x->lineCleared, &x->fitness);
+        x->lifeMove = buf.get()[cnt];
+        x->lineCleared = buf.get()[cnt + 1];
+        x->fitness = buf.get()[cnt + 2];
         cerr << x->lifeMove << x->lineCleared << x->fitness << endl;
+        cnt += 3;
     }
-    fclose(fp);
+    close(sockfd);
     que.V(subject);
 }
 int main()

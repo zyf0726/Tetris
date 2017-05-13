@@ -286,7 +286,7 @@ namespace network
         return 0;
     }
 
-    FILE* open()
+    int open()
     {
         unsigned addlen = sizeof(struct sockaddr);
         cli_sockfd = accept(ser_sockfd, (struct sockaddr *) &cli_addr, &addlen);
@@ -294,7 +294,7 @@ namespace network
         {
             printf("accept error\n");
         }
-        return fdopen(cli_sockfd, "r+");
+        return cli_sockfd;
     }
 
     void final(){
@@ -307,17 +307,19 @@ int main(int argc, char** argv) {
     int n = 1;
     while (n < 50000000)
     {
-        FILE* fp=network::open();
+        int fd = network::open();
         int ttlPopulation;
 
         //文件第一行：进行实验的种群规模
-        fscanf(fp,"%d",&ttlPopulation);
+        recv(fd, &ttlPopulation, 4, MSG_WAITALL);
 
         vector<CGen> popSet;
+        unique_ptr<int> buf (new int[ttlPopulation * 6]);
+        recv(fd, (void*)buf.get(), ttlPopulation * 4 * 6, MSG_WAITALL);
+
         for (int i = 0; i < ttlPopulation; i++) {
             CGen curGen;
-            for(int j=0;j<6;j++)
-                fscanf(fp,"%d",&curGen.weight[j]);
+            for(int j=0;j<6;j++) curGen.weight[j] = buf.get()[i * 6 + j];
             popSet.push_back(curGen);
         }
 
@@ -411,10 +413,12 @@ int main(int argc, char** argv) {
         //输出实验结果
         for(int i=0;i<ttlPopulation;i++)
         {
-            fprintf(fp,"%d %d %d\n",popSet[i].lifeMove,popSet[i].lineCleared,popSet[i].fitness);
+            buf.get()[i * 3] = popSet[i].lifeMove;
+            buf.get()[i * 3 + 1] = popSet[i].lineCleared;
+            buf.get()[i * 3 + 2] = popSet[i].fitness;
         }
-        fflush(fp);
-        fclose(fp);
+        send(fd, (void*)buf.get(), ttlPopulation * 3 * 4, MSG_CONFIRM);
+        close(fd);
     }
     network::final();
 }
