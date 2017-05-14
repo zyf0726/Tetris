@@ -6,14 +6,20 @@
 
 
 ## TODO lists
-* 确定估价函数
+### include<Tetris-ea>
 
-catch: pw384已完成
-* 重写
+步骤：
+1. (t, x, y, o) -> (T, x, y)
+1. 重写恢复棋盘状态
+2. 给Tea加上bfs寻路径操作
+3. 重写寻找最优方法：phenotype.cpp:look_ahead
 
-catch: include<Tetris-ea>
+### 确定估价函数
 
-* 加入搜索
+重新编译training/tetris.cpp
+并且在mac机房运行。
+如果时间紧任务重就用论文里面已经训好的估价参数。
 
-## 估价函数第一次实验
+### 加入搜索
+
 
