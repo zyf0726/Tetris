@@ -16,14 +16,9 @@ uint16_t cell_masks[BOARD_WIDTH] = {
     0x0020, // 0b0000000000100000
 };
 
-struct board initialize_board () {
-    struct board board;
-
-    for (int i = 0; i < BOARD_HEIGHT; i++) {
-        board.lines[i] = EMPTY_LINE;
-    }
-
-    return board;
+board::board () {
+    for (int i = 0; i < BOARD_HEIGHT; i++)
+        lines[i] = EMPTY_LINE;
 }
 
 struct board copy_board (struct board * board) {

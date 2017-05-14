@@ -1,6 +1,7 @@
 #ifndef SINGLEFILE
 
 #include "game_board.h"
+#include "board.h"
 
 #endif
 
@@ -160,6 +161,14 @@ bool element::rotation(const game_board& gb, int o) {
 }
  *
  * */
+game_board::operator board()
+{
+    board b;
+    for (int i = 1;i <= MAPHEIGHT; ++i)
+        for (int j = 1; j <= MAPWIDTH; ++j)
+            b.lines[MAPHEIGHT - i] |= cell_masks[j - 1];
+    return b;
+}
 int game_board::evaluate() {
     bool blocks[MAPHEIGHT][MAPWIDTH] = {};
     for (int i = 0; i < MAPHEIGHT ; i++)

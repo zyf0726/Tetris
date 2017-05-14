@@ -11,10 +11,10 @@
 
 struct board {
     uint16_t lines[BOARD_HEIGHT];
+    INLINE board();
 };
 extern uint16_t cell_masks[BOARD_WIDTH];
 
-struct board initialize_board ();
 struct board copy_board (struct board * board);
 int remove_lines (struct board * board, struct t_last_placement * tlp);
 void remove_line (struct board * board, int line);

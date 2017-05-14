@@ -1,6 +1,7 @@
 #pragma once
 #ifndef SINGLEFILE
 #include "shared.h"
+#include "board.h"
 #endif
 class game_board
 {
@@ -34,6 +35,7 @@ public:
     INLINE bool is_valid(int ty, int x, int y, int o) const ;
     INLINE bool is_on_ground(int ty, int x, int y, int o) const ;
     INLINE bool place(int ty, int x, int y, int o);
+    INLINE explicit operator board();
     friend class element;
     friend class game_manager;
 };
