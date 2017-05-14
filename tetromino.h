@@ -287,10 +287,11 @@ struct t_last_placement {
     } else if(n == 15) {         \
         *rotation = 4;           \
     }
-int place_tetromino (struct board * board, const tetromino * tr, int position, int * placement);
+
+
 INLINE void shift_lines(uint16_t lines[], int position, const tetromino* tr);
 int random_tetromino (struct options* opt);
-tuple<__cord, int> __toxy2Txy(SHAPES t, ORI o, int x, int y)
+inline tuple<__cord, int> __toxy2Txy(SHAPES t, ORI o, int x, int y)
 {
     __cord c0 = __cord{x - 1, 20 - y};
     using CA = __cord[];

@@ -4,7 +4,7 @@
 #include "board.h"
 #include "tetromino.h
 #endif
-class game_board : board
+class game_board : public board
 {
 // 代表分别向对方转移的行
     uint16_t trans[4]= {  };
@@ -17,7 +17,6 @@ class game_board : board
 
 
 public:
-    INLINE tuple<int, int, int, int> get_decision(int ty);
     INLINE game_board(){}
     // 消去行
     // 转移双方消去的行，返回-1表示继续，否则返回输者
@@ -25,6 +24,5 @@ public:
 
     friend class game_manager;
     void put_eliminate(const tetromino *tr, int x, int y);
-    void get_decision();
-
+    void get_decision(int next_tetromino);
 };

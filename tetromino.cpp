@@ -20,38 +20,7 @@ void shift_lines(uint16_t lines[], int position, const tetromino* tr)
     }
 
 }
-int place_tetromino (struct board * board, const tetromino * tr, int position, int * placement) {
 
-    uint16_t lines[4]; shift_lines(lines, position, tr);
-    int i;
-    for (i = -tr->p_top; i < BOARD_HEIGHT + tr->p_bottom - 4 + 1; i++) {
-        for (int y = tr->p_top; y < 4 - tr->p_bottom; y++) {
-            if ((board->lines[i + y] & lines[y]) != EMPTY_LINE) {
-                i--;
-                goto found_i;
-            }
-        }
-    }
-    i--;
-
-    found_i:
-
-
-    if (i < -tr->p_top) {
-        return 1;
-    }
-
-    if (placement != NULL) {
-        *placement = i;
-    }
-
-    for (int y = tr->p_top; y < 4 - tr->p_bottom; y++) {
-        board->lines[i + y] |= lines[y];
-    }
-
-
-    return 0;
-}
 
 int random_tetromino (struct options* opt) {
     int tetromino, rotations,

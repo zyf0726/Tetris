@@ -32,6 +32,7 @@ constexpr int  MAPHEIGHT =  20;
 constexpr int featureDimensions = 7;
 struct __cord { int x, y; };
 inline __cord operator +(const __cord& a, const __cord& b) { return {a.x + b.x, a.y + b.y}; }
+
 constexpr __cord blockShape[7][4][4] = {
         { { 0,0,1,0,-1,0,-1,-1 },{ 0,0,0,1,0,-1,1,-1 },{ 0,0,-1,0,1,0,1,1 },{ 0,0,0,-1,0,1,-1,1 } },
         { { 0,0,-1,0,1,0,1,-1 },{ 0,0,0,-1,0,1,1,1 },{ 0,0,1,0,-1,0,-1,1 },{ 0,0,0,1,0,-1,-1,-1 } },
@@ -52,6 +53,8 @@ enum SHAPES
     _I_,
     _O_
 };
+constexpr SHAPES shape_prder[] = { _O_, _I_, _S_, _Z_, _L_, _J_, _T_ };
+constexpr int shape_order_rev[] = { 4, 5, 2, 3, 6, 1, 0};
 enum ORI
 {
     _UP_,

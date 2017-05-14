@@ -33,5 +33,5 @@ struct options {
 
 };
 
-void enable_feature (int feature_i, struct options * opt);
+INLINE void enable_feature (int feature_i, struct options * opt);
 

@@ -28,6 +28,9 @@ struct board {
         }
 
     }
+
+    int directly_drop(const tetromino *tr, int position, int *placement);
+
 private:
     void remove_line(int line);
 };

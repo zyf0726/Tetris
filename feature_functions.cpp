@@ -132,27 +132,21 @@ float f_mean_height (struct board * new_board, struct board * old_board, struct 
     return (float) sum / (float) BOARD_WIDTH;
 }
 
-float feature_difference (const char * name, struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {
-    int feature_i = feature_index(name);
-
-    return call_feature(feature_i, new_board, old_board, tlp)
-        - call_feature(feature_i, old_board, new_board, tlp);
-}
-
+#define DIFF(F, N, O, T) (F(N, O, T) - F(O, N, T))
 float f_v_max_height (struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {
-    return feature_difference("--f-max-height", new_board, old_board, tlp);
+    return DIFF(f_max_height, new_board, old_board, tlp);
 }
 
 float f_v_n_holes (struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {
-    return feature_difference("--f-n-holes", new_board, old_board, tlp);
+    return DIFF(f_n_holes, new_board, old_board, tlp);
 }
 
 float f_v_height_differences (struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {
-    return feature_difference("--f-height-differences", new_board, old_board, tlp);
+    return DIFF(f_height_differences, new_board, old_board, tlp);
 }
 
 float f_v_mean_height (struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {
-    return feature_difference("--f-mean-height", new_board, old_board, tlp);
+    return DIFF(f_mean_height, new_board, old_board, tlp);
 }
 
 float f_removed_lines (struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {

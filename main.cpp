@@ -4,16 +4,67 @@
 #ifndef SINGLEFILE
 
 #include "main.h"
+#include "phenotype.h"
+#include "feature_functions.h"
+#include "feature_helpers.h"
+#include "options.h"
 
 #endif
+
 
 int currBotColor;
 int enemyColor;
 
-
+/*
+ Feature Value
+3. Holes -35
+6. Landing height -51
+7. Cell transitions -46
+8. Deep wells -12
+10. Height differences 19
+11. Mean height 6
+12. ∆ max height 50
+13. ∆ holes 25
+15. ∆ mean height 17
+18. Wells -19
+21. Row transitions -38
+23. Cumulative wells -42
+24. Min height -41
+26. Mean - min height -60
+ 29. Adjacent column holes -155
+ */
+options global_option = {
+        .n_features_enabled    = 0,
+        .n_weights_enabled     = 0,
+};
 int main()
 {
-    cerr << sizeof(game_manager) << endl;
+    initialize_feature_helpers(&global_option);
+#define EF(x) enable_feature(feature_index(x), &global_option);
+    EF("--f-n-holes");
+    EF("--f-landing-height");
+    EF("--f-cell-transitions");
+    EF("--f-deep-well-sum");
+    EF("--f-height-differences");
+    EF("--f-mean-height");
+    EF("--f-v--max-height");
+    EF("--f-v-n-holes");
+    EF("--f-v-mean-height");
+    EF("--f-well-sum");
+    EF("--f-row-transitions");
+    EF("--f-cumulative-wells-fast");
+    EF("--f-min-height");
+    EF("--f-mean-minus-min-height");
+    EF("--f-n-adjacent-holes");
+
+    phenotype *global_phenotype = initialize_phenotype(initialize_genotype(&global_option));
+
+
+    for (int i = 0; i < global_option.n_features_enabled; i++) {
+        global_phenotype->genotype->feature_enabled[i] = 1;
+    }
+
+    global_phenotype->genotype->feature_weights = {-35, -51, -46, -12, 19, 6, 50, 25, 17, -19, -38, -42, -41, -60, -155};
     // 加速输入
     istream::sync_with_stdio(false);
     int turnID, blockType;
@@ -68,14 +119,15 @@ int main()
         g.fixup();
     }
 
-    int blockForEnemy, finalX, finalY, finalO, val;
-
+    int blockForEnemy, finalX, finalY, finalO;
+    float val;
 
     // 遇事不决先输出（平台上编译不会输出）
     g.printField();
 
-    tie(finalX, finalY, finalO, val) = g.gb[currBotColor].
-            get_decision(nextTypeForColor[currBotColor]);
+    alternative alt  = continue_board(g.gb + currBotColor, global_phenotype,shape_order_rev[nextTypeForColor[currBotColor]],
+            &global_option);
+
     blockForEnemy = g.worst_for_enemy(currBotColor);
 
     // 决策结束，输出结果（你只需修改以上部分）

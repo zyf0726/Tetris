@@ -1,11 +1,12 @@
 #include <string.h>
 
+#include "options.h"
 #include "board.h"
 #include "feature_functions.h"
 #include "feature_helpers.h"
 
 char full_cells_on_line[POSSIBLE_LINES];
-struct feature features[N_FEATURES] = {
+feature features[N_FEATURES] = {
     {
         .name = "--f-max-height",
         .weights = 1,
@@ -103,7 +104,7 @@ struct feature features[N_FEATURES] = {
         .weights = 1,
         .function = &f_max_minus_mean_height,
     }, {
-        .name = "--f-mean-minux-min-height",
+        .name = "--f-mean-minus-min-height",
         .weights = 1,
         .function = &f_mean_minus_min_height,
     }, {
@@ -141,7 +142,7 @@ int * column_heigths;
 int features_cached[N_FEATURES];
 float cached_feature_values[N_FEATURES];
 
-void reset_feature_caches (struct options * opt) {
+void reset_feature_caches (options * opt) {
     for (int i = 0; i < BOARD_WIDTH; i++) {
         column_heigths[i] = -1;
     }
@@ -151,7 +152,7 @@ void reset_feature_caches (struct options * opt) {
     }
 }
 
-void initialize_feature_helpers (struct options * opt) {
+void initialize_feature_helpers (options * opt) {
     column_heigths = (int*)malloc(sizeof(int) * BOARD_WIDTH);
 
     features[feature_index("--f-column-heights")].weights = BOARD_WIDTH;
@@ -192,7 +193,7 @@ int feature_index (const char * name) {
     exit(1);
 }
 
-float call_feature (int feature_i, struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {
+float call_feature (int feature_i, board * new_board, board * old_board, t_last_placement * tlp) {
     if (features_cached[feature_i] == 0 || features[feature_i].weights > 1) {
         cached_feature_values[feature_i] = (features[feature_i].function) (new_board, old_board, tlp);
         features_cached[feature_i] = 1;
@@ -201,7 +202,7 @@ float call_feature (int feature_i, struct board * new_board, struct board * old_
     return cached_feature_values[feature_i];
 }
 
-int column_height (struct board * board, int column) {
+int column_height (board * board, int column) {
     if (column_heigths[column] == -1) {
         column_heigths[column] = 0;
 
