@@ -2,15 +2,17 @@
 // Created by prwang on 2017/4/22.
 //
 #ifndef SINGLEFILE
+
 #include "main.h"
+
 #endif
 
 int currBotColor;
 int enemyColor;
 
 
-
-int main() {
+int main()
+{
     cerr << sizeof(game_manager) << endl;
     // 加速输入
     istream::sync_with_stdio(false);
@@ -32,7 +34,8 @@ int main() {
     // 然后分析以前每回合的输入输出，并恢复状态
     // 循环中，color 表示当前这一行是 color 的行为
     // 平台保证所有输入都是合法输入
-    for (int i = 1; i < turnID; i++) {
+    for (int i = 1; i < turnID; i++)
+    {
         int currTypeForColor[2] = {nextTypeForColor[0], nextTypeForColor[1]};
         int x, y, o;
         // 根据这些输入输出逐渐恢复状态到当前回合
@@ -43,7 +46,8 @@ int main() {
         cin >> blockType >> x >> y >> o;
 
         // 我当时把上一块落到了 x y o！
-        g.gb[currBotColor].place(currTypeForColor[currBotColor],x, y, o);
+        auto r = toxy2TXY((SHAPES) currTypeForColor[currBotColor], (ORI) o, x, y);
+        g.gb[currBotColor].put_eliminate(get<0>(r), get<1>(r), get<2>(r));
 
         // 我给对方什么块来着？
         g.type_count[enemyColor][blockType]++;
@@ -54,7 +58,8 @@ int main() {
         cin >> blockType >> x >> y >> o;
 
         // 对方当时把上一块落到了 x y o！
-        g.gb[enemyColor].place(currTypeForColor[enemyColor],x, y, o);
+        r = toxy2TXY((SHAPES) currTypeForColor[enemyColor], (ORI) o, x, y);
+        g.gb[enemyColor].put_eliminate(get<0>(r), get<1>(r), get<2>(r));
 
         // 对方给我什么块来着？
         g.type_count[currBotColor][blockType]++;

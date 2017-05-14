@@ -12,9 +12,10 @@ class game_manager {
     INLINE int transfer();
 public:
     INLINE void printField();
-    INLINE void fixup() { gb[0].eliminate(); gb[1].eliminate(); transfer(); }
+    INLINE void fixup() { transfer(); }
     INLINE int worst_for_enemy(int player);
     friend int main();
 };
+
 
 

@@ -8,9 +8,12 @@ struct tetromino {
     int p_left;
     int p_right;
     int p_bottom;
-
+    tetromino&operator=(const tetromino&) = delete;
+    tetromino(const tetromino&) = delete;
 
 };
+
+
 constexpr tetromino tetrominos[19] = {
         {
                 .lines = {
@@ -244,7 +247,7 @@ constexpr tetromino tetrominos[19] = {
         },
 };
 struct t_last_placement {
-    struct tetromino * tetromino;
+    const tetromino * tetromino;
     int x;
     int y;
     int n_lines_removed;
@@ -284,6 +287,24 @@ struct t_last_placement {
     } else if(n == 15) {         \
         *rotation = 4;           \
     }
-int place_tetromino (struct board * board, struct tetromino * tetromino, int position, int * placement);
+int place_tetromino (struct board * board, const tetromino * tr, int position, int * placement);
+INLINE void shift_lines(uint16_t lines[], int position, const tetromino* tr);
 int random_tetromino (struct options* opt);
-
+tuple<__cord, int> __toxy2Txy(SHAPES t, ORI o, int x, int y)
+{
+    __cord c0 = __cord{x - 1, 20 - y};
+    using CA = __cord[];
+    if (t == _O_) return make_tuple(c0 + ((__cord[])  {{-2, -2}, {-2, -1}, {-1, -1}, {-1, -2}})[o], 0); // _O_
+    else if (t == _I_) return o & 1 ? make_tuple(c0 + (CA{{-2, -1 }, {-1, -1}})[o >> 1], 1) : make_tuple(c0 + (CA{{-2, -2}, {-2, -1}})[o >> 1], 2);
+    else if (t == _S_) return ~o & 1 ? make_tuple(c0 + (CA{{-2, -1}, {-2, -2}})[o >> 1], 3) : make_tuple(c0 + (CA{{-2, -1}, {-3, -1}})[o >> 1], 4);
+    else if (t == _Z_) return ~o & 1 ? make_tuple(c0 + (CA{{-2, -1}, {-2, -2}})[o >> 1], 5) : make_tuple(c0 + (CA{{-2, -1}, {-3, -1}})[o >> 1], 6);
+    else if (t == _L_) return make_tuple(c0 +  __cord{-2, -1}, 7 + o);
+    else if (t == _J_) return make_tuple(c0 + __cord{-2, -1} , 11 + o);
+    else if (t == _T_) return make_tuple(c0 + __cord{-2, -1}, ((int[]){2, 3, 0, 1})[o] + 15);
+}
+using c_pt_tet = const tetromino*;
+inline tuple<const tetromino*, int , int > toxy2TXY(SHAPES t, ORI o, int x, int y)
+{
+    auto r = __toxy2Txy(t, o, x, y);
+    return make_tuple(&tetrominos[get<1>(r)], get<0>(r).x, get<0>(r).y);
+}

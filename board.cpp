@@ -22,7 +22,7 @@ board::board () {
 }
 
 
-int remove_lines (struct board * board, struct t_last_placement * tlp) {
+int board::remove_lines (t_last_placement * tlp) {
     int n_lines_removed = 0;
 
     if (tlp != NULL) {
@@ -31,30 +31,29 @@ int remove_lines (struct board * board, struct t_last_placement * tlp) {
     }
 
     for (int y = 0; y < BOARD_HEIGHT; y++) {
-        if (board->lines[y] == FULL_LINE) {
+        if (lines[y] == FULL_LINE) {
             if (tlp != NULL) {
                 tlp->lines_removed[tlp->n_lines_removed++] = y;
             }
 
             n_lines_removed++;
-
-            remove_line(board, y);
+            remove_line(y);
         }
     }
 
     return n_lines_removed;
 }
 
-void remove_line (struct board * board, int line) {
+void board::remove_line (int line) {
     for (int y = line; y > 0; y--) {
-        board->lines[y] = board->lines[y - 1];
+        lines[y] = lines[y - 1];
     }
 
-    board->lines[0] = EMPTY_LINE;
+    lines[0] = EMPTY_LINE;
 }
 
-int get_tile (int x, int y, struct board * board) {
-    return board->lines[y] & cell_masks[x];
+int board::get_tile (int x, int y) {
+    return lines[y] & cell_masks[x];
 }
 
 void set_tile (int x, int y, struct board * board, int value) {

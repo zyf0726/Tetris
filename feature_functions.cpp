@@ -70,17 +70,17 @@ float f_cell_transitions (struct board * new_board, struct board * old_board, st
 
     for (int x = 0; x < BOARD_WIDTH; x++) {
         for (int y = 0; y < BOARD_HEIGHT; y++) {
-            if (get_tile(x, y, new_board) == 0) {
-                if (x > 0 && get_tile(x - 1, y, new_board))
+            if (new_board->get_tile(x, y) == 0) {
+                if (x > 0 &&  new_board->get_tile(x - 1, y))
                     transitions++;
 
-                if (x < BOARD_WIDTH - 1 && get_tile(x + 1, y, new_board))
+                if (x < BOARD_WIDTH - 1 && new_board->get_tile(x + 1, y))
                     transitions++;
 
-                if (y > 0 && get_tile(x, y - 1, new_board))
+                if (y > 0 && new_board->get_tile(x, y - 1))
                     transitions++;
 
-                if (y < BOARD_HEIGHT - 1 && get_tile(x, y + 1, new_board))
+                if (y < BOARD_HEIGHT - 1 &&  new_board->get_tile(x, y + 1))
                     transitions++;
             }
         }

@@ -13,13 +13,27 @@
 struct board {
     uint16_t lines[BOARD_HEIGHT];
     INLINE board();
+    int remove_lines (t_last_placement * tlp);
+
+    int get_tile (int x, int y);
+    INLINE void place(const tetromino* tr, int x, int y)
+    {
+        uint16_t tl[4]; shift_lines(tl, x, tr);
+        for (int i = 0; i < 4; ++i)
+        {
+#ifdef debug
+            assert(0 == (lines[i + y] & tl[i]));
+#endif
+            lines[i + y] |= tl[i];
+        }
+
+    }
+private:
+    void remove_line(int line);
 };
 extern uint16_t cell_masks[BOARD_WIDTH];
 
-int remove_lines (board * board, t_last_placement * tlp);
-void remove_line (board * board, int line);
-int get_tile (int x, int y, board * board);
-void set_tile (int x, int y, board * board, int value);
+
 void print_board (FILE * stream, board * board);
 
 void read_board (board * board);

@@ -105,7 +105,7 @@ int phenotype_fitness (phenotype * phenotype, options* opt) {
         }
 
         // Remove lines and add to the current fitness value.
-        fitness += remove_lines(&brd, NULL);
+        fitness += brd.remove_lines( NULL);
 
         // Fill the lookahead with a new tetromino.
         for (int i = 0; i < opt->n_piece_lookahead; i++) {
@@ -153,7 +153,7 @@ void _look_ahead(future * f, board * brd, phenotype * phenotype, int n_ahead, al
     int n_boards = 0;
 
     for (int rotation_i = 0; rotation_i < n_rotations; rotation_i++) {
-        tetromino tetromino = tetrominos[next_tetrominos[n_ahead]
+        const tetromino &tetromino = tetrominos[next_tetrominos[n_ahead]
                                          + rotation_i];
         //printf("p left is %d..\n", tetromino.p_left);
         n_boards += BOARD_WIDTH - 4 + 1 + tetromino.p_left + tetromino.p_right;
@@ -169,10 +169,9 @@ void _look_ahead(future * f, board * brd, phenotype * phenotype, int n_ahead, al
     // Place the tetromino in all possible ways on the boards.
     int board_i = 0;
 
-    t_last_placement tlp[n_boards];
 
     for (int rotation_i = 0; rotation_i < n_rotations; rotation_i++) {
-        tetromino tetromino = tetrominos[next_tetrominos[n_ahead] + rotation_i];
+        const tetromino &tetromino = tetrominos[next_tetrominos[n_ahead] + rotation_i];
 
         int positions = BOARD_WIDTH - 4 + 1 + tetromino.p_left + tetromino.p_right;
 
@@ -195,7 +194,7 @@ void _look_ahead(future * f, board * brd, phenotype * phenotype, int n_ahead, al
                         .y = y,
                     };
 
-                    remove_lines(&boards[board_i], &tlp);
+                    boards[board_i].remove_lines( &tlp);
 
                     alt->score = board_score(&boards[board_i], brd, phenotype, &tlp, opt);
 
@@ -203,7 +202,7 @@ void _look_ahead(future * f, board * brd, phenotype * phenotype, int n_ahead, al
 
                     f->push_back(*alt);
                 } else {
-                    remove_lines(&boards[board_i], NULL);
+                    boards[board_i].remove_lines(NULL);
 
                     _look_ahead(f, &boards[board_i], phenotype, n_ahead + 1, alt, next_tetrominos, opt);
                 }
@@ -237,7 +236,7 @@ int continue_board(board * board, phenotype* phenotype, int next_tetrominos[], o
                 max_alt = f[i];
             }
         }
-
+        //TODO: 增加横向插入
         place_tetromino(
             board,
             &tetrominos[next_tetrominos[0] + max_alt.rotation_i],
