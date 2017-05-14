@@ -153,7 +153,8 @@ void _look_ahead(future * f, board * brd, phenotype * phenotype, int n_ahead, al
     int n_boards = 0;
 
     for (int rotation_i = 0; rotation_i < n_rotations; rotation_i++) {
-        tetromino tetromino = tetrominos[next_tetrominos[n_ahead] + rotation_i];
+        tetromino tetromino = tetrominos[next_tetrominos[n_ahead]
+                                         + rotation_i];
         //printf("p left is %d..\n", tetromino.p_left);
         n_boards += BOARD_WIDTH - 4 + 1 + tetromino.p_left + tetromino.p_right;
     }
@@ -162,7 +163,7 @@ void _look_ahead(future * f, board * brd, phenotype * phenotype, int n_ahead, al
     board * boards = (board*)malloc(sizeof(board) * n_boards);
 
     for (int i = 0; i < n_boards; i++) {
-        boards[i] = copy_board(brd);
+        boards[i] = board(*brd);
     }
 
     // Place the tetromino in all possible ways on the boards.
@@ -180,10 +181,11 @@ void _look_ahead(future * f, board * brd, phenotype * phenotype, int n_ahead, al
 
             if (place_tetromino(&boards[board_i], &tetromino, position_i, &y) == 0) {
                 if (n_ahead == 0) {
-                    alt = & (alternative) {
+                    *alt =  (alternative) {
                         .position_i = position_i,
                         .rotation_i = rotation_i,
                     };
+
                 }
 
                 if (n_ahead == opt->n_piece_lookahead) {
@@ -211,15 +213,13 @@ void _look_ahead(future * f, board * brd, phenotype * phenotype, int n_ahead, al
         }
     }
 
-    for (int i = 0; i < n_boards; i++) {
-        free_board(&boards[i]);
-    }
 
     free(boards);
 }
 
 void look_ahead(future * f, board * board, phenotype* phenotype, int next_tetrominos[], options* opt) {
-    _look_ahead(f, board, phenotype, 0, NULL, next_tetrominos, opt);
+    alternative alt;
+    _look_ahead(f, board, phenotype, 0, &alt, next_tetrominos, opt);
 }
 
 int continue_board(board * board, phenotype* phenotype, int next_tetrominos[], options* opt) {

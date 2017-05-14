@@ -21,13 +21,6 @@ board::board () {
         lines[i] = EMPTY_LINE;
 }
 
-struct board copy_board (struct board * board) {
-    struct board copy;
-
-    memcpy(copy.lines, board->lines, BOARD_HEIGHT * sizeof(uint16_t));
-
-    return copy;
-}
 
 int remove_lines (struct board * board, struct t_last_placement * tlp) {
     int n_lines_removed = 0;
@@ -94,9 +87,7 @@ void print_board (FILE * stream, struct board * board) {
     fprintf(stream, "\n");
 }
 
-void free_board (struct board * board) {
-    // NOOP.
-}
+
 /*
 void read_board (struct board * board) {
     size_t len;

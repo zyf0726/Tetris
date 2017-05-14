@@ -7,31 +7,31 @@
 #include "feature_functions.h"
 #include "feature_helpers.h"
 
-void free_genotype (struct genotype* g) {
+void free_genotype (genotype* g) {
     free(g->feature_weights);
     free(g->feature_enabled);
     free(g);
 }
 
-struct genotype* initialize_genotype (struct options* opt) {
-    struct genotype* g = malloc(sizeof(struct genotype));
+genotype* initialize_genotype (options* opt) {
+    genotype* g = (genotype*)malloc(sizeof(genotype));
 
-    g->feature_weights = malloc(sizeof(float) * opt->n_weights_enabled);
-    g->feature_enabled = malloc(sizeof(int) * opt->n_features_enabled);
+    g->feature_weights = (float*)malloc(sizeof(float) * opt->n_weights_enabled);
+    g->feature_enabled = (int*)malloc(sizeof(int) * opt->n_features_enabled);
 
     return g;
 }
 
-struct genotype* copy_genotype (struct genotype* genotype, struct options* opt) {
-    struct genotype* copy = initialize_genotype(opt);
+genotype* copy_genotype (genotype* gt, options* opt) {
+    genotype* copy = initialize_genotype(opt);
 
-    memcpy(copy->feature_weights, genotype->feature_weights, sizeof(float) * opt->n_weights_enabled);
-    memcpy(copy->feature_enabled, genotype->feature_enabled, sizeof(int) * opt->n_features_enabled);
+    memcpy(copy->feature_weights, gt->feature_weights, sizeof(float) * opt->n_weights_enabled);
+    memcpy(copy->feature_enabled, gt->feature_enabled, sizeof(int) * opt->n_features_enabled);
 
     return copy;
 }
 
-void randomize_genotype (struct genotype* g, struct options* opt) {
+void randomize_genotype (genotype* g, options* opt) {
     for (int i = 0; i < opt->n_weights_enabled; i++) {
         g->feature_weights[i] = l_rand(- opt->randomization_range / 2 - 1, opt->randomization_range / 2 + 1, opt);
     }
@@ -41,13 +41,10 @@ void randomize_genotype (struct genotype* g, struct options* opt) {
     }
 }
 
-int intcmp (const void *aa, const void *bb) {
-    const int *a = aa, *b = bb;
-    return (*a < *b) ? -1 : (*a > *b);
-}
 
-struct genotype* crossover_genotypes (struct genotype* g_1, struct genotype* g_2, struct options* opt) {
-    struct genotype* g = initialize_genotype(opt);
+
+genotype* crossover_genotypes (genotype* g_1, genotype* g_2, options* opt) {
+    genotype* g = initialize_genotype(opt);
 
     if (opt->crossover_points == opt->n_features_enabled) {
         // Uniform crossover
@@ -55,7 +52,7 @@ struct genotype* crossover_genotypes (struct genotype* g_1, struct genotype* g_2
         int weight_i = 0;
 
         for (int i = 0; i < opt->n_features_enabled; i++) {
-            struct genotype * selecting_from_genotype;
+            genotype * selecting_from_genotype;
 
             if (b_rand(opt)) {
                 selecting_from_genotype = g_1;
@@ -88,14 +85,14 @@ struct genotype* crossover_genotypes (struct genotype* g_1, struct genotype* g_2
             possible_points[r] = possible_points[i];
         }
 
-        qsort(selected_points, opt->crossover_points, sizeof(int), intcmp);
+        sort(selected_points, selected_points+ opt->crossover_points);
 
         int selecting_from = b_rand(opt),
             at_point = 0,
             weight_i = 0;
 
         for (int i = 0; i < opt->n_features_enabled; i++) {
-            struct genotype * selecting_from_genotype;
+            genotype * selecting_from_genotype;
 
             if (selecting_from) {
                 selecting_from_genotype = g_1;
@@ -119,7 +116,7 @@ struct genotype* crossover_genotypes (struct genotype* g_1, struct genotype* g_2
     return g;
 }
 
-int mutate_genotype (struct genotype* g, struct options* opt) {
+int mutate_genotype (genotype* g, options* opt) {
     int was_mutated = 0,
         weight_i = 0,
         previous_value;

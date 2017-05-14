@@ -41,6 +41,28 @@ constexpr __cord blockShape[7][4][4] = {
         { { 0,0,0,1,-1,0,-1,1 },{ 0,0,-1,0,0,-1,-1,-1 },{ 0,0,0,-1,1,-0,1,-1 },{ 0,0,1,0,0,1,1,1 } }
 };// 7种形状(长L| 短L| 反z| 正z| T| 直一| 田格)，4种朝向(上左下右)，8:每相邻的两个分别为x，y
 
+enum SHAPES
+{
+    _L_,
+    _J_,
+    _S_,
+    _Z_,
+    _T_,
+    _I_,
+    _O_
+};
+//    x    y    newTy
+tuple<int, int, int> toxyAdapter(SHAPES t, int o, int x, int y)
+{
+
+    switch (t)
+    {
+        case _O_:
+            break;
+
+
+    }
+};
 constexpr int blockHeight[7][4]={
         {0,1,1,1},
         {0,1,1,1},

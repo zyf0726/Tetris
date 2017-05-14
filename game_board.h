@@ -24,18 +24,16 @@ class game_board
 
 // 总消去行数的分数之和
     int elimTotal;
+    INLINE bool is_valid(int ty, int x, int y, int o) const ;
+    INLINE bool is_on_ground(int ty, int x, int y, int o) const ;
 public:
     INLINE tuple<int, int, int, int> get_decision(int ty);
     INLINE game_board();
     // 消去行
     INLINE void eliminate();
     // 转移双方消去的行，返回-1表示继续，否则返回输者
-    INLINE int evaluate();
     // 判断当前位置是否合法
-    INLINE bool is_valid(int ty, int x, int y, int o) const ;
-    INLINE bool is_on_ground(int ty, int x, int y, int o) const ;
     INLINE bool place(int ty, int x, int y, int o);
     INLINE explicit operator board();
-    friend class element;
     friend class game_manager;
 };

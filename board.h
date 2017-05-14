@@ -16,13 +16,12 @@ struct board {
 };
 extern uint16_t cell_masks[BOARD_WIDTH];
 
-board copy_board (board * board);
 int remove_lines (board * board, t_last_placement * tlp);
 void remove_line (board * board, int line);
 int get_tile (int x, int y, board * board);
 void set_tile (int x, int y, board * board, int value);
 void print_board (FILE * stream, board * board);
-void free_board (board * board);
+
 void read_board (board * board);
 
 #endif
