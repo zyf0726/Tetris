@@ -31,6 +31,7 @@ constexpr int  MAPHEIGHT =  20;
 
 constexpr int featureDimensions = 7;
 struct __cord { int x, y; };
+inline __cord operator +(const __cord& a, const __cord& b) { return {a + b}; }
 constexpr __cord blockShape[7][4][4] = {
         { { 0,0,1,0,-1,0,-1,-1 },{ 0,0,0,1,0,-1,1,-1 },{ 0,0,-1,0,1,0,1,1 },{ 0,0,0,-1,0,1,-1,1 } },
         { { 0,0,-1,0,1,0,1,-1 },{ 0,0,0,-1,0,1,1,1 },{ 0,0,1,0,-1,0,-1,1 },{ 0,0,0,1,0,-1,-1,-1 } },
@@ -51,18 +52,41 @@ enum SHAPES
     _I_,
     _O_
 };
-//    x    y    newTy
-tuple<int, int, int> toxyAdapter(SHAPES t, int o, int x, int y)
+enum ORI
 {
-
-    switch (t)
-    {
-        case _O_:
-            break;
-
-
-    }
+    _UP_,
+    _LF_,
+    _DN_,
+    _RT_
 };
+//    x    y    newTy
+tuple<__cord,  int> toxyAdapter(SHAPES t, int o, int x, int y)
+{
+    __cord c0 = __cord{x - 1, 20 - y};
+    int newshape;
+    using CA = __cord[];
+
+    if (t == _O_)
+        return make_tuple(c0 + ((__cord[])  {{-2, -2}, {-2, -1}, {-1, -1}, {-1, -2}})[o], 0); // _O_
+    else if (t == _I_)
+    {
+        if ((o & 1))
+            return make_tuple(c0 + (CA{{-2, -1 }, {-1, -1}})[o >> 1], 1);
+        else return make_tuple(c0 + (CA{{-2, -2}, {-2, -1}})[o >> 1], 2);
+    } else if (t == _S_)
+    {
+        if (~o & 1)
+            return make_tuple(c0 + (CA{{-2, -1}, {-2, -2}})[o >> 1], 3);
+        else  return make_tuple(c0 + (CA{{-2, -1}, {-3, -1}})[o >> 1], 4);
+    } else if (t == _Z_)
+    {
+        if (~o & 1)
+            return make_tuple(c0+ (CA{{-2, -1}, {-2, -2}})[o >> 1], 5);
+        else return make_tuple(c0+ (CA{{-2, -1}, {-3, -1}})[o >> 1], 6);
+    } else if (t == _L_) return make_tuple(c0 +  __cord{-2, -1}, 7 + o);
+    else if (t == _J_) return make_tuple(c0 + __cord{-2, -1} , 11 + o);
+    else if (t == _T_) return make_tuple(c0 + __cord{-2, -1}, ((int[]){2, 3, 0, 1})[o] + 15);
+}
 constexpr int blockHeight[7][4]={
         {0,1,1,1},
         {0,1,1,1},

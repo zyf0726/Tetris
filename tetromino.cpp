@@ -30,7 +30,21 @@ int place_tetromino (struct board * board, struct tetromino * tetromino, int pos
             }
         }
     }
+/*
 
+----------
+**********
+**********
+**********
+**********
+----------
+----------
+----------
+----------
+----------
+
+
+ * */
     i--;
 
     found_i:

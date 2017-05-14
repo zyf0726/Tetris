@@ -10,6 +10,7 @@
 
 步骤：
 1. (t, x, y, o) -> (T, x, y)
+![](https://wiki.botzone.org/images/e/e5/Tetris.Blocks.png)
 1. 重写恢复棋盘状态
 2. 给Tea加上bfs寻路径操作
 3. 重写寻找最优方法：phenotype.cpp:look_ahead
