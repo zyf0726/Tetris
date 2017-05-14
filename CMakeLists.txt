@@ -8,3 +8,8 @@ add_executable(ga_experiment ga_experiment.cpp)
 add_executable(ga_summary ga_summary.cpp)
 target_link_libraries(ga_summary pthread)
 add_executable(genetic_algorithm genetic_algorithm.cpp)
+
+
+add_executable(training  selection.cpp population.cpp phenotype.cpp genotype.cpp
+random.cpp board.cpp tetromino.cpp feature_functions.cpp feature_helpers.cpp options.cpp tetris.cpp )
+
