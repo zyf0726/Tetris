@@ -272,7 +272,7 @@ int game_board::evaluate() {
     features[5] *= 32;
     features[6] *= 4;
 
-    int weight[7]={3408, 2147, -281, 167, 1423, 126,224};
+    int weight[7]={3472, 1723, -367, 178, 911, 3035, 1223};
     int ans=0;
     for(int i=0;i<7;i++)
         ans+=features[i]*weight[i];

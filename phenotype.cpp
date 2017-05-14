@@ -140,20 +140,8 @@ struct alternative {
     float score;
 };
 
-struct future {
-    int size;
-    alternative * alternatives;
-};
+using future = vector<alternative>;
 
-void expand_future(future * f, alternative * alt) {
-    if (f->size == 0) {
-        f->alternatives = (alternative*)malloc(sizeof(alternative));
-    } else {
-        f->alternatives = (alternative*)realloc(f->alternatives, sizeof(alternative) * (f->size + 1));
-    }
-
-    f->alternatives[f->size++] = *alt;
-}
 
 void _look_ahead(future * f, board * brd, phenotype * phenotype, int n_ahead, alternative * alt, int next_tetrominos[], options* opt) {
     // See how many rotations exists of the next tetromino.
@@ -211,7 +199,7 @@ void _look_ahead(future * f, board * brd, phenotype * phenotype, int n_ahead, al
 
                     free(tlp.lines_removed);
 
-                    expand_future(f, alt);
+                    f->push_back(*alt);
                 } else {
                     remove_lines(&boards[board_i], NULL);
 
@@ -235,25 +223,20 @@ void look_ahead(future * f, board * board, phenotype* phenotype, int next_tetrom
 }
 
 int continue_board(board * board, phenotype* phenotype, int next_tetrominos[], options* opt) {
-    future f = {
-        .size = 0,
-    };
-
+    future f;
     look_ahead(&f, board, phenotype, next_tetrominos, opt);
 
-    if (f.size == 0) {
-        free(f.alternatives);
+    if (f.size() == 0) {
+
         return 1;
     } else {
-        alternative max_alt = f.alternatives[0];
+        alternative max_alt = f[0];
 
-        for (int i = 1; i < f.size; i++) {
-            if (f.alternatives[i].score > max_alt.score) {
-                max_alt = f.alternatives[i];
+        for (int i = 1; i < f.size(); i++) {
+            if (f[i].score > max_alt.score) {
+                max_alt = f[i];
             }
         }
-
-        free(f.alternatives);
 
         place_tetromino(
             board,

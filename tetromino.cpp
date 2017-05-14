@@ -4,7 +4,7 @@
 #include "board.h"
 #include "random.h"
 
-struct tetromino tetrominos[19] = {
+ tetromino tetrominos[19] = {
     {
         .lines = {
           0x0000, // 0b0000000000000000

@@ -2,12 +2,13 @@
 #include "shared.h"
 
 struct tetromino {
+    uint16_t lines[4];
     int p_top;
     int p_left;
     int p_right;
     int p_bottom;
 
-    uint16_t lines[4];
+
 };
 extern tetromino tetrominos[19];
 struct t_last_placement {

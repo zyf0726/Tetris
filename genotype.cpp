@@ -4,6 +4,8 @@
 #include "genotype.h"
 #include "options.h"
 #include "random.h"
+#include "feature_functions.h"
+#include "feature_helpers.h"
 
 void free_genotype (struct genotype* g) {
     free(g->feature_weights);

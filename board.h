@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "shared.h"
+#include "tetromino.h"
 
 #define LINE_MASK  (uint16_t) 0x7FE0 // 0b0111111111100000
 #define EMPTY_LINE (uint16_t) 0x8010 // 0b1000000000010000
@@ -15,13 +16,13 @@ struct board {
 };
 extern uint16_t cell_masks[BOARD_WIDTH];
 
-struct board copy_board (struct board * board);
-int remove_lines (struct board * board, struct t_last_placement * tlp);
-void remove_line (struct board * board, int line);
-int get_tile (int x, int y, struct board * board);
-void set_tile (int x, int y, struct board * board, int value);
-void print_board (FILE * stream, struct board * board);
-void free_board (struct board * board);
-void read_board (struct board * board);
+board copy_board (board * board);
+int remove_lines (board * board, t_last_placement * tlp);
+void remove_line (board * board, int line);
+int get_tile (int x, int y, board * board);
+void set_tile (int x, int y, board * board, int value);
+void print_board (FILE * stream, board * board);
+void free_board (board * board);
+void read_board (board * board);
 
 #endif

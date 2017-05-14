@@ -97,7 +97,7 @@ void print_board (FILE * stream, struct board * board) {
 void free_board (struct board * board) {
     // NOOP.
 }
-
+/*
 void read_board (struct board * board) {
     size_t len;
     char * line = NULL;
@@ -113,4 +113,4 @@ void read_board (struct board * board) {
             }
         }
     }
-}
+}*/

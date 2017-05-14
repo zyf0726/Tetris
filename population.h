@@ -1,7 +1,7 @@
 #ifndef POPULATION_H
 #define POPULATION_H
 
-#include "structs.h"
+//#include "structs.h"
 
 struct population {
     int size;
