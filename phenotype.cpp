@@ -154,34 +154,34 @@ inline vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int ne
         const tetromino &te = tetrominos[next_tetromino + rotation_i];
         //n_boards += BOARD_WIDTH - 4 + 1 + te.p_left + te.p_right;
         bool __state[BOARD_HEIGHT + 5][BOARD_WIDTH + 4]{};
-#define ST(x, y) __state[(x) + 4][(y) + 4]
+#define ST(y, x) __state[(y) + 4][(x) + 4]
 
 
-        int bg = -te.p_left, ed = te.p_right + BOARD_HEIGHT - 3;
-        for (int i = bg; i <  ed; ++i) ST(-te.p_bottom, i) = true;
-        for (int i = -te.p_bottom; i < BOARD_HEIGHT - 3 + te.p_bottom; ++i) // TODO 要特判到底的情况
+        int begin_x = -te.p_left, end_x = te.p_right + BOARD_HEIGHT - 3;
+        for (int i = begin_x; i <  end_x; ++i) ST(-te.p_bottom, i) = true;
+        for (int yy = -te.p_bottom; yy < BOARD_HEIGHT - 3 + te.p_bottom; ++yy) // TODO 要特判到底的情况
         {
             //i->i + 1
-            for (int j = bg; j < ed; ++j) if (ST(i, j))
-                if (!brd->valid_pos(te, i + 1, j))
+            for (int xx = begin_x; xx < end_x; ++xx) if (ST(yy, xx))
+                if (!brd->valid_pos(te, yy + 1, xx))
                 {
                     //if i >=足够使进入棋局的位置, then成为可行决策
-                    if (i >= -te.p_top)
+                    if (yy >= -te.p_top)
                     {
-                        alternative alt =  {  i,  rotation_i, j };
-                        t_last_placement tlp = {  &te, .x = i, .y = j, };
-                        board cp(*brd); cp.place(te, i, j); cp.remove_lines(&tlp);
+                        alternative alt =  {  yy,  rotation_i, xx };
+                        t_last_placement tlp = {  &te, .x = xx, .y = yy, };
+                        board cp(*brd); cp.place(te, xx, yy); cp.remove_lines(&tlp);
                         alt.score = board_score(&cp, brd, phenotype, &tlp, opt);
                         free(tlp.lines_removed);
                         f.push_back(alt);
                     }
                 } else
                 {
-                    for (int k = -1; k + j >= bg; --k)
-                        if (!ST(i + 1, j + k) && brd->valid_pos(te, i + 1, j + k)) ST(i + 1, j + k) = true;
+                    for (int k = -1; k + xx >= begin_x; --k)
+                        if (!ST(yy + 1, xx + k) && brd->valid_pos(te, xx + k, yy + 1)) ST(yy + 1, xx + k) = true;
                         else break;
-                    for (int k = 1; k + j < ed; ++k)
-                        if (!ST(i + 1, j + k) && brd->valid_pos(te, i + 1, j + k)) ST(i + 1, j + k) = true;
+                    for (int k = 1; k + xx < end_x; ++k)
+                        if (!ST(yy + 1, xx + k) && brd->valid_pos(te, xx + k, yy + 1)) ST(yy + 1, xx + k) = true;
                         else break;
                 }
         }

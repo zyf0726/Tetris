@@ -120,7 +120,7 @@ __attribute__((optimize("unroll-loops")))
 inline bool board::valid_pos(ctet tr, int x, int y) const
 __attribute__((optimize("unroll-loops")))
 {
-    if (y >= BOARD_WIDTH - 4 + tr.p_bottom) return false;
+    if (y >= BOARD_HEIGHT - 4 + tr.p_bottom) return false;
     uint16_t ls[4];
     shift_lines(ls, x, &tr);
     for (int dy = tr.p_top; dy < 4 - tr.p_bottom; ++dy)
