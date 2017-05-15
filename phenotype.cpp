@@ -142,10 +142,11 @@ float average_phenotype_fitness (phenotype * pt, options* opt) {
 
 
 
-inline vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int next_tetromino, options* opt)
+vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int next_tetromino, options* opt)
 {
     vector<alternative> f;
     int n_rotations;
+    N_TETROMINO(&next_tetromino, next_tetromino);
     N_ROTATIONS(&n_rotations, next_tetromino);
     int n_boards = 0;
 
@@ -168,10 +169,11 @@ inline vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int ne
                     //if i >=足够使进入棋局的位置, then成为可行决策
                     if (yy >= -te.p_top)
                     {
-                        alternative alt =  {  yy,  rotation_i, xx };
+                        alternative alt =  {  xx, yy, rotation_i };
                         t_last_placement tlp = {  &te, .x = xx, .y = yy, };
                         board cp(*brd); cp.place(te, xx, yy); cp.remove_lines(&tlp);
                         alt.score = board_score(&cp, brd, phenotype, &tlp, opt);
+                        alt.b = cp;
                         free(tlp.lines_removed);
                         f.push_back(alt);
                     }
@@ -190,15 +192,3 @@ inline vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int ne
     return f;
 }
 
-
-
-alternative continue_board(board *board, phenotype *phenotype, int next_tetromino, options *opt)
-{
-    auto f = _look_ahead(board, phenotype,  next_tetromino, opt);
-    if (f.size() == 0) throw 1;
-    else {
-        alternative& max_alt = *max_element(f.begin(), f.end());
-        board->directly_drop( &tetrominos[next_tetromino + max_alt.rotation_i], max_alt.position_i, NULL);
-        return max_alt;
-    }
-}
