@@ -5,7 +5,6 @@
 
 #include "main.h"
 #include "phenotype.h"
-#include "feature_functions.h"
 #include "feature_helpers.h"
 #include "options.h"
 
@@ -37,8 +36,8 @@ options global_option = {
         .n_features_enabled    = 0,
         .n_weights_enabled     = 0,
 };
-int main()
-{
+
+int main() {
     initialize_feature_helpers(&global_option);
 #define EF(x) enable_feature(feature_index(x), &global_option);
     EF("--f-n-holes");
@@ -64,7 +63,8 @@ int main()
         global_phenotype->genotype->feature_enabled[i] = 1;
     }
 
-    global_phenotype->genotype->feature_weights = {-35, -51, -46, -12, 19, 6, 50, 25, 17, -19, -38, -42, -41, -60, -155};
+    global_phenotype->genotype->feature_weights = {-35, -51, -46, -12, 19, 6, 50, 25, 17, -19, -38, -42, -41, -60,
+                                                   -155};
     // 加速输入
     istream::sync_with_stdio(false);
     int turnID, blockType;
@@ -85,8 +85,7 @@ int main()
     // 然后分析以前每回合的输入输出，并恢复状态
     // 循环中，color 表示当前这一行是 color 的行为
     // 平台保证所有输入都是合法输入
-    for (int i = 1; i < turnID; i++)
-    {
+    for (int i = 1; i < turnID; i++) {
         int currTypeForColor[2] = {nextTypeForColor[0], nextTypeForColor[1]};
         int x, y, o;
         // 根据这些输入输出逐渐恢复状态到当前回合
@@ -120,13 +119,15 @@ int main()
     }
 
     int blockForEnemy, finalX, finalY, finalO;
-    float val;
 
     // 遇事不决先输出（平台上编译不会输出）
     g.printField();
 
-    auto f=_look_ahead(g.gb+currBotColor,global_phenotype,shape_order_rev[nextTypeForColor[currBotColor]],&global_option);
+    auto f = _look_ahead(g.gb + currBotColor, global_phenotype, shape_order_rev[nextTypeForColor[currBotColor]],
+                         &global_option);
 //TODO xyo
+
+    alternative best_alt = *max_element(f.begin(), f.end());
 
 
     blockForEnemy = g.worst_for_enemy(currBotColor); //FIXME:

@@ -9,7 +9,7 @@ struct phenotype {
 struct alternative
 {
     int x, y;
-    int rotation_i;
+    int offset;
     float score;
     board b;
 };
@@ -20,4 +20,4 @@ void free_phenotype (phenotype * phenotype);
 int compare_phenotypes (const void * p_1, const void * p_2);
 void write_phenotype (FILE * stream, phenotype * phenotype, options * opt);
 float board_score (board * new_board, board * old_board, phenotype* phenotype, t_last_placement * tlp, options * opt);
-vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int next_tetromino, options* opt);
+vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int Ty1, options* opt);

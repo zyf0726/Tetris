@@ -53,7 +53,7 @@ enum SHAPES
     _I_,
     _O_
 };
-constexpr SHAPES shape_prder[] = { _O_, _I_, _S_, _Z_, _L_, _J_, _T_ };
+constexpr SHAPES shape_order[] = { _O_, _I_, _S_, _Z_, _L_, _J_, _T_ };
 constexpr int shape_order_rev[] = { 4, 5, 2, 3, 6, 1, 0};
 enum ORI
 {

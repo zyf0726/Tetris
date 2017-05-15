@@ -6,8 +6,6 @@
 #include "genotype.h"
 #include "options.h"
 #include "phenotype.h"
-#include "random.h"
-#include "tetromino.h"
 
 
 phenotype *copy_phenotype(phenotype *ori, options *opt)
@@ -142,17 +140,17 @@ float average_phenotype_fitness (phenotype * pt, options* opt) {
 
 
 
-vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int next_tetromino, options* opt)
+vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int Ty1, options* opt)
 {
     vector<alternative> f;
-    int n_rotations;
-    N_TETROMINO(&next_tetromino, next_tetromino);
-    N_ROTATIONS(&n_rotations, next_tetromino);
+    int tet_offset_all, tet_base;
+    N_TETROMINO(&tet_base, Ty1);
+    N_ROTATIONS(&tet_offset_all, Ty1);
     int n_boards = 0;
 
-    for (int rotation_i = 0; rotation_i < n_rotations; rotation_i++)
+    for (int tet_offset = 0; tet_offset < tet_offset_all; tet_offset++)
     {
-        const tetromino &te = tetrominos[next_tetromino + rotation_i];
+        const tetromino &te = tetrominos[Ty1 + tet_offset];
         //n_boards += BOARD_WIDTH - 4 + 1 + te.p_left + te.p_right;
         bool __state[BOARD_HEIGHT + 5][BOARD_WIDTH + 4]{};
 #define ST(y, x) __state[(y) + 4][(x) + 4]
@@ -160,7 +158,7 @@ vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int next_tetr
 
         int begin_x = -te.p_left, end_x = te.p_right + BOARD_HEIGHT - 3;
         for (int i = begin_x; i <  end_x; ++i) ST(-te.p_bottom, i) = true;
-        for (int yy = -te.p_bottom; yy < BOARD_HEIGHT - 3 + te.p_bottom; ++yy) // TODO 要特判到底的情况
+        for (int yy = -te.p_bottom; yy < BOARD_HEIGHT - 3 + te.p_bottom; ++yy)
         {
             //i->i + 1
             for (int xx = begin_x; xx < end_x; ++xx) if (ST(yy, xx))
@@ -169,7 +167,7 @@ vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int next_tetr
                     //if i >=足够使进入棋局的位置, then成为可行决策
                     if (yy >= -te.p_top)
                     {
-                        alternative alt =  {  xx, yy, rotation_i };
+                        alternative alt =  {  xx, yy, tet_offset };
                         t_last_placement tlp = {  &te, .x = xx, .y = yy, };
                         board cp(*brd); cp.place(te, xx, yy); cp.remove_lines(&tlp);
                         alt.score = board_score(&cp, brd, phenotype, &tlp, opt);
