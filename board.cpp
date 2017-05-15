@@ -3,6 +3,8 @@
 #include "feature_functions.h"
 #include "tetromino.h"
 
+#define CELL_MASKS(x) uint16_t(1u << (14 - (x)))
+
 uint16_t cell_masks[BOARD_WIDTH] = {
         0x4000, // 0b0100000000000000
         0x2000, // 0b0010000000000000
@@ -62,17 +64,17 @@ void board::remove_line(int line)
 
 int board::get_tile(int x, int y)
 {
-    return lines[y] & cell_masks[x];
+    return lines[y] & CELL_MASKS(x);
 }
 
 void set_tile(int x, int y, struct board *board, int value)
 {
     if (value)
     {
-        board->lines[y] |= cell_masks[x];
+        board->lines[y] |= CELL_MASKS(x);
     } else
     {
-        board->lines[y] &= ~cell_masks[x];
+        board->lines[y] &= ~CELL_MASKS(x);
     }
 }
 
@@ -84,7 +86,7 @@ void print_board(FILE *stream, struct board *board)
 
         for (int x = 0; x < BOARD_WIDTH; x++)
         {
-            if (board->lines[y] & cell_masks[x])
+            if (board->lines[y] & CELL_MASKS(x))
             {
                 fprintf(stream, "#");
             } else
@@ -103,27 +105,49 @@ void print_board(FILE *stream, struct board *board)
     fprintf(stream, "\n");
 }
 
-int board::directly_drop(const tetromino *tr, int position, int *placement)
+inline void shift_lines(uint16_t lines[], int position, ctet tr)
+__attribute__((optimize("unroll-loops")))
 {
-    uint16_t lines[4];
-    shift_lines(lines, position, tr);
+    if (position == 0)
+        for (int i = 0; i < 4; ++i) lines[i] = tr.lines[i] | EMPTY_LINE;
+    else if (position > 0)
+        for (int i = 0; i < 4; ++i) lines[i] = tr.lines[i] >> position | EMPTY_LINE;
+    else
+        for (int i = 0; i < 4; ++i) lines[i] = tr.lines[i] << -position | EMPTY_LINE;
+
+}
+
+inline bool board::valid_pos(ctet tr, int x, int y) const
+__attribute__((optimize("unroll-loops")))
+{
+    if (y >= BOARD_WIDTH - 4 + tr.p_bottom) return false;
+    uint16_t ls[4];
+    shift_lines(ls, x, &tr);
+    for (int dy = tr.p_top; dy < 4 - tr.p_bottom; ++dy)
+        if (lines[y + dy] & ls[dy] != EMPTY_LINE) return false;
+    return true;
+}
+
+int board::directly_drop(const tetromino *tr, int position, int *placement) {
+    uint16_t ls[4];
+    shift_lines(ls, position, *tr);
     int i;
     for (i = -tr->p_top; i < BOARD_HEIGHT + tr->p_bottom - 4 + 1; i++)
         for (int y = tr->p_top; y < 4 - tr->p_bottom; y++)
-            if ((lines[i + y] & lines[y]) != EMPTY_LINE)
+            if ((lines[i + y] & ls[y]) != EMPTY_LINE)
             {
                 i--;
                 goto found_i;
             }
     i--;
 
-found_i:
+    found_i:
     if (i < -tr->p_top) return 1;
 
     if (placement != NULL)
         *placement = i;
 
-    for (int y = tr->p_top; y < 4 - tr->p_bottom; y++) lines[i + y] |= lines[y];
+    for (int y = tr->p_top; y < 4 - tr->p_bottom; y++) ls[i + y] |= ls[y];
     return 0;
 }
 /*

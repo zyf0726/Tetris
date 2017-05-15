@@ -127,8 +127,10 @@ int main()
 
     alternative alt  = continue_board(g.gb + currBotColor, global_phenotype,shape_order_rev[nextTypeForColor[currBotColor]],
             &global_option);
+//TODO xyo
 
-    blockForEnemy = g.worst_for_enemy(currBotColor);
+
+    blockForEnemy = g.worst_for_enemy(currBotColor); //FIXME:
 
     // 决策结束，输出结果（你只需修改以上部分）
 

@@ -289,7 +289,7 @@ struct t_last_placement {
     }
 
 
-INLINE void shift_lines(uint16_t lines[], int position, const tetromino* tr);
+INLINE void shift_lines(uint16_t lines[], int position, ctet tr);
 int random_tetromino (struct options* opt);
 inline tuple<__cord, int> __toxy2Txy(SHAPES t, ORI o, int x, int y)
 {
@@ -303,9 +303,15 @@ inline tuple<__cord, int> __toxy2Txy(SHAPES t, ORI o, int x, int y)
     else if (t == _J_) return make_tuple(c0 + __cord{-2, -1} , 11 + o);
     else if (t == _T_) return make_tuple(c0 + __cord{-2, -1}, ((int[]){2, 3, 0, 1})[o] + 15);
 }
-using c_pt_tet = const tetromino*;
+using cptr_tet = const tetromino*;
+using ctet = const tetromino&;
 inline tuple<const tetromino*, int , int > toxy2TXY(SHAPES t, ORI o, int x, int y)
 {
     auto r = __toxy2Txy(t, o, x, y);
     return make_tuple(&tetrominos[get<1>(r)], get<0>(r).x, get<0>(r).y);
 }
+inline tuple<int, int, int, int> TXY2toxy(cptr_tet Ty, int x, int y)
+{
+
+
+};

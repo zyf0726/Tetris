@@ -16,7 +16,7 @@ struct board {
     int remove_lines (t_last_placement * tlp);
 
     int get_tile (int x, int y);
-    INLINE void place(const tetromino* tr, int x, int y)
+    INLINE void place(ctet tr, int x, int y)
     {
         uint16_t tl[4]; shift_lines(tl, x, tr);
         for (int i = 0; i < 4; ++i)
@@ -30,6 +30,7 @@ struct board {
     }
 
     int directly_drop(const tetromino *tr, int position, int *placement);
+    INLINE bool valid_pos(ctet tr, int x, int y) const ;
 
 private:
     void remove_line(int line);

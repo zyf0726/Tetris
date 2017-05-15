@@ -151,35 +151,42 @@ inline vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int ne
 
     for (int rotation_i = 0; rotation_i < n_rotations; rotation_i++)
     {
-        const tetromino &tetromino = tetrominos[next_tetromino + rotation_i];
-        n_boards += BOARD_WIDTH - 4 + 1 + tetromino.p_left + tetromino.p_right;
-        //DP
-    }
+        const tetromino &te = tetrominos[next_tetromino + rotation_i];
+        //n_boards += BOARD_WIDTH - 4 + 1 + te.p_left + te.p_right;
+        bool __state[BOARD_HEIGHT + 5][BOARD_WIDTH + 4]{};
+#define ST(x, y) __state[(x) + 4][(y) + 4]
 
-    board *boards = (board *) malloc(sizeof(board) * n_boards);
-    for (int i = 0; i < n_boards; i++) boards[i] = board(*brd);
-    int board_i = 0;
-    for (int rotation_i = 0; rotation_i < n_rotations; rotation_i++)
-    {
-        const tetromino &tetromino = tetrominos[next_tetromino + rotation_i];
-        int positions = BOARD_WIDTH - 4 + 1 + tetromino.p_left + tetromino.p_right;
-        for (int position_i = -tetromino.p_left; position_i < positions - tetromino.p_left; position_i++)
+
+        int bg = -te.p_left, ed = te.p_right + BOARD_HEIGHT - 3;
+        for (int i = bg; i <  ed; ++i) ST(-te.p_bottom, i) = true;
+        for (int i = -te.p_bottom; i < BOARD_HEIGHT - 3 + te.p_bottom; ++i) // TODO 要特判到底的情况
         {
-            int y;
-            if (boards[board_i].directly_drop(&tetromino, position_i, &y) == 0)
-            {
-                alternative alt =  {  position_i,  rotation_i, y };
-                t_last_placement tlp = {  &tetromino, .x = position_i, .y = y, };
-                boards[board_i].remove_lines(&tlp);
-                alt.score = board_score(&boards[board_i], brd, phenotype, &tlp, opt);
-                free(tlp.lines_removed);
-                f.push_back(alt);
-                board_i++;
-            }
+            //i->i + 1
+            for (int j = bg; j < ed; ++j) if (ST(i, j))
+                if (!brd->valid_pos(te, i + 1, j))
+                {
+                    //if i >=足够使进入棋局的位置, then成为可行决策
+                    if (i >= -te.p_top)
+                    {
+                        alternative alt =  {  i,  rotation_i, j };
+                        t_last_placement tlp = {  &te, .x = i, .y = j, };
+                        board cp(*brd); cp.place(te, i, j); cp.remove_lines(&tlp);
+                        alt.score = board_score(&cp, brd, phenotype, &tlp, opt);
+                        free(tlp.lines_removed);
+                        f.push_back(alt);
+                    }
+                } else
+                {
+                    for (int k = -1; k + j >= bg; --k)
+                        if (!ST(i + 1, j + k) && brd->valid_pos(te, i + 1, j + k)) ST(i + 1, j + k) = true;
+                        else break;
+                    for (int k = 1; k + j < ed; ++k)
+                        if (!ST(i + 1, j + k) && brd->valid_pos(te, i + 1, j + k)) ST(i + 1, j + k) = true;
+                        else break;
+                }
         }
+#undef ST
     }
-    free(boards);
-    return f;
 }
 
 

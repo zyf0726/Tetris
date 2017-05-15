@@ -4,22 +4,6 @@
 #include "board.h"
 #include "random.h"
 
-void shift_lines(uint16_t lines[], int position, const tetromino* tr)
-{
-
-    for (int i = 0; i < 4; i++) {
-        if (position == 0) {
-            lines[i] = tr->lines[i];
-        } else if (position > 0) {
-            lines[i] = tr->lines[i] >> position;
-        } else {
-            lines[i] = tr->lines[i] << -position;
-        }
-
-        lines[i] |= EMPTY_LINE;
-    }
-
-}
 
 
 int random_tetromino (struct options* opt) {
