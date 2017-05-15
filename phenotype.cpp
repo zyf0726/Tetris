@@ -187,6 +187,7 @@ inline vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int ne
         }
 #undef ST
     }
+    return f;
 }
 
 
