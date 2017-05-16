@@ -156,5 +156,11 @@ int main() {
 
     cout << blockForEnemy << " " << best_alt.x << " " << best_alt.y << " " << best_alt.o;
 
+    cout<<endl;
+
+    auto r = toxy2TXY((SHAPES) nextTypeForColor[currBotColor], (ORI) best_alt.o, best_alt.x, best_alt.y);
+    g.gb[currBotColor].put_eliminate(get<0>(r), get<1>(r), get<2>(r));
+    g.printField();
+
     return 0;
 }

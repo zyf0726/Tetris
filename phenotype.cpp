@@ -159,7 +159,7 @@ vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int Ty1, opti
 
     for (int tet_offset = 0; tet_offset < tet_offset_all; tet_offset++)
     {
-        const tetromino &te = tetrominos[Ty1 + tet_offset];
+        const tetromino &te = tetrominos[tet_base + tet_offset];
         //n_boards += BOARD_WIDTH - 4 + 1 + te.p_left + te.p_right;
         int __state[BOARD_HEIGHT + 5][BOARD_WIDTH + 4];
         memset(__state, 0, sizeof(__state));
