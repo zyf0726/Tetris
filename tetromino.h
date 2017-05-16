@@ -1,7 +1,8 @@
 #pragma once
 
+#ifndef SINGLEFILE
 #include "shared.h"
-
+#endif
 
 struct tetromino {
     uint16_t lines[4];
@@ -271,7 +272,7 @@ constexpr tetromino tetrominos[19] = {
         },
 };
 struct t_last_placement {
-    const tetromino *tetromino;
+    const tetromino *tet;
     int x;
     int y;
     int n_lines_removed;
