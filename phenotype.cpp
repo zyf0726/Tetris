@@ -166,8 +166,8 @@ vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int Ty1, opti
 
 
         int begin_x = -te.p_left, end_x = te.p_right + BOARD_WIDTH - 3;
-        for (int i = begin_x; i <  end_x; ++i) ST(-te.p_bottom, i) = true;
-        for (int yy = -te.p_bottom; yy < BOARD_HEIGHT - 3 + te.p_bottom; ++yy)
+        for (int i = begin_x; i <  end_x; ++i) ST(te.p_bottom - 4, i) = true;
+        for (int yy = te.p_bottom - 4; yy < BOARD_HEIGHT - 3 + te.p_bottom; ++yy)
         {
             //i->i + 1
             for (int xx = begin_x; xx < end_x; ++xx)
