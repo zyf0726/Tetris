@@ -2,7 +2,7 @@
 #ifndef SINGLEFILE
 #include "shared.h"
 #include "board.h"
-#include "tetromino.h
+#include "tetromino.h"
 #endif
 class game_board : public board
 {
@@ -24,5 +24,4 @@ public:
 
     friend class game_manager;
     void put_eliminate(const tetromino *tr, int x, int y);
-    void get_decision(int next_tetromino);
 };

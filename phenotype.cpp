@@ -54,7 +54,7 @@ void write_phenotype(FILE *stream, phenotype *phenotype, options *opt)
     {
         if (strlen(features[opt->enabled_f_indices[i]].name) > max_feature_length)
         {
-            max_feature_length = strlen(features[opt->enabled_f_indices[i]].name);
+            max_feature_length = (int)strlen(features[opt->enabled_f_indices[i]].name);
         }
     }
 
@@ -161,28 +161,36 @@ vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int Ty1, opti
         for (int yy = -te.p_bottom; yy < BOARD_HEIGHT - 3 + te.p_bottom; ++yy)
         {
             //i->i + 1
-            for (int xx = begin_x; xx < end_x; ++xx) if (ST(yy, xx))
-                if (!brd->valid_pos(te, yy + 1, xx))
+            for (int xx = begin_x; xx < end_x; ++xx)
+                if (ST(yy, xx))
                 {
-                    //if i >=足够使进入棋局的位置, then成为可行决策
-                    if (yy >= -te.p_top)
+                    if (!brd->valid_pos(te, yy + 1, xx))
                     {
-                        alternative alt =  {  xx, yy, tet_offset };
-                        t_last_placement tlp = {  &te, .x = xx, .y = yy, };
-                        board cp(*brd); cp.place(te, xx, yy); cp.remove_lines(&tlp);
-                        alt.score = board_score(&cp, brd, phenotype, &tlp, opt);
-                        alt.b = cp;
-                        free(tlp.lines_removed);
-                        f.push_back(alt);
+                        //if i >=足够使进入棋局的位置, then成为可行决策
+                        if (yy >= -te.p_top)
+                        {
+                            ORI o;
+                            int x, y;
+                            tie(o, x, y) = TXY2toxy(Ty1, tet_offset, __cord{xx, yy});
+                            alternative alt = {o, x, y};
+                            t_last_placement tlp = {&te, .x = xx, .y = yy,};
+                            board cp(*brd);
+                            cp.place(te, xx, yy);
+                            cp.remove_lines(&tlp);
+                            alt.score = board_score(&cp, brd, phenotype, &tlp, opt);
+                            alt.b = cp;
+                            free(tlp.lines_removed);
+                            f.push_back(alt);
+                        }
+                    } else
+                    {
+                        for (int k = -1; k + xx >= begin_x; --k)
+                            if (!ST(yy + 1, xx + k) && brd->valid_pos(te, xx + k, yy + 1)) ST(yy + 1, xx + k) = true;
+                            else break;
+                        for (int k = 1; k + xx < end_x; ++k)
+                            if (!ST(yy + 1, xx + k) && brd->valid_pos(te, xx + k, yy + 1)) ST(yy + 1, xx + k) = true;
+                            else break;
                     }
-                } else
-                {
-                    for (int k = -1; k + xx >= begin_x; --k)
-                        if (!ST(yy + 1, xx + k) && brd->valid_pos(te, xx + k, yy + 1)) ST(yy + 1, xx + k) = true;
-                        else break;
-                    for (int k = 1; k + xx < end_x; ++k)
-                        if (!ST(yy + 1, xx + k) && brd->valid_pos(te, xx + k, yy + 1)) ST(yy + 1, xx + k) = true;
-                        else break;
                 }
         }
 #undef ST

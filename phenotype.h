@@ -8,10 +8,10 @@ struct phenotype {
 };
 struct alternative
 {
-    int x, y;
-    int offset;
+    int o, x, y;
     float score;
     board b;
+    bool operator<(const alternative& other) const { return score < other.score; }
 };
 
 phenotype* copy_phenotype (phenotype* phenotype, options* opt);

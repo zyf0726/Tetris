@@ -1,7 +1,5 @@
 #include "shared.h"
 #include "board.h"
-#include "feature_functions.h"
-#include "tetromino.h"
 
 #define CELL_MASKS(x) uint16_t(1u << (14 - (x)))
 
@@ -106,7 +104,6 @@ void print_board(FILE *stream, struct board *board)
 }
 
 inline void shift_lines(uint16_t lines[], int position, ctet tr)
-__attribute__((optimize("unroll-loops")))
 {
     if (position == 0)
         for (int i = 0; i < 4; ++i) lines[i] = tr.lines[i] | EMPTY_LINE;
@@ -117,14 +114,13 @@ __attribute__((optimize("unroll-loops")))
 
 }
 
-inline bool board::valid_pos(ctet tr, int x, int y) const
-__attribute__((optimize("unroll-loops")))
+bool board::valid_pos(ctet tr, int x, int y) const
 {
     if (y >= BOARD_HEIGHT - 4 + tr.p_bottom) return false;
     uint16_t ls[4];
-    shift_lines(ls, x, &tr);
+    shift_lines(ls, x, tr);
     for (int dy = tr.p_top; dy < 4 - tr.p_bottom; ++dy)
-        if (lines[y + dy] & ls[dy] != EMPTY_LINE) return false;
+        if ((lines[y + dy] & ls[dy]) != EMPTY_LINE) return false;
     return true;
 }
 

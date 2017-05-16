@@ -8,7 +8,7 @@ void game_board::put_eliminate(const tetromino *tr, int x, int y)
     board new_board(*this);
 
     t_last_placement tlp{tr, x, y, 0, NULL};
-    new_board.place(tr, x, y);
+    new_board.place(*tr, x, y);
     new_board.remove_lines(&tlp);
     transCount = tlp.n_lines_removed;
     for (int i = 0; i < tlp.n_lines_removed; i++)

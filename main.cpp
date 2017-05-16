@@ -63,8 +63,10 @@ int main() {
         global_phenotype->genotype->feature_enabled[i] = 1;
     }
 
-    global_phenotype->genotype->feature_weights = {-35, -51, -46, -12, 19, 6, 50, 25, 17, -19, -38, -42, -41, -60,
-                                                   -155};
+    float fwt[] =  {-35, -51, -46, -12, 19,
+                    6, 50, 25, 17, -19,
+                    -38, -42, -41, -60,   -155};
+    copy(fwt, fwt + 15, global_phenotype->genotype->feature_weights);
     // 加速输入
     istream::sync_with_stdio(false);
     int turnID, blockType;
@@ -118,7 +120,7 @@ int main() {
         g.fixup();
     }
 
-    int blockForEnemy, finalX, finalY, finalO;
+    int blockForEnemy;
 
     // 遇事不决先输出（平台上编译不会输出）
     g.printField();
@@ -129,7 +131,6 @@ int main() {
 
     alternative best_alt = *max_element(f.begin(), f.end());
 
-
     blockForEnemy = g.worst_for_enemy(currBotColor); //FIXME:
 
 
@@ -138,7 +139,7 @@ int main() {
 
     // 决策结束，输出结果（你只需修改以上部分）
 
-    cout << blockForEnemy << " " << finalX << " " << finalY << " " << finalO;
+    cout << blockForEnemy << " " << best_alt.x << " " << best_alt.y << " " << best_alt.o;
 
     return 0;
 }

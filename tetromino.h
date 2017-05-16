@@ -317,14 +317,14 @@ INLINE void shift_lines(uint16_t lines[], int position, ctet tr);
 
 int random_tetromino(struct options *opt);
 
+using CA = __cord[];
 inline tuple<__cord, int> __toxy2Txy(SHAPES t, ORI o, int x, int y) {
     __cord c0 = __cord{x - 1, 20 - y};
-    using CA = __cord[];
     if (t == _O_)
-        return make_tuple(c0 + ((__cord[]) {{-2, -2},
-                                            {-2, -1},
-                                            {-1, -1},
-                                            {-1, -2}})[o], 0); // _O_
+        return make_tuple(c0 + (CA {{-2, -2},
+                                    {-2, -1},
+                                    {-1, -1},
+                                    {-1, -2}})[o], 0); // _O_
     else if (t == _I_)
         return o & 1 ? make_tuple(c0 + (CA{{-2, -1},
                                            {-1, -1}})[o >> 1], 1)
@@ -339,17 +339,42 @@ inline tuple<__cord, int> __toxy2Txy(SHAPES t, ORI o, int x, int y) {
         return ~o & 1 ? make_tuple(c0 + (CA{{-2, -1},
                                             {-2, -2}})[o >> 1], 5)
                       : make_tuple(c0 + (CA{{-2, -1},
-                                            {-3, -1}})[o
-                        >> 1], 6);
+                                            {-3, -1}})[o >> 1], 6);
     else if (t == _L_) return make_tuple(c0 + __cord{-2, -1}, 7 + o);
     else if (t == _J_) return make_tuple(c0 + __cord{-2, -1}, 11 + o);
-    else if (t == _T_) return make_tuple(c0 + __cord{-2, -1}, ((int[]) {2, 3, 0, 1})[o] + 15);
+    else /*if (t == _T_)*/ return make_tuple(c0 + __cord{-2, -1}, ((int[]) {2, 3, 0, 1})[o] + 15);
+
 }
 
-inline tuple<SHAPES, ORI, int, int> TXY2toxy(int Ty1, int offset, int xx, int yy)
+inline tuple<ORI, int, int> TXY2toxy(int Ty1, int offset, __cord C)
 {
-    SHAPES sh = shape_order[Ty1];
-//TODO offset+Ty1 -> toxy
+    SHAPES t = shape_order[Ty1];
+    ORI o; __cord dlt{-2333, -2333};
+    if (t == _O_)
+    {
+        dlt = __cord{2, 2};
+        o = _UP_;
+    }
+    else if (t == _I_)
+    {
+        dlt = CA{{2, 1}, {2, 2}}[offset];
+        o = ORI(~offset & 1);
+    } else if (t == _S_ || t == _Z_)
+    {
+        dlt = __cord{2, 1};
+        o = ORI(offset & 1);
+    } else if (t == _L_ || t == _J_)
+    {
+        dlt = __cord{2, 1};
+        o = ORI(offset);
+    } else /*if (t == _T_)*/
+    {
+        dlt = __cord{2, 1};
+        o = ((ORI[]){_DN_, _RT_, _UP_, _LF_})[offset];
+    }
+    C = C + dlt;
+    return make_tuple(o, C.x + 1, 20 - C.y);
+
 }
 
 inline tuple<const tetromino *, int, int> toxy2TXY(SHAPES t, ORI o, int x, int y) {
