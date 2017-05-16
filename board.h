@@ -19,7 +19,7 @@ struct board {
     INLINE void place(ctet tr, int x, int y)
     {
         uint16_t tl[4]; shift_lines(tl, x, tr);
-        for (int i = 0; i < 4; ++i)
+        for (int i = tr.p_top; i < 4 - tr.p_bottom; ++i)
         {
 #ifdef debug
             assert(0 == (lines[i + y] & tl[i]));
