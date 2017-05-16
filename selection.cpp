@@ -9,12 +9,12 @@
 phenotype** select_parent_pairs (population* ppl, options* opt) {
     phenotype** pairs = (phenotype**)malloc(sizeof(phenotype*) * ppl->size * 2);
 
-    if (opt->selection == TOURNAMENT) {
+    if (opt->sel == TOURNAMENT) {
         for (int i = 0; i < ppl->size; i++) {
             pairs[i * 2 + 0] = select_by_tournament(ppl, opt);
             pairs[i * 2 + 1] = select_by_tournament(ppl, opt);
         }
-    } else if (opt->selection == SUS) {
+    } else if (opt->sel == SUS) {
         pairs = select_by_sus(ppl, ppl->size * 2, opt);
     } else {
         pairs = select_by_sigma_scaling(ppl, ppl->size * 2, opt);

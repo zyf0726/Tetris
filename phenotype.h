@@ -1,10 +1,13 @@
+#pragma once
+#ifndef SINGLEFILE
 #include "shared.h"
 #include "genotype.h"
 #include "board.h"
+#endif
 struct phenotype {
     int fitness;
     int has_fitness;
-    genotype* genotype;
+    genotype* gen;
 };
 struct alternative
 {

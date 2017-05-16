@@ -1,6 +1,7 @@
+#ifndef SINGLEFILE
 #include "shared.h"
 #include "board.h"
-
+#endif
 #define CELL_MASKS(x) uint16_t(1u << (14 - (x)))
 
 uint16_t cell_masks[BOARD_WIDTH] = {
@@ -62,7 +63,7 @@ void board::remove_line(int line)
 
 int board::get_tile(int x, int y)
 {
-    return lines[y] & CELL_MASKS(x);
+    return !!(lines[y] & CELL_MASKS(x));
 }
 
 void set_tile(int x, int y, struct board *board, int value)
@@ -116,7 +117,7 @@ inline void shift_lines(uint16_t lines[], int position, ctet tr)
 
 bool board::valid_pos(ctet tr, int x, int y) const
 {
-    if (y >= BOARD_HEIGHT - 4 + tr.p_bottom) return false;
+    if (y > BOARD_HEIGHT - 4 + tr.p_bottom) return false;
     uint16_t ls[4];
     shift_lines(ls, x, tr);
     for (int dy = tr.p_top; dy < 4 - tr.p_bottom; ++dy)

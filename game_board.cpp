@@ -2,7 +2,7 @@
 
 #include "game_board.h"
 #include "board.h"
-
+#endif
 void game_board::put_eliminate(const tetromino *tr, int x, int y)
 {
     board new_board(*this);
@@ -24,5 +24,4 @@ void game_board::put_eliminate(const tetromino *tr, int x, int y)
 }
 
 
-#endif
 

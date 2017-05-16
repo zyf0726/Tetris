@@ -1,10 +1,11 @@
+#ifndef SINGLEFILE
 #include <string.h>
 
 #include "options.h"
 #include "board.h"
 #include "feature_functions.h"
 #include "feature_helpers.h"
-
+#endif
 char full_cells_on_line[POSSIBLE_LINES];
 feature features[N_FEATURES] = {
     {

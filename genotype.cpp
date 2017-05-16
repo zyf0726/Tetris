@@ -1,3 +1,5 @@
+
+#ifndef SINGLEFILE
 #include <stdlib.h>
 #include <string.h>
 
@@ -6,6 +8,7 @@
 #include "random.h"
 #include "feature_functions.h"
 #include "feature_helpers.h"
+#endif
 
 void free_genotype (genotype* g) {
     free(g->feature_weights);

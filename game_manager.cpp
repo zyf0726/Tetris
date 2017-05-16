@@ -19,7 +19,7 @@ void game_manager::printField()
             "[]",
             "##"
     };
-    clog << "~~：墙，[]：块" << endl;
+
     for (int y = 0; y < MAPHEIGHT; y++)
     {
         clog << "~~";

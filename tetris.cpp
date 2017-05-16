@@ -52,7 +52,7 @@ struct options opt = {
     .crossover_rate                    = 0.5,
     .tournament_group_random_selection = 0.1,
 
-    .selection = TOURNAMENT,
+    .sel = TOURNAMENT,
 };
 
 char* program_name;
@@ -180,11 +180,11 @@ int main (int argc, char **argv) {
         } else if (strcmp(argv[i], "--selection") == 0) {
             i++;
             if (strcmp(argv[i], "TOURNAMENT") == 0) {
-                opt.selection = TOURNAMENT;
+                opt.sel = TOURNAMENT;
             } else if (strcmp(argv[i], "SUS") == 0) {
-                opt.selection = SUS;
+                opt.sel = SUS;
             } else if (strcmp(argv[i], "SIGMA") == 0) {
-                opt.selection = SIGMA;
+                opt.sel = SIGMA;
             } else {
                 printf("Unknown option for selection '%s'.\n", argv[i]);
                 return 1;
@@ -298,7 +298,7 @@ int main (int argc, char **argv) {
             children->individuals[i] = initialize_phenotype(initialize_genotype(&opt));
             parents->individuals[i] = initialize_phenotype(initialize_genotype(&opt));
 
-            randomize_genotype(children->individuals[i]->genotype, &opt);
+            randomize_genotype(children->individuals[i]->gen, &opt);
         }
 
         PRINT_V("A random population has been initialized.\n\n");
@@ -369,12 +369,12 @@ int main (int argc, char **argv) {
                             MPI_COMM_WORLD);
 
                         MPI_Send(
-                            children->individuals[individual]->genotype->feature_weights,
+                            children->individuals[individual]->gen->feature_weights,
                             opt.n_features_enabled, MPI_FLOAT, status.MPI_SOURCE,
                             FEAT_WEIGHTS_TAG, MPI_COMM_WORLD);
 
                         MPI_Send(
-                            children->individuals[individual]->genotype->feature_enabled,
+                            children->individuals[individual]->gen->feature_enabled,
                             opt.n_features_enabled, MPI_INT, status.MPI_SOURCE,
                             FEAT_ENABLED_TAG, MPI_COMM_WORLD);
                     }

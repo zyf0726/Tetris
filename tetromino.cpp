@@ -1,8 +1,8 @@
-#include <stdlib.h>
+#ifndef SINGLEFILE
 
 #include "tetromino.h"
-#include "board.h"
 #include "random.h"
+#endif
 
 
 

@@ -1,2 +1,1 @@
 #define SINGLEFILE
-#define release

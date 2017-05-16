@@ -1,5 +1,7 @@
 #pragma once
+#ifndef SINGLEFILE
 #include "shared.h"
+#endif
 
 struct options {
     int feature_enabled[N_FEATURES];
@@ -27,7 +29,7 @@ struct options {
     float crossover_rate;
     float tournament_group_random_selection;
 
-    selection selection;
+    selection sel;
 
     char* log_directory;
 

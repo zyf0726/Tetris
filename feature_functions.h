@@ -1,9 +1,9 @@
-#ifndef FEATURE_FUNCTIONS_H
-#define FEATURE_FUNCTIONS_H
-
+#pragma once
+#ifndef SINGLEFILE
 #include "shared.h"
 #include "board.h"
 #include "tetromino.h"
+#endif
 struct feature {
     const char * name;
     int weights;
@@ -48,4 +48,3 @@ float f_hole_depths           (board * new_board, board * old_board, t_last_plac
 float f_n_rows_with_holes     (board * new_board, board * old_board, t_last_placement * tlp);
 float f_diversity             (board * new_board, board * old_board, t_last_placement * tlp);
 
-#endif

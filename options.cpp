@@ -1,6 +1,8 @@
 
+#ifndef SINGLEFILE
 #include "options.h"
 #include "feature_functions.h"
+#endif
 
 void enable_feature (int feature_i, struct options * opt) {
     if (opt->feature_enabled[feature_i] == 1) {

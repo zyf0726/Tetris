@@ -1,3 +1,4 @@
+#ifndef SINGLEFILE
 #include "shared.h"
 
 #include "board.h"
@@ -6,6 +7,7 @@
 #include "genotype.h"
 #include "options.h"
 #include "phenotype.h"
+#endif
 
 
 phenotype *copy_phenotype(phenotype *ori, options *opt)
@@ -13,7 +15,7 @@ phenotype *copy_phenotype(phenotype *ori, options *opt)
     phenotype *Copy = (phenotype *) malloc(sizeof(phenotype));
 
     *Copy = *ori;
-    Copy->genotype = copy_genotype(ori->genotype, opt);
+    Copy->gen = copy_genotype(ori->gen, opt);
 
     return Copy;
 }
@@ -24,7 +26,7 @@ phenotype *initialize_phenotype(genotype *g)
 
     p->fitness = 0;
     p->has_fitness = 0;
-    p->genotype = g;
+    p->gen = g;
 
     return p;
 }
@@ -33,7 +35,7 @@ void free_phenotype(phenotype *phenotype)
 {
     if (phenotype != NULL)
     {
-        free_genotype(phenotype->genotype);
+        free_genotype(phenotype->gen);
         free(phenotype);
     }
 }
@@ -62,14 +64,14 @@ void write_phenotype(FILE *stream, phenotype *phenotype, options *opt)
 
     for (int i = 0; i < opt->n_features_enabled; i++)
     {
-        if (phenotype->genotype->feature_enabled[i])
+        if (phenotype->gen->feature_enabled[i])
         {
             for (int a = 0; a < features[opt->enabled_f_indices[i]].weights; a++)
             {
                 fprintf(stream, "%-*s % .2f\n",
                         max_feature_length,
                         features[opt->enabled_f_indices[i]].name,
-                        phenotype->genotype->feature_weights[weight_i++]);
+                        phenotype->gen->feature_weights[weight_i++]);
             }
         }
     }
@@ -81,9 +83,9 @@ float board_score(board *new_board, board *old_board, phenotype *phenotype, t_la
     int weight_i = 0;
     reset_feature_caches(opt);
     for (int i = 0; i < opt->n_features_enabled; i++)
-        if (phenotype->genotype->feature_enabled[i])
+        if (phenotype->gen->feature_enabled[i])
             for (int a = 0; a < features[opt->enabled_f_indices[i]].weights; a++)
-                score += phenotype->genotype->feature_weights[weight_i++] *
+                score += phenotype->gen->feature_weights[weight_i++] *
                          call_feature(opt->enabled_f_indices[i], new_board, old_board, tlp);
     return score;
 }
@@ -137,7 +139,14 @@ float average_phenotype_fitness (phenotype * pt, options* opt) {
     return sum / opt->n_trials;
 }
 */
-
+void output_state(ctet te, int __state[BOARD_HEIGHT + 5][BOARD_WIDTH + 4])
+{
+#define ST(y, x) (__state[(y) + 4][(x) + 4])
+    int begin_x = -te.p_left, end_x = te.p_right + BOARD_WIDTH - 3;
+    for (int yy = -te.p_bottom; yy < BOARD_HEIGHT - 3 + te.p_bottom; ++yy, puts(""))
+        for (int xx = begin_x; xx < end_x; ++xx)
+            putchar(ST(yy, xx) + '0');
+}
 
 
 vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int Ty1, options* opt)
@@ -145,18 +154,18 @@ vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int Ty1, opti
     vector<alternative> f;
     int tet_offset_all, tet_base;
     N_TETROMINO(&tet_base, Ty1);
-    N_ROTATIONS(&tet_offset_all, Ty1);
+    N_ROTATIONS(&tet_offset_all, tet_base);
     int n_boards = 0;
 
     for (int tet_offset = 0; tet_offset < tet_offset_all; tet_offset++)
     {
         const tetromino &te = tetrominos[Ty1 + tet_offset];
         //n_boards += BOARD_WIDTH - 4 + 1 + te.p_left + te.p_right;
-        bool __state[BOARD_HEIGHT + 5][BOARD_WIDTH + 4]{};
-#define ST(y, x) __state[(y) + 4][(x) + 4]
+        int __state[BOARD_HEIGHT + 5][BOARD_WIDTH + 4];
+        memset(__state, 0, sizeof(__state));
 
 
-        int begin_x = -te.p_left, end_x = te.p_right + BOARD_HEIGHT - 3;
+        int begin_x = -te.p_left, end_x = te.p_right + BOARD_WIDTH - 3;
         for (int i = begin_x; i <  end_x; ++i) ST(-te.p_bottom, i) = true;
         for (int yy = -te.p_bottom; yy < BOARD_HEIGHT - 3 + te.p_bottom; ++yy)
         {
@@ -164,7 +173,7 @@ vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int Ty1, opti
             for (int xx = begin_x; xx < end_x; ++xx)
                 if (ST(yy, xx))
                 {
-                    if (!brd->valid_pos(te, yy + 1, xx))
+                    if (!brd->valid_pos(te, xx, yy + 1))
                     {
                         //if i >=足够使进入棋局的位置, then成为可行决策
                         if (yy >= -te.p_top)
@@ -184,12 +193,17 @@ vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int Ty1, opti
                         }
                     } else
                     {
-                        for (int k = -1; k + xx >= begin_x; --k)
-                            if (!ST(yy + 1, xx + k) && brd->valid_pos(te, xx + k, yy + 1)) ST(yy + 1, xx + k) = true;
-                            else break;
-                        for (int k = 1; k + xx < end_x; ++k)
-                            if (!ST(yy + 1, xx + k) && brd->valid_pos(te, xx + k, yy + 1)) ST(yy + 1, xx + k) = true;
-                            else break;
+                        if (!ST(yy + 1, xx))
+                        {
+                            ST(yy + 1, xx) = true;
+                            for (int k = -1; k + xx >= begin_x; --k)
+                                if (!ST(yy + 1, xx + k) && brd->valid_pos(te, xx + k, yy + 1)) ST(yy + 1, xx + k) = true;
+                                else break;
+                            for (int k = 1; k + xx < end_x; ++k)
+                                if (!ST(yy + 1, xx + k) && brd->valid_pos(te, xx + k, yy + 1)) ST(yy + 1, xx + k) = true;
+                                else break;
+
+                        }
                     }
                 }
         }

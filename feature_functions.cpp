@@ -1,3 +1,4 @@
+#ifndef SINGLEFILE
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -5,7 +6,7 @@
 #include "board.h"
 #include "feature_functions.h"
 #include "feature_helpers.h"
-
+#endif
 
 float f_max_height (struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {
     for (int y = 0; y < BOARD_HEIGHT; y++) {
@@ -61,8 +62,8 @@ float f_column_difference (struct board * new_board, struct board * old_board, s
 float f_landing_height (struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {
     return BOARD_HEIGHT - tlp->y
         - 4
-        + tlp->tetromino->p_bottom
-        + (4 - 1 - tlp->tetromino->p_top - tlp->tetromino->p_bottom) / 2.0f;
+        + tlp->tet->p_bottom
+        + (4 - 1 - tlp->tet->p_top - tlp->tet->p_bottom) / 2.0f;
 }
 
 float f_cell_transitions (struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {
@@ -202,9 +203,9 @@ float f_eroded_piece_cells (struct board * new_board, struct board * old_board, 
     for (int i = 0; i < tlp->n_lines_removed; i++) {
         int y = tlp->lines_removed[i];
 
-        if (y >= tlp->y + tlp->tetromino->p_top &&
-            y <= tlp->y + 3 - tlp->tetromino->p_bottom) {
-            eroded_cells += full_cells_on_line[tlp->tetromino->lines[y - tlp->y]];
+        if (y >= tlp->y + tlp->tet->p_top &&
+            y <= tlp->y + 3 - tlp->tet->p_bottom) {
+            eroded_cells += full_cells_on_line[tlp->tet->lines[y - tlp->y]];
         }
     }
 

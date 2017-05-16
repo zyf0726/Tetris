@@ -33,11 +33,14 @@ int enemyColor;
  29. Adjacent column holes -155
  */
 options global_option = {
-        .n_features_enabled    = 0,
-        .n_weights_enabled     = 0,
+//        .n_features_enabled    = 0,
+//        .n_weights_enabled     = 0,
 };
 
 int main() {
+#ifndef SINGLEFILE
+    freopen("in.txt", "r", stdin);
+#endif
     initialize_feature_helpers(&global_option);
 #define EF(x) enable_feature(feature_index(x), &global_option);
     EF("--f-n-holes");
@@ -46,7 +49,7 @@ int main() {
     EF("--f-deep-well-sum");
     EF("--f-height-differences");
     EF("--f-mean-height");
-    EF("--f-v--max-height");
+    EF("--f-v-max-height");
     EF("--f-v-n-holes");
     EF("--f-v-mean-height");
     EF("--f-well-sum");
@@ -60,13 +63,13 @@ int main() {
 
 
     for (int i = 0; i < global_option.n_features_enabled; i++) {
-        global_phenotype->genotype->feature_enabled[i] = 1;
+        global_phenotype->gen->feature_enabled[i] = 1;
     }
 
     float fwt[] =  {-35, -51, -46, -12, 19,
                     6, 50, 25, 17, -19,
                     -38, -42, -41, -60,   -155};
-    copy(fwt, fwt + 15, global_phenotype->genotype->feature_weights);
+    copy(fwt, fwt + 15, global_phenotype->gen->feature_weights);
     // 加速输入
     istream::sync_with_stdio(false);
     int turnID, blockType;
@@ -131,11 +134,23 @@ int main() {
 
     alternative best_alt = *max_element(f.begin(), f.end());
 
-    blockForEnemy = g.worst_for_enemy(currBotColor); //FIXME:
+//    blockForEnemy = g.worst_for_enemy(currBotColor); //FIXME:
 
+    blockForEnemy=1;
 
-
-
+    auto __f = minmax_element(g.type_count[enemyColor], g.type_count[enemyColor] + 7);
+    int minCount = *__f.first, maxCount = *__f.second;
+    if (maxCount - minCount == 2)
+    {
+        // 危险，找一个不是最大的块给对方吧
+        for (blockForEnemy = 0; blockForEnemy < 7; blockForEnemy++)
+            if (g.type_count[enemyColor][blockForEnemy] != maxCount)
+             break;
+    }
+    else
+    {
+        blockForEnemy = int(RAND() % 7);
+    }
 
     // 决策结束，输出结果（你只需修改以上部分）
 

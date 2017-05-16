@@ -2,8 +2,7 @@
 // Created by prwang on 2017/4/22.
 //
 
-#ifndef TETRIS_SHARED_H
-#define TETRIS_SHARED_H
+#pragma once
 #include <iostream>
 #include <cassert>
 #include <cstdio>
@@ -93,4 +92,3 @@ template<class T> inline void maxt(T& a, T b) { if (a < b) a = b; }
 #define INLINE
 #endif
 
-#endif //TETRIS_SHARED_H

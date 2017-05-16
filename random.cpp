@@ -1,8 +1,7 @@
-#include <stdlib.h>
-#include <time.h>
-#include <unistd.h>
+#ifndef SINGLEFILE
 
 #include "shared.h"
+#endif
 
 int l_rand (int a, int b, struct options * ) {
     return (std::uniform_int_distribution<int>(a, b))(RAND);

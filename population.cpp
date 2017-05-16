@@ -68,12 +68,12 @@ phenotype* mate_individuals (phenotype* phenotype_1, phenotype* phenotype_2, str
     phenotype* offspring;
 
     if (f_rand(opt) < opt->crossover_rate) {
-        offspring = initialize_phenotype(crossover_genotypes(phenotype_1->genotype, phenotype_2->genotype, opt));
+        offspring = initialize_phenotype(crossover_genotypes(phenotype_1->gen, phenotype_2->gen, opt));
     } else {
         offspring = copy_phenotype(b_rand(opt) ? phenotype_1 : phenotype_2, opt);
     }
 
-    if (mutate_genotype(offspring->genotype, opt)) {
+    if (mutate_genotype(offspring->gen, opt)) {
         offspring->has_fitness = 0;
     }
 
