@@ -30,7 +30,7 @@ struct board {
     }
 
     int directly_drop(const tetromino *tr, int position, int *placement);
-    INLINE bool valid_pos(ctet tr, int x, int y) const ;
+    INLINE bool valid_pos_except_top(ctet tr, int x, int y) const ;
 
 private:
     void remove_line(int line);

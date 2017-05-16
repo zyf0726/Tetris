@@ -115,12 +115,12 @@ inline void shift_lines(uint16_t lines[], int position, ctet tr)
 
 }
 
-bool board::valid_pos(ctet tr, int x, int y) const
+bool board::valid_pos_except_top(ctet tr, int x, int y) const
 {
     if (y > BOARD_HEIGHT - 4 + tr.p_bottom) return false;
     uint16_t ls[4];
     shift_lines(ls, x, tr);
-    for (int dy = tr.p_top; dy < 4 - tr.p_bottom; ++dy)
+    for (int dy = max(tr.p_top, -y); dy < 4 - tr.p_bottom; ++dy)
         if ((lines[y + dy] & ls[dy]) != EMPTY_LINE) return false;
     return true;
 }

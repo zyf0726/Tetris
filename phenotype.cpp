@@ -173,7 +173,7 @@ vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int Ty1, opti
             for (int xx = begin_x; xx < end_x; ++xx)
                 if (ST(yy, xx))
                 {
-                    if (!brd->valid_pos(te, xx, yy + 1))
+                    if (!brd->valid_pos_except_top(te, xx, yy + 1))
                     {
                         //if i >=足够使进入棋局的位置, then成为可行决策
                         if (yy >= -te.p_top)
@@ -197,10 +197,10 @@ vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int Ty1, opti
                         {
                             ST(yy + 1, xx) = true;
                             for (int k = -1; k + xx >= begin_x; --k)
-                                if (!ST(yy + 1, xx + k) && brd->valid_pos(te, xx + k, yy + 1)) ST(yy + 1, xx + k) = true;
+                                if (!ST(yy + 1, xx + k) && brd->valid_pos_except_top(te, xx + k, yy + 1)) ST(yy + 1, xx + k) = true;
                                 else break;
                             for (int k = 1; k + xx < end_x; ++k)
-                                if (!ST(yy + 1, xx + k) && brd->valid_pos(te, xx + k, yy + 1)) ST(yy + 1, xx + k) = true;
+                                if (!ST(yy + 1, xx + k) && brd->valid_pos_except_top(te, xx + k, yy + 1)) ST(yy + 1, xx + k) = true;
                                 else break;
 
                         }
