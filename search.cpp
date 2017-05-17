@@ -9,7 +9,7 @@ float ans_g[7];  //TODO 初始化
 alternative best_alt_g; //TODO 初始化
 
 half_game::half_game(const game_manager &m, int subject, SHAPES _curr_type)
-: curr_type(_curr_type), gb(m.gb[subject])
+: curr_type(shape_order_rev[_curr_type]), gb(m.gb[subject])
 {
     for (int i = 0; i < 7; ++i)
         type_count[i] = m.type_count[subject][shape_order[i]];
@@ -36,8 +36,8 @@ INLINE half_game::half_game(const half_game& ori, const board& newgb)
     copy(ori.type_count, ori.type_count + 7, type_count);
 }
 constexpr int OUTPUT_DEPTH = 0;
-constexpr int MAX_DEPTH = 1;
-constexpr size_t MAX_SOLUTIONS = 10;
+constexpr int MAX_DEPTH = 3;
+constexpr size_t MAX_SOLUTIONS = 20;
 float search_for_type(half_game g, int depth)
 {
     vector<int> tps = g.get_valid_types();
@@ -45,7 +45,7 @@ float search_for_type(half_game g, int depth)
 
     for (int x : tps)
     {
-        float ans_t = search_for_pos(half_game(g, x), depth);
+        float ans_t = search_for_pos(half_game(g, x), depth + 1);
         if (depth == OUTPUT_DEPTH) mint(ans_g[x], ans_t);
         mint(ans1, ans_t);
     }
@@ -58,7 +58,7 @@ float search_for_pos(half_game g, int depth) //对敌方调用(..., -1)
     if (f.size()==0){
         return -FLT_MAX;
     }
-    if (depth == MAX_DEPTH)
+    if (depth >= MAX_DEPTH)
     {
         alternative best_alt = *max_element(f.begin(), f.end());
         return best_alt.score;
