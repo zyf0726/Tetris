@@ -124,6 +124,7 @@ int main() {
     // 遇事不决先输出（平台上编译不会输出）
     g.printField();
 
+
     auto f = _look_ahead(g.gb + currBotColor, global_phenotype, shape_order_rev[nextTypeForColor[currBotColor]],
                          &global_option);
 

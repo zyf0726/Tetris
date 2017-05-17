@@ -18,7 +18,7 @@ vector<int> half_game::get_valid_types() {
     int m(*x.first), M(*x.second);
     vector<int> ret; ret.reserve(7);
     for (int i = 0; i < 7; ++i)
-        if (type_count[i] < M || m > M - 2) ret.push_back(i);
+        if (type_count[i] < M || m > M - 2) ret.push_back(shape_order_rev[i]);
     return ret;
 }
 
@@ -81,6 +81,14 @@ SHAPES worst_for_enemy(const game_manager &m, int subject, SHAPES last_type)
 
     for (int i = 0; i < 7; ++i) ans_g[i] = FLT_MAX;
     search_for_pos(half_game(m, subject,  last_type), -1);
+    /*
+    for(int i=0;i<7;i++)
+        clog<<m.type_count[subject][i]<<' ';
+    clog<<endl;
+    for(int i=0;i<7;i++)
+        clog<<ans_g[i]<<' ';
+    clog<<endl;
+     */
     return shape_order[min_element(ans_g, ans_g + 7) - ans_g];
 }
 
