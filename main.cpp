@@ -5,7 +5,6 @@
 
 #include "main.h"
 #include "feature_helpers.h"
-#include "search.h"
 
 #endif
 
@@ -41,31 +40,20 @@ int main() {
 #define EF(x) enable_feature(feature_index(x), &global_option);
     EF("--f-n-holes");
     EF("--f-landing-height");
-    EF("--f-cell-transitions");
-    EF("--f-deep-well-sum");
-    EF("--f-height-differences");
-    EF("--f-mean-height");
-    EF("--f-v-max-height");
-    EF("--f-v-n-holes");
-    EF("--f-v-mean-height");
-    EF("--f-well-sum");
+    EF("--f-eroded-piece-cells");
     EF("--f-row-transitions");
+    EF("--f-column-transitions");
     EF("--f-cumulative-wells-fast");
-    EF("--f-min-height");
-    EF("--f-mean-minus-min-height");
-    EF("--f-n-adjacent-holes");
-
+    EF("--f-hole-depths");
+    EF("--f-n-rows-with-holes");
     global_phenotype = initialize_phenotype(initialize_genotype(&global_option));
-
 
     for (int i = 0; i < global_option.n_features_enabled; i++) {
         global_phenotype->gen->feature_enabled[i] = 1;
     }
 
-    float fwt[] = {-35, -51, -46, -12, 19,
-                   6, 50, 25, 17, -19,
-                   -38, -42, -41, -60, -155};
-    copy(fwt, fwt + 15, global_phenotype->gen->feature_weights);
+    float fwt[] = {5, -33, 9, -20, -76, -31, -2, -65};
+    copy(fwt, fwt + 8, global_phenotype->gen->feature_weights);
     // 加速输入
     istream::sync_with_stdio(false);
     int turnID, blockType;

@@ -28,19 +28,9 @@ constexpr int  MAPHEIGHT =  20;
 #define BOARD_WIDTH 10
 #define BOARD_HEIGHT 20
 
-constexpr int featureDimensions = 7;
 struct __cord { int x, y; };
 inline __cord operator +(const __cord& a, const __cord& b) { return {a.x + b.x, a.y + b.y}; }
 
-constexpr __cord blockShape[7][4][4] = {
-        { { 0,0,1,0,-1,0,-1,-1 },{ 0,0,0,1,0,-1,1,-1 },{ 0,0,-1,0,1,0,1,1 },{ 0,0,0,-1,0,1,-1,1 } },
-        { { 0,0,-1,0,1,0,1,-1 },{ 0,0,0,-1,0,1,1,1 },{ 0,0,1,0,-1,0,-1,1 },{ 0,0,0,1,0,-1,-1,-1 } },
-        { { 0,0,1,0,0,-1,-1,-1 },{ 0,0,0,1,1,0,1,-1 },{ 0,0,-1,0,0,1,1,1 },{ 0,0,0,-1,-1,0,-1,1 } },
-        { { 0,0,-1,0,0,-1,1,-1 },{ 0,0,0,-1,1,0,1,1 },{ 0,0,1,0,0,1,-1,1 },{ 0,0,0,1,-1,0,-1,-1 } },
-        { { 0,0,-1,0,0,1,1,0 },{ 0,0,0,-1,-1,0,0,1 },{ 0,0,1,0,0,-1,-1,0 },{ 0,0,0,1,1,0,0,-1 } },
-        { { 0,0,0,-1,0,1,0,2 },{ 0,0,1,0,-1,0,-2,0 },{ 0,0,0,1,0,-1,0,-2 },{ 0,0,-1,0,1,0,2,0 } },
-        { { 0,0,0,1,-1,0,-1,1 },{ 0,0,-1,0,0,-1,-1,-1 },{ 0,0,0,-1,1,-0,1,-1 },{ 0,0,1,0,0,1,1,1 } }
-};// 7种形状(长L| 短L| 反z| 正z| T| 直一| 田格)，4种朝向(上左下右)，8:每相邻的两个分别为x，y
 
 enum SHAPES
 {
@@ -64,15 +54,6 @@ enum ORI
 //    x    y    newTy
 
 
-constexpr int blockHeight[7][4]={
-        {0,1,1,1},
-        {0,1,1,1},
-        {0,1,1,1},
-        {0,1,1,1},
-        {1,1,0,1},
-        {2,0,1,0},
-        {1,0,0,1}
-};
 
 enum selection {
     TOURNAMENT,
@@ -82,8 +63,6 @@ enum selection {
 
 extern mt19937_64 RAND;
 constexpr int elimBonus[4] = { 1, 3, 5, 7 };
-typedef unsigned char ubyte;
-typedef signed char sbyte;
 template<class T> inline void mint(T& a, T b) { if (a > b) a = b; }
 template<class T> inline bool mint1(T& a, T b) { return a > b ? (a = b, true) : false;  }
 template<class T> inline void maxt(T& a, T b) { if (a < b) a = b; }
@@ -94,3 +73,27 @@ template<class T> inline bool maxt1(T& a, T b) { return a < b ? (a = b, true) : 
 #define INLINE
 #endif
 
+constexpr size_t MAX_SOLUTIONS = 8;
+
+template<class T, size_t max_size>struct insert_sort_container
+{
+    T* begin() { return data; }
+    T* end() { return data + real_size; }
+    insert_sort_container() { real_size = 0; }
+    void push_back(const T& x)
+    __attribute__((optimize("unroll-loops")))
+    {
+        size_t p = real_size;
+        while (p > 0 && x <  data[p - 1])
+        {
+            data[p] = data[p - 1];
+            --p;
+        }
+        data[p] = x;
+        mint(++real_size, max_size);
+    }
+    size_t size() { return real_size; }
+private:
+    T data[max_size + 1];
+    size_t real_size;
+};

@@ -149,9 +149,9 @@ void output_state(ctet te, int __state[BOARD_HEIGHT + 5][BOARD_WIDTH + 4])
 }
 
 
-vector<alternative> _look_ahead(board *brd, phenotype *phenotype,  int Ty1, options* opt)
+alt_c_t _look_ahead(board *brd, phenotype *phenotype,  int Ty1, options* opt)
 {
-    vector<alternative> f;
+    alt_c_t f;
     int tet_offset_all, tet_base;
     N_TETROMINO(&tet_base, Ty1);
     N_ROTATIONS(&tet_offset_all, tet_base);

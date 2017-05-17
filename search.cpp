@@ -37,7 +37,6 @@ INLINE half_game::half_game(const half_game& ori, const board& newgb)
 }
 constexpr int OUTPUT_DEPTH = 0;
 int MAX_DEPTH = 3;
-constexpr size_t MAX_SOLUTIONS = 12;
 float search_for_type(half_game g, int depth)
 {
     vector<int> tps = g.get_valid_types();
@@ -56,21 +55,15 @@ float search_for_pos(half_game g, int depth) //对敌方调用(..., -1)
 {
     auto f = _look_ahead(&g.gb, global_phenotype, g.curr_type, &global_option);
     if (f.size()==0){
-        return -FLT_MAX;
+        return -FLT_MAX / 2;
     }
     if (depth >= MAX_DEPTH)
     {
-        alternative best_alt = *max_element(f.begin(), f.end());
+        alternative best_alt = *f.begin();
         return best_alt.score;
     } else
     {
-        size_t sol_size = min(MAX_SOLUTIONS, f.size());
-        partial_sort(f.begin(), f.begin() + sol_size, f.end(),
-                     [](const alternative& a, const alternative& b)
-            { return a.score > b.score; });
-
-        f.resize(sol_size);
-        alternative best_alt;
+        alternative best_alt{-1, -1, -1};
         float ans = -FLT_MAX;
         for (const auto& x : f)
             if (maxt1(ans, search_for_type(half_game(g, x.b), depth + 1)))

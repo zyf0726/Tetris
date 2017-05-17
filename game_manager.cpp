@@ -102,7 +102,6 @@ void game_manager::recover(int blockTypeBot, int xBot, int yBot, int oBot,
 int game_manager::make_decisions() {
     best_alt_g = {-1, -1, -1};
 
-
     search_for_pos(half_game(type_count[curBotColor], gb[curBotColor], nextTypeForColor[curBotColor]), 0);
     return worst_for_enemy(*this, enemyColor, nextTypeForColor[enemyColor]);
 }

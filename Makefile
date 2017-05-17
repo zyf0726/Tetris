@@ -3,6 +3,6 @@ imp_files =  board.cpp feature_functions.cpp feature_helpers.cpp game_board.cpp 
 Submit.cc: $(headers) $(imp_files)
 	cat S.h $(headers) $(imp_files) > Submit.cc
 	cp  -f Submit.cc cmake-build-debug/
-	g++ -g -Ofast -march=native -D_BOTZONE_ONLINE cmake-build-debug/Submit.cc -o Submit -std=c++11 -Wall -Wextra --pedantic
+	g++ -g -O2 -D_BOTZONE_ONLINE cmake-build-debug/Submit.cc -o Submit -std=c++11 -Wall -Wextra --pedantic
 clean:
 	rm -f Submit.cc Submit
