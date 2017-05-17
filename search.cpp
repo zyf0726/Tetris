@@ -54,6 +54,9 @@ float search_for_type(half_game g, int depth)
 float search_for_pos(half_game g, int depth) //对敌方调用(..., -1)
 {
     auto f = _look_ahead(&g.gb, global_phenotype, g.curr_type, &global_option);
+    if (f.size()==0){
+        return -FLT_MAX;
+    }
     if (depth == MAX_DEPTH)
     {
         alternative best_alt = *max_element(f.begin(), f.end());
