@@ -7,6 +7,6 @@
 #include "options.h"
 
 #endif
-extern phenotype *global_phenotype;
-extern options global_option;
 
+extern options global_option;
+extern phenotype *global_phenotype;

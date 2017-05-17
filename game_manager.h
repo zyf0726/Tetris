@@ -12,7 +12,6 @@ struct game_manager {
     INLINE int transfer();
     INLINE void printField();
     INLINE void fixup() { transfer(); }
-    INLINE int worst_for_enemy(int player);
     friend int main();
 };
 

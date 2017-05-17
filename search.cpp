@@ -35,8 +35,8 @@ INLINE half_game::half_game(const half_game& ori, const board& newgb)
     copy(ori.type_count, ori.type_count + 7, type_count);
 }
 constexpr int OUTPUT_DEPTH = 0;
-constexpr int MAX_DEPTH = 2;
-constexpr size_t MAX_SOLUTIONS = 20;
+constexpr int MAX_DEPTH = 1;
+constexpr size_t MAX_SOLUTIONS = 6;
 float search_for_type(half_game g, int depth)
 {
     vector<int> tps = g.get_valid_types();
@@ -44,7 +44,7 @@ float search_for_type(half_game g, int depth)
 
     for (int x : tps)
     {
-        float ans_t = search_for_pos(half_game(g, x), depth + 1);
+        float ans_t = search_for_pos(half_game(g, x), depth);
         if (depth == OUTPUT_DEPTH) mint(ans_g[x], ans_t);
         mint(ans1, ans_t);
     }
@@ -78,6 +78,7 @@ float search_for_pos(half_game g, int depth) //对敌方调用(..., -1)
 }
 SHAPES worst_for_enemy(const game_manager &m, int subject, SHAPES last_type)
 {
+
     for (int i = 0; i < 7; ++i) ans_g[i] = FLT_MAX;
     search_for_pos(half_game(m, subject,  last_type), -1);
     return shape_order[min_element(ans_g, ans_g + 7) - ans_g];

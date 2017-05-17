@@ -5,6 +5,7 @@
 
 #include "main.h"
 #include "feature_helpers.h"
+#include "search.h"
 
 #endif
 
@@ -30,6 +31,7 @@ int enemyColor;
  29. Adjacent column holes -155
  */
 options global_option = { };
+phenotype* global_phenotype;
 
 int main() {
 #ifndef SINGLEFILE
@@ -127,23 +129,8 @@ int main() {
 
     alternative best_alt = *max_element(f.begin(), f.end());
 
-//    blockForEnemy = g.worst_for_enemy(currBotColor); //FIXME:
+    if(turnID>1) blockForEnemy = worst_for_enemy(g,enemyColor,shape_order[nextTypeForColor[enemyColor]]); else blockForEnemy=6;
 
-    blockForEnemy=1;
-
-    auto __f = minmax_element(g.type_count[enemyColor], g.type_count[enemyColor] + 7);
-    int minCount = *__f.first, maxCount = *__f.second;
-    if (maxCount - minCount == 2)
-    {
-        // 危险，找一个不是最大的块给对方吧
-        for (blockForEnemy = 0; blockForEnemy < 7; blockForEnemy++)
-            if (g.type_count[enemyColor][blockForEnemy] != maxCount)
-             break;
-    }
-    else
-    {
-        blockForEnemy = int(RAND() % 7);
-    }
 
     // 决策结束，输出结果（你只需修改以上部分）
 

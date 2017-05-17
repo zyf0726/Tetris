@@ -24,6 +24,6 @@ extern alternative best_alt_g; //TODO 初始化
 float search_for_type(half_game g, int depth); //depth == 0 : output;
 float search_for_pos(half_game g, int depth);
 
-void worst_for_enemy();
+SHAPES worst_for_enemy(const game_manager &m, int subject, SHAPES last_type);
 
 
