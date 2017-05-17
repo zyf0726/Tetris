@@ -16,7 +16,7 @@ void game_board::put_eliminate(const tetromino *tr, int x, int y)
 
     free(tlp.lines_removed);
     for (maxHeight = 1; maxHeight <= MAPHEIGHT; maxHeight++)
-        if (lines[20 - maxHeight] == EMPTY_LINE)
+        if (new_board.lines[20 - maxHeight] == EMPTY_LINE)
             break;
     maxHeight--;
     (board &) *this = new_board;
