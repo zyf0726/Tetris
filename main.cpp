@@ -4,12 +4,9 @@
 #ifndef SINGLEFILE
 
 #include "main.h"
-#include "phenotype.h"
 #include "feature_helpers.h"
-#include "options.h"
 
 #endif
-
 
 int currBotColor;
 int enemyColor;
@@ -32,10 +29,7 @@ int enemyColor;
 26. Mean - min height -60
  29. Adjacent column holes -155
  */
-options global_option = {
-//        .n_features_enabled    = 0,
-//        .n_weights_enabled     = 0,
-};
+options global_option = { };
 
 int main() {
 #ifndef SINGLEFILE
@@ -59,7 +53,7 @@ int main() {
     EF("--f-mean-minus-min-height");
     EF("--f-n-adjacent-holes");
 
-    phenotype *global_phenotype = initialize_phenotype(initialize_genotype(&global_option));
+    global_phenotype = initialize_phenotype(initialize_genotype(&global_option));
 
 
     for (int i = 0; i < global_option.n_features_enabled; i++) {
@@ -130,7 +124,6 @@ int main() {
 
     auto f = _look_ahead(g.gb + currBotColor, global_phenotype, shape_order_rev[nextTypeForColor[currBotColor]],
                          &global_option);
-//TODO xyo
 
     alternative best_alt = *max_element(f.begin(), f.end());
 

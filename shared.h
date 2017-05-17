@@ -85,7 +85,9 @@ constexpr int elimBonus[4] = { 1, 3, 5, 7 };
 typedef unsigned char ubyte;
 typedef signed char sbyte;
 template<class T> inline void mint(T& a, T b) { if (a > b) a = b; }
+template<class T> inline bool mint1(T& a, T b) { return a > b ? (a = b, true) : false;  }
 template<class T> inline void maxt(T& a, T b) { if (a < b) a = b; }
+template<class T> inline bool maxt1(T& a, T b) { return a < b ? (a = b, true) : false; }
 #ifdef SINGLEFILE
 #define INLINE inline
 #else
