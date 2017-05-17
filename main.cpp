@@ -30,8 +30,8 @@ int enemyColor;
 26. Mean - min height -60
  29. Adjacent column holes -155
  */
-options global_option = { };
-phenotype* global_phenotype;
+options global_option = {};
+phenotype *global_phenotype;
 
 int main() {
 #ifndef SINGLEFILE
@@ -62,24 +62,25 @@ int main() {
         global_phenotype->gen->feature_enabled[i] = 1;
     }
 
-    float fwt[] =  {-35, -51, -46, -12, 19,
-                    6, 50, 25, 17, -19,
-                    -38, -42, -41, -60,   -155};
+    float fwt[] = {-35, -51, -46, -12, 19,
+                   6, 50, 25, 17, -19,
+                   -38, -42, -41, -60, -155};
     copy(fwt, fwt + 15, global_phenotype->gen->feature_weights);
     // 加速输入
     istream::sync_with_stdio(false);
     int turnID, blockType;
 
     game_manager g;
-    int nextTypeForColor[2];
+    SHAPES nextTypeForColor[2];
     cin >> turnID;
 
     // 先读入第一回合，得到自己的颜色
     // 双方的第一块肯定是一样的
     cin >> blockType >> currBotColor;
+
     enemyColor = 1 - currBotColor;
-    nextTypeForColor[0] = blockType;
-    nextTypeForColor[1] = blockType;
+    nextTypeForColor[0] = (SHAPES) blockType;
+    nextTypeForColor[1] = (SHAPES) blockType;
     g.type_count[0][blockType]++;
     g.type_count[1][blockType]++;
 
@@ -99,10 +100,9 @@ int main() {
         // 我当时把上一块落到了 x y o！
         auto r = toxy2TXY((SHAPES) currTypeForColor[currBotColor], (ORI) o, x, y);
         g.gb[currBotColor].put_eliminate(get<0>(r), get<1>(r), get<2>(r));
-
         // 我给对方什么块来着？
         g.type_count[enemyColor][blockType]++;
-        nextTypeForColor[enemyColor] = blockType;
+        nextTypeForColor[enemyColor] = (SHAPES)blockType;
 
         // 然后读自己的输入，也就是对方的行为
         // 裁判给自己的输入是对方的最后一步
@@ -114,7 +114,7 @@ int main() {
 
         // 对方给我什么块来着？
         g.type_count[currBotColor][blockType]++;
-        nextTypeForColor[currBotColor] = blockType;
+        nextTypeForColor[currBotColor] = (SHAPES)blockType;
 
         g.fixup();
     }
@@ -124,22 +124,21 @@ int main() {
     // 遇事不决先输出（平台上编译不会输出）
     g.printField();
 
+    best_alt_g = {-1, -1, -1};
+    search_for_pos(half_game(g, currBotColor, nextTypeForColor[currBotColor]), 0);
 
-    auto f = _look_ahead(g.gb + currBotColor, global_phenotype, shape_order_rev[nextTypeForColor[currBotColor]],
-                         &global_option);
 
-    alternative best_alt = *max_element(f.begin(), f.end());
-
-    if(turnID>1) blockForEnemy = worst_for_enemy(g,enemyColor,shape_order[nextTypeForColor[enemyColor]]); else blockForEnemy=6;
+    if (turnID > 1)
+        blockForEnemy = worst_for_enemy(g, enemyColor, nextTypeForColor[enemyColor]);
+    else blockForEnemy = 6;
 
 
     // 决策结束，输出结果（你只需修改以上部分）
+    cout << blockForEnemy << " " << best_alt_g.x << " " << best_alt_g.y << " " << best_alt_g.o;
 
-    cout << blockForEnemy << " " << best_alt.x << " " << best_alt.y << " " << best_alt.o;
+    cout << endl;
 
-    cout<<endl;
-
-    auto r = toxy2TXY((SHAPES) nextTypeForColor[currBotColor], (ORI) best_alt.o, best_alt.x, best_alt.y);
+    auto r = toxy2TXY((SHAPES) nextTypeForColor[currBotColor], (ORI) best_alt_g.o, best_alt_g.x, best_alt_g.y);
     g.gb[currBotColor].put_eliminate(get<0>(r), get<1>(r), get<2>(r));
     g.printField();
 

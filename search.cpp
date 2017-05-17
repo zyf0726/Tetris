@@ -9,16 +9,17 @@ float ans_g[7];  //TODO 初始化
 alternative best_alt_g; //TODO 初始化
 
 half_game::half_game(const game_manager &m, int subject, SHAPES _curr_type)
-: curr_type(shape_order_rev[_curr_type]), gb(m.gb[subject])
+: curr_type(_curr_type), gb(m.gb[subject])
 {
-    copy(m.type_count[subject], m.type_count[subject] + 7, type_count);
+    for (int i = 0; i < 7; ++i)
+        type_count[i] = m.type_count[subject][shape_order[i]];
 }
 vector<int> half_game::get_valid_types() {
     auto x = minmax_element(type_count, type_count + 7);
     int m(*x.first), M(*x.second);
     vector<int> ret; ret.reserve(7);
     for (int i = 0; i < 7; ++i)
-        if (type_count[i] < M || m > M - 2) ret.push_back(shape_order_rev[i]);
+        if (type_count[i] < M || m > M - 2) ret.push_back(i);
     return ret;
 }
 
@@ -26,7 +27,7 @@ half_game::half_game(const half_game& ori, int selected_type)
 : curr_type(selected_type), gb(ori.gb)
 {
     copy(ori.type_count, ori.type_count + 7, type_count);
-    --type_count[selected_type];
+    ++type_count[selected_type];
 }
 
 INLINE half_game::half_game(const half_game& ori, const board& newgb)
@@ -36,7 +37,7 @@ INLINE half_game::half_game(const half_game& ori, const board& newgb)
 }
 constexpr int OUTPUT_DEPTH = 0;
 constexpr int MAX_DEPTH = 1;
-constexpr size_t MAX_SOLUTIONS = 6;
+constexpr size_t MAX_SOLUTIONS = 10;
 float search_for_type(half_game g, int depth)
 {
     vector<int> tps = g.get_valid_types();
@@ -84,14 +85,6 @@ SHAPES worst_for_enemy(const game_manager &m, int subject, SHAPES last_type)
 
     for (int i = 0; i < 7; ++i) ans_g[i] = FLT_MAX;
     search_for_pos(half_game(m, subject,  last_type), -1);
-    /*
-    for(int i=0;i<7;i++)
-        clog<<m.type_count[subject][i]<<' ';
-    clog<<endl;
-    for(int i=0;i<7;i++)
-        clog<<ans_g[i]<<' ';
-    clog<<endl;
-     */
     return shape_order[min_element(ans_g, ans_g + 7) - ans_g];
 }
 
