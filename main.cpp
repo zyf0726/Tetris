@@ -125,12 +125,12 @@ int main() {
     g.printField();
 
     best_alt_g = {-1, -1, -1};
+    MAX_DEPTH = 3;
     search_for_pos(half_game(g, currBotColor, nextTypeForColor[currBotColor]), 0);
 
 
-    if (turnID > 1)
-        blockForEnemy = worst_for_enemy(g, enemyColor, nextTypeForColor[enemyColor]);
-    else blockForEnemy = 6;
+    MAX_DEPTH -= 2;
+    blockForEnemy = worst_for_enemy(g, enemyColor, nextTypeForColor[enemyColor]);
 
 
     // 决策结束，输出结果（你只需修改以上部分）
