@@ -12,9 +12,19 @@ struct tetromino {
     int p_right;
     int p_bottom;
 
+    tetromino(int line1, int line2, int line3, int line4, int _p_top, int _p_left, int _p_right, int _p_bottom){
+        lines[0]=line1;
+        lines[1]=line2;
+        lines[2]=line3;
+        lines[3]=line4;
+        p_top=_p_top;
+        p_left=_p_left;
+        p_right=_p_right;
+        p_bottom=_p_bottom;
+    }
+
     tetromino &operator=(const tetromino &) = delete;
 
-    tetromino(const tetromino &) = delete;
 
 };
 
