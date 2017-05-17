@@ -64,3 +64,44 @@ int game_manager::transfer()
     
 }
 
+void game_manager::init(int blockType, int _curBotColor) {
+    curBotColor = _curBotColor;
+    enemyColor = 1 - _curBotColor;
+    nextTypeForColor[0] = nextTypeForColor[1] = (SHAPES) blockType;
+    ++type_count[0][blockType], ++type_count[1][blockType];
+}
+
+void game_manager::recoverBot(int blockType, int x, int y, int o) {
+    curTypeForColor[curBotColor] = nextTypeForColor[curBotColor];
+    // 我当时把上一块落到了x y o
+    auto r = toxy2TXY((SHAPES)curTypeForColor[curBotColor], (ORI) o, x, y);
+    gb[curBotColor].put_eliminate(get<0>(r), get<1>(r), get<2>(r));
+    // 我给对方什么块来着
+    type_count[enemyColor][blockType]++;
+    nextTypeForColor[enemyColor] = (SHAPES)blockType;
+}
+
+void game_manager::recoverEnemy(int blockType, int x, int y, int o) {
+    curTypeForColor[enemyColor] = nextTypeForColor[enemyColor];
+    // 对方当时把上一块落到了 x y o！
+    auto r = toxy2TXY((SHAPES) curTypeForColor[enemyColor], (ORI) o, x, y);
+    gb[enemyColor].put_eliminate(get<0>(r), get<1>(r), get<2>(r));
+    // 对方给我什么块来着？
+    type_count[curBotColor][blockType]++;
+    nextTypeForColor[curBotColor] = (SHAPES)blockType;
+}
+
+void game_manager::recover(int blockTypeBot, int xBot, int yBot, int oBot,
+                           int blockTypeEnemy, int xEnemy, int yEnemy, int oEnemy) {
+    recoverBot(blockTypeBot, xBot, yBot, oBot);
+    recoverEnemy(blockTypeEnemy, xEnemy, yEnemy, oEnemy);
+    fixup();
+}
+
+int game_manager::make_decisions() {
+    best_alt_g = {-1, -1, -1};
+
+
+    search_for_pos(half_game(type_count[curBotColor], gb[curBotColor], nextTypeForColor[curBotColor]), 0);
+    return worst_for_enemy(*this, enemyColor, nextTypeForColor[enemyColor]);
+}

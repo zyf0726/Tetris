@@ -2,16 +2,17 @@
 #ifndef SINGLEFILE
 #include "shared.h"
 #include "game_board.h"
-#include "game_manager.h"
 #include "phenotype.h"
 
 #endif
+
+struct game_manager;
 struct half_game
 {
     board gb; int type_count[7], curr_type;
     INLINE vector<int> get_valid_types();
     INLINE half_game(const half_game& ori, const board& newgb);
-    INLINE half_game(const game_manager &m, int subject, SHAPES _curr_type);
+    INLINE half_game(const int count[], const game_board &m_gb, SHAPES _curr_type);
     INLINE half_game(const half_game& ori, int selected_type);
 };
 

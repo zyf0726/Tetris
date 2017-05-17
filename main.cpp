@@ -77,70 +77,34 @@ int main() {
     // 先读入第一回合，得到自己的颜色
     // 双方的第一块肯定是一样的
     cin >> blockType >> currBotColor;
-
-    enemyColor = 1 - currBotColor;
-    nextTypeForColor[0] = (SHAPES) blockType;
-    nextTypeForColor[1] = (SHAPES) blockType;
-    g.type_count[0][blockType]++;
-    g.type_count[1][blockType]++;
+    g.init(blockType, currBotColor);
 
     // 然后分析以前每回合的输入输出，并恢复状态
     // 循环中，color 表示当前这一行是 color 的行为
     // 平台保证所有输入都是合法输入
     for (int i = 1; i < turnID; i++) {
-        int currTypeForColor[2] = {nextTypeForColor[0], nextTypeForColor[1]};
-        int x, y, o;
+        int blockTypeBot, xBot, yBot, oBot;
+        int blockTypeEnemy, xEnemy, yEnemy, oEnemy;
         // 根据这些输入输出逐渐恢复状态到当前回合
 
         // 先读自己的输出，也就是自己的行为
         // 自己的输出是自己的最后一步
         // 然后模拟最后一步放置块
-        cin >> blockType >> x >> y >> o;
-
-        // 我当时把上一块落到了 x y o！
-        auto r = toxy2TXY((SHAPES) currTypeForColor[currBotColor], (ORI) o, x, y);
-        g.gb[currBotColor].put_eliminate(get<0>(r), get<1>(r), get<2>(r));
-        // 我给对方什么块来着？
-        g.type_count[enemyColor][blockType]++;
-        nextTypeForColor[enemyColor] = (SHAPES)blockType;
-
         // 然后读自己的输入，也就是对方的行为
         // 裁判给自己的输入是对方的最后一步
-        cin >> blockType >> x >> y >> o;
 
-        // 对方当时把上一块落到了 x y o！
-        r = toxy2TXY((SHAPES) currTypeForColor[enemyColor], (ORI) o, x, y);
-        g.gb[enemyColor].put_eliminate(get<0>(r), get<1>(r), get<2>(r));
-
-        // 对方给我什么块来着？
-        g.type_count[currBotColor][blockType]++;
-        nextTypeForColor[currBotColor] = (SHAPES)blockType;
-
-        g.fixup();
+        cin >> blockTypeBot >> xBot >> yBot >> oBot;
+        cin >> blockTypeEnemy >> xEnemy >> yEnemy >> oEnemy;
+        g.recover(blockTypeBot, xBot, yBot, oBot,
+                  blockTypeEnemy, xEnemy, yEnemy, oEnemy);
     }
-
-    int blockForEnemy;
 
     // 遇事不决先输出（平台上编译不会输出）
     g.printField();
 
-    best_alt_g = {-1, -1, -1};
-    MAX_DEPTH = 3;
-    search_for_pos(half_game(g, currBotColor, nextTypeForColor[currBotColor]), 0);
-
-
-    MAX_DEPTH -= 2;
-    blockForEnemy = worst_for_enemy(g, enemyColor, nextTypeForColor[enemyColor]);
-
-
-    // 决策结束，输出结果（你只需修改以上部分）
-    cout << blockForEnemy << " " << best_alt_g.x << " " << best_alt_g.y << " " << best_alt_g.o;
-
-    cout << endl;
-
-    auto r = toxy2TXY((SHAPES) nextTypeForColor[currBotColor], (ORI) best_alt_g.o, best_alt_g.x, best_alt_g.y);
-    g.gb[currBotColor].put_eliminate(get<0>(r), get<1>(r), get<2>(r));
-    g.printField();
+    int blockForEnemy = g.make_decisions();
+    // 决策结束，输出结果
+    cout << blockForEnemy << " " << best_alt_g.x << " " << best_alt_g.y << " " << best_alt_g.o << endl;
 
     return 0;
 }

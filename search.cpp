@@ -8,11 +8,11 @@
 float ans_g[7];  //TODO 初始化
 alternative best_alt_g; //TODO 初始化
 
-half_game::half_game(const game_manager &m, int subject, SHAPES _curr_type)
-: curr_type(shape_order_rev[_curr_type]), gb(m.gb[subject])
+half_game::half_game(const int count[], const game_board &m_gb, SHAPES _curr_type)
+: curr_type(shape_order_rev[_curr_type]), gb(m_gb)
 {
     for (int i = 0; i < 7; ++i)
-        type_count[i] = m.type_count[subject][shape_order[i]];
+        type_count[i] = count[shape_order[i]];
 }
 vector<int> half_game::get_valid_types() {
     auto x = minmax_element(type_count, type_count + 7);
@@ -83,7 +83,7 @@ float search_for_pos(half_game g, int depth) //对敌方调用(..., -1)
 SHAPES worst_for_enemy(const game_manager &m, int subject, SHAPES last_type)
 {
     for (int i = 0; i < 7; ++i) ans_g[i] = FLT_MAX;
-    search_for_pos(half_game(m, subject,  last_type), -1);
+    search_for_pos(half_game(m.type_count[subject], m.gb[subject], last_type), -1);
     return shape_order[min_element(ans_g, ans_g + 7) - ans_g];
 }
 
