@@ -7,11 +7,11 @@
 #include "feature_functions.h"
 #include "feature_helpers.h"
 #endif
-
+inline float hack(float x) { return x >= 16 ? x + expf(x - 16) - 1 : x; }
 float f_max_height (struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {
     for (int y = 0; y < BOARD_HEIGHT; y++) {
         if (new_board->lines[y] != EMPTY_LINE) {
-            return BOARD_HEIGHT - y;
+            return hack(BOARD_HEIGHT - y);
         }
     }
 

@@ -77,8 +77,6 @@ void game_manager::recoverBot(int blockType, int x, int y, int o) {
     auto r = toxy2TXY((SHAPES)curTypeForColor[curBotColor], (ORI) o, x, y);
     gb[curBotColor].put_eliminate(get<0>(r), get<1>(r), get<2>(r));
     // 我给对方什么块来着
-    type_count[enemyColor][blockType]++;
-    nextTypeForColor[enemyColor] = (SHAPES)blockType;
 }
 
 void game_manager::recoverEnemy(int blockType, int x, int y, int o) {
@@ -87,14 +85,17 @@ void game_manager::recoverEnemy(int blockType, int x, int y, int o) {
     auto r = toxy2TXY((SHAPES) curTypeForColor[enemyColor], (ORI) o, x, y);
     gb[enemyColor].put_eliminate(get<0>(r), get<1>(r), get<2>(r));
     // 对方给我什么块来着？
-    type_count[curBotColor][blockType]++;
-    nextTypeForColor[curBotColor] = (SHAPES)blockType;
 }
 
 void game_manager::recover(int blockTypeBot, int xBot, int yBot, int oBot,
                            int blockTypeEnemy, int xEnemy, int yEnemy, int oEnemy) {
     recoverBot(blockTypeBot, xBot, yBot, oBot);
     recoverEnemy(blockTypeEnemy, xEnemy, yEnemy, oEnemy);
+
+    type_count[enemyColor][blockTypeBot]++;
+    nextTypeForColor[enemyColor] = (SHAPES)blockTypeBot;
+    type_count[curBotColor][blockTypeEnemy]++;
+    nextTypeForColor[curBotColor] = (SHAPES)blockTypeEnemy;
     fixup();
 }
 

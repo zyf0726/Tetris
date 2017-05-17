@@ -5,8 +5,8 @@
 
 #endif
 
-float ans_g[7];  //TODO 初始化
-alternative best_alt_g; //TODO 初始化
+float ans_g[7];
+alternative best_alt_g;
 
 half_game::half_game(const int count[], const game_board &m_gb, SHAPES _curr_type)
 : curr_type(shape_order_rev[_curr_type]), gb(m_gb)
