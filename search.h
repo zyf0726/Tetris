@@ -22,10 +22,9 @@ struct half_game
 
 extern float ans_g[7];  //TODO 初始化
 extern alternative best_alt_g; //TODO 初始化
-INLINE float search_for_type(half_game g, int depth); //depth == 0 : output;
-INLINE float search_for_pos(half_game g, int depth);
+template<int MAX_DEPTH> INLINE float search_for_type(half_game g, int depth); //depth == 0 : output;
+template<int MAX_DEPTH> INLINE float search_for_pos(half_game g, int depth);
 
-INLINE SHAPES worst_for_enemy(const game_manager &m, int subject, SHAPES last_type);
-extern int MAX_DEPTH;
+template<int MAX_DEPTH> INLINE SHAPES worst_for_enemy(const game_manager &m, int subject, SHAPES last_type);
 
 

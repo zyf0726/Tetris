@@ -29,6 +29,7 @@ int enemyColor;
 26. Mean - min height -60
  29. Adjacent column holes -155
  */
+
 options global_option = {};
 phenotype *global_phenotype;
 
@@ -44,7 +45,7 @@ int main() {
     EF("--f-row-transitions");
     EF("--f-column-transitions");
     EF("--f-cumulative-wells-fast");
-    EF("--f-hole-depths");
+    EF("--f-max-height");
     EF("--f-n-rows-with-holes");
     global_phenotype = initialize_phenotype(initialize_genotype(&global_option));
 
@@ -52,7 +53,7 @@ int main() {
         global_phenotype->gen->feature_enabled[i] = 1;
     }
 
-    float fwt[] = {5, -33, 9, -20, -76, -31, -2, -65};
+    float fwt[] = {5, -33, 9, -20, -76, -31, -.25f, -65};
     copy(fwt, fwt + 8, global_phenotype->gen->feature_weights);
     // 加速输入
     istream::sync_with_stdio(false);

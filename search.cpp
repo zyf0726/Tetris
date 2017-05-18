@@ -36,22 +36,21 @@ INLINE half_game::half_game(const half_game& ori, const board& newgb)
     copy(ori.type_count, ori.type_count + 7, type_count);
 }
 constexpr int OUTPUT_DEPTH = 0;
-int MAX_DEPTH = 3;
-float search_for_type(half_game g, int depth)
+template<int MAX_DEPTH> float search_for_type(half_game g, int depth)
 {
     vector<int> tps = g.get_valid_types();
     float ans1 = FLT_MAX;
 
     for (int x : tps)
     {
-        float ans_t = search_for_pos(half_game(g, x), depth + 1);
+        float ans_t = search_for_pos<MAX_DEPTH> (half_game(g, x), depth + 1);
         if (depth == OUTPUT_DEPTH) mint(ans_g[x], ans_t);
         mint(ans1, ans_t);
     }
     return ans1;
 }; //depth == 0 : output;
 
-float search_for_pos(half_game g, int depth) //对敌方调用(..., -1)
+template<int MAX_DEPTH> float search_for_pos(half_game g, int depth) //对敌方调用(..., -1)
 {
     auto f = _look_ahead(&g.gb, global_phenotype, g.curr_type, &global_option);
     if (f.size()==0){
@@ -66,17 +65,19 @@ float search_for_pos(half_game g, int depth) //对敌方调用(..., -1)
         alternative best_alt{-1, -1, -1};
         float ans = -FLT_MAX;
         for (const auto& x : f)
-            if (maxt1(ans, search_for_type(half_game(g, x.b), depth + 1)))
+            if (maxt1(ans, search_for_type<MAX_DEPTH>(half_game(g, x.b), depth + 1)))
                 best_alt = x;
         if (depth == OUTPUT_DEPTH)
             best_alt_g = best_alt;
         return ans;
     }
 }
-SHAPES worst_for_enemy(const game_manager &m, int subject, SHAPES last_type)
+template<int MAX_DEPTH> SHAPES worst_for_enemy(const game_manager &m, int subject, SHAPES last_type)
 {
     for (int i = 0; i < 7; ++i) ans_g[i] = FLT_MAX;
-    search_for_pos(half_game(m.type_count[subject], m.gb[subject], last_type), -1);
+    search_for_pos<MAX_DEPTH>(half_game(m.type_count[subject], m.gb[subject], last_type), -1);
     return shape_order[min_element(ans_g, ans_g + 7) - ans_g];
 }
 
+template float search_for_pos<3>(half_game g, int depth); //对敌方调用(..., -1)
+template SHAPES worst_for_enemy<1>(const game_manager &m, int subject, SHAPES last_type);
