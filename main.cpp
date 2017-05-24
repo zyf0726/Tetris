@@ -53,7 +53,7 @@ int main() {
         global_phenotype->gen->feature_enabled[i] = 1;
     }
 
-    float fwt[] = {5, -33, 9, -20, -76, -31, -.25f, -65};
+    float fwt[] = {5, -33, 9, -37, -76, -31, -.25f, -65};
     copy(fwt, fwt + 8, global_phenotype->gen->feature_weights);
     // 加速输入
     istream::sync_with_stdio(false);
@@ -61,6 +61,23 @@ int main() {
 
     game_manager g;
     SHAPES nextTypeForColor[2];
+
+
+    g.gamePhenotypes[0] = initialize_phenotype(initialize_genotype(&global_option));
+    g.gamePhenotypes[1] = initialize_phenotype(initialize_genotype(&global_option));
+    for(int i=0;i<global_option.n_features_enabled;i++)
+        for(int j=0;j<2;j++)
+            g.gamePhenotypes[j]->gen->feature_enabled[i]=1;
+    float fwt2[]={-43,-66,28,-20,-76,-17,-8,-85};
+    copy(fwt,fwt+8,g.gamePhenotypes[0]->gen->feature_weights);
+    copy(fwt2,fwt2+8,g.gamePhenotypes[1]->gen->feature_weights);
+
+    g.auto_game();
+
+
+
+
+/*
     cin >> turnID;
 
     // 先读入第一回合，得到自己的颜色
@@ -91,9 +108,15 @@ int main() {
     // 遇事不决先输出（平台上编译不会输出）
     g.printField();
 
-    int blockForEnemy = g.make_decisions();
+    int blockForEnemy = g.make_decisions(g.curBotColor);
     // 决策结束，输出结果
     cout << blockForEnemy << " " << best_alt_g.x << " " << best_alt_g.y << " " << best_alt_g.o << endl;
+
+*/
+
+
+
+
 
     return 0;
 }

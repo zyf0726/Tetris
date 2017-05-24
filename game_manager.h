@@ -12,6 +12,8 @@ struct game_manager {
     SHAPES nextTypeForColor[2];
     int curTypeForColor[2];
     int curBotColor, enemyColor, turnID;
+    phenotype *gamePhenotypes[2];
+
 
 
     INLINE int transfer();
@@ -23,5 +25,6 @@ struct game_manager {
     INLINE void recoverEnemy(int blockType, int x, int y, int o);
     INLINE void recover(int blockTypeBot, int xBot, int yBot, int oBot,
                         int blockTypeEnemy, int xEnemy, int yEnemy, int oEnemy);
-    INLINE int make_decisions();
+    INLINE int make_decisions(int teamColor);
+    INLINE int auto_game();
 };

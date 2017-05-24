@@ -99,8 +99,30 @@ void game_manager::recover(int blockTypeBot, int xBot, int yBot, int oBot,
     fixup();
 }
 
-int game_manager::make_decisions() {
+int game_manager::make_decisions(int teamColor) {
     best_alt_g = {-1, -1, -1};
-    search_for_pos<3>(half_game(type_count[curBotColor], gb[curBotColor], nextTypeForColor[curBotColor]), 0);
-    return worst_for_enemy<1>(*this, enemyColor, nextTypeForColor[enemyColor]);
+    search_for_pos<3>(half_game(type_count[teamColor], gb[teamColor], nextTypeForColor[teamColor], gamePhenotypes[1-teamColor]), 0);
+    if(best_alt_g.o==-1) return -1;
+    return worst_for_enemy<1>(*this, 1-teamColor, nextTypeForColor[1-teamColor]);
+}
+
+int game_manager::auto_game() {
+    init(0,0);
+    while(true){
+
+        printField();
+
+        int xbot, ybot, obot, xenemy, yenemy, oenemy;
+        int blockForEnemy=make_decisions(curBotColor);
+        if(blockForEnemy==-1) return enemyColor;
+        xbot=best_alt_g.x;
+        ybot=best_alt_g.y;
+        obot=best_alt_g.o;
+        int blockForCur=make_decisions(enemyColor);
+        if(blockForCur==-1) return curBotColor;
+        xenemy=best_alt_g.x;
+        yenemy=best_alt_g.y;
+        oenemy=best_alt_g.o;
+        recover(blockForEnemy,xbot,ybot,obot,blockForCur,xenemy,yenemy,oenemy);
+    }
 }

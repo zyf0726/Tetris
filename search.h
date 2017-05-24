@@ -10,10 +10,11 @@ struct game_manager;
 struct half_game
 {
     board gb; int type_count[7], curr_type;
+    phenotype* curPhenotype;
     INLINE vector<int> get_valid_types();
-    INLINE half_game(const half_game& ori, const board& newgb);
-    INLINE half_game(const int count[], const game_board &m_gb, SHAPES _curr_type);
-    INLINE half_game(const half_game& ori, int selected_type);
+    INLINE half_game(const half_game &ori, const board &newgb);
+    INLINE half_game(const int count[], const game_board &m_gb, SHAPES _curr_type, phenotype *tempPhenotype);
+    INLINE half_game(const half_game &ori, int selected_type);
 };
 
 // 1. dfs(self, FOR_POS, 0) -> 输出类型 ==> ...
