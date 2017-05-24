@@ -55,7 +55,7 @@ template<int MAX_DEPTH> float search_for_type(half_game g, int depth)
 
 template<int MAX_DEPTH> float search_for_pos(half_game g, int depth) //对敌方调用(..., -1)
 {
-    auto f = _look_ahead(&g.gb, g.curPhenotype, g.curr_type, &global_option);
+    auto f = _look_ahead(&g.gb, g.curPhenotype, g.curr_type, &opt);
     if (f.size()==0){
         return -FLT_MAX / 2;
     }
@@ -92,5 +92,5 @@ template<int MAX_DEPTH> SHAPES worst_for_enemy(const game_manager &m, int subjec
     return shape_order[min_element(ans_g, ans_g + 7) - ans_g];
 }
 
-template float search_for_pos<3>(half_game g, int depth); //对敌方调用(..., -1)
+template float search_for_pos<2>(half_game g, int depth); //对敌方调用(..., -1)
 template SHAPES worst_for_enemy<1>(const game_manager &m, int subject, SHAPES last_type);

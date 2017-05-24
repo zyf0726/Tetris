@@ -25,7 +25,6 @@ phenotype *initialize_phenotype(genotype *g)
     phenotype *p = (phenotype *) malloc(sizeof(phenotype));
 
     p->fitness = 0;
-    p->has_fitness = 0;
     p->gen = g;
 
     return p;
@@ -64,15 +63,12 @@ void write_phenotype(FILE *stream, phenotype *phenotype, options *opt)
 
     for (int i = 0; i < opt->n_features_enabled; i++)
     {
-        if (phenotype->gen->feature_enabled[i])
-        {
             for (int a = 0; a < features[opt->enabled_f_indices[i]].weights; a++)
             {
                 fprintf(stream, "%-*s % .2f\n",
                         max_feature_length,
                         features[opt->enabled_f_indices[i]].name,
                         phenotype->gen->feature_weights[weight_i++]);
-            }
         }
     }
 }
@@ -84,10 +80,10 @@ float board_score(board *new_board, board *old_board, phenotype *phenotype, t_la
     int weight_i = 0;
     reset_feature_caches(opt);
     for (int i = 0; i < opt->n_features_enabled; i++)
-        if (phenotype->gen->feature_enabled[i])
         {
             const feature& pt = features[opt->enabled_f_indices[i]];
-            if (pt.dynamic && enable_dynamic || !pt.dynamic && enable_static)
+            if ((pt.dynamic && enable_dynamic)
+                || (!pt.dynamic && enable_static))
                 for (int a = 0; a < pt.weights; a++)
                     score += phenotype->gen->feature_weights[weight_i++] * call_feature(opt->enabled_f_indices[i], new_board, old_board, tlp);
         }

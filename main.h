@@ -8,5 +8,5 @@
 
 #endif
 
-extern options global_option;
+extern options opt;
 extern phenotype *global_phenotype;

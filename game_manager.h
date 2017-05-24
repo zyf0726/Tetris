@@ -3,6 +3,7 @@
 #include "shared.h"
 #include "game_board.h"
 #include "search.h"
+#include "options.h"
 #endif
 
 struct game_manager {
@@ -15,16 +16,18 @@ struct game_manager {
     phenotype *gamePhenotypes[2];
 
 
-
     INLINE int transfer();
     INLINE void printField();
-    INLINE void fixup() { transfer(); }
-    friend int main();
-    INLINE void init(int blockType, int _curBotColor);
+    INLINE game_manager(int blockType, int _curBotColor, float*, float*, options&);
     INLINE void recoverBot(int blockType, int x, int y, int o);
     INLINE void recoverEnemy(int blockType, int x, int y, int o);
-    INLINE void recover(int blockTypeBot, int xBot, int yBot, int oBot,
+    INLINE int recover(int blockTypeBot, int xBot, int yBot, int oBot,
                         int blockTypeEnemy, int xEnemy, int yEnemy, int oEnemy);
     INLINE int make_decisions(int teamColor);
     INLINE int auto_game();
+    INLINE ~game_manager()
+    {
+        free_phenotype(gamePhenotypes[0]);
+        free_phenotype(gamePhenotypes[1]);
+    }
 };

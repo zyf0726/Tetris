@@ -31,7 +31,7 @@ struct options {
 
     selection sel;
 
-    char* log_directory;
+    const char* log_directory;
 
 };
 

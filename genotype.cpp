@@ -12,7 +12,6 @@
 
 void free_genotype (genotype* g) {
     free(g->feature_weights);
-    free(g->feature_enabled);
     free(g);
 }
 
@@ -20,7 +19,6 @@ genotype* initialize_genotype (options* opt) {
     genotype* g = (genotype*)malloc(sizeof(genotype));
 
     g->feature_weights = (float*)malloc(sizeof(float) * opt->n_weights_enabled);
-    g->feature_enabled = (int*)malloc(sizeof(int) * opt->n_features_enabled);
 
     return g;
 }
@@ -29,7 +27,6 @@ genotype* copy_genotype (genotype* gt, options* opt) {
     genotype* copy = initialize_genotype(opt);
 
     memcpy(copy->feature_weights, gt->feature_weights, sizeof(float) * opt->n_weights_enabled);
-    memcpy(copy->feature_enabled, gt->feature_enabled, sizeof(int) * opt->n_features_enabled);
 
     return copy;
 }
@@ -39,9 +36,6 @@ void randomize_genotype (genotype* g, options* opt) {
         g->feature_weights[i] = l_rand(- opt->randomization_range / 2 - 1, opt->randomization_range / 2 + 1, opt);
     }
 
-    for (int i = 0; i < opt->n_features_enabled; i++) {
-        g->feature_enabled[i] = f_rand(opt) < opt->feature_enable_rate ? 1 : 0;
-    }
 }
 
 
@@ -63,7 +57,6 @@ genotype* crossover_genotypes (genotype* g_1, genotype* g_2, options* opt) {
                 selecting_from_genotype = g_2;
             }
 
-            g->feature_enabled[i] = selecting_from_genotype->feature_enabled[i];
 
             for (int a = 0; a < features[opt->enabled_f_indices[i]].weights; a++, weight_i++) {
                 g->feature_weights[weight_i] = selecting_from_genotype->feature_weights[weight_i];
@@ -103,7 +96,6 @@ genotype* crossover_genotypes (genotype* g_1, genotype* g_2, options* opt) {
                 selecting_from_genotype = g_2;
             }
 
-            g->feature_enabled[i] = selecting_from_genotype->feature_enabled[i];
 
             for (int a = 0; a < features[opt->enabled_f_indices[i]].weights; a++, weight_i++) {
                 g->feature_weights[weight_i] = selecting_from_genotype->feature_weights[weight_i];
@@ -131,24 +123,12 @@ int mutate_genotype (genotype* g, options* opt) {
 
                 g->feature_weights[weight_i] += l_rand(- opt->mutation_range / 2 - 1, opt->mutation_range / 2 + 1, opt);
 
-                if (g->feature_weights[weight_i] != previous_value && g->feature_enabled[i]) {
+                if (g->feature_weights[weight_i] != previous_value ) {
                     was_mutated = 1;
                 }
             }
 
             weight_i++;
-        }
-    }
-
-    for (int i = 0; i < opt->n_features_enabled; i++) {
-        if (f_rand(opt) > opt->mutation_rate) {
-            previous_value = g->feature_enabled[i];
-
-            g->feature_enabled[i] = f_rand(opt) < opt->feature_enable_rate ? 1 : 0;
-
-            if (g->feature_enabled[i] != previous_value) {
-                was_mutated = 1;
-            }
         }
     }
 

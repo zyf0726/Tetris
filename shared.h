@@ -1,3 +1,4 @@
+#pragma GCC optimize("unroll-loops")
 //
 // Created by prwang on 2017/4/22.
 //
@@ -73,7 +74,7 @@ template<class T> inline bool maxt1(T& a, T b) { return a < b ? (a = b, true) : 
 #define INLINE
 #endif
 
-constexpr size_t MAX_SOLUTIONS = 8;
+constexpr size_t MAX_SOLUTIONS = 24;
 
 template<class T, size_t max_size>struct insert_sort_container
 {
@@ -81,7 +82,6 @@ template<class T, size_t max_size>struct insert_sort_container
     T* end() { return data + real_size; }
     insert_sort_container() { real_size = 0; }
     void push_back(const T& x)
-    __attribute__((optimize("unroll-loops")))
     {
         size_t p = real_size;
         while (p > 0 && x <  data[p - 1])

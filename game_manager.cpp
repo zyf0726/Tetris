@@ -9,8 +9,7 @@
 #endif
 
 // 打印场地用于调试
-void game_manager::printField()
-{
+void game_manager::printField() {
 #ifndef _BOTZONE_ONLINE
     static const char *i2s[] = {
             "~~",
@@ -20,9 +19,8 @@ void game_manager::printField()
             "##"
     };
 
-    clog<<"cur:                       enemy:\n";
-    for (int y = 0; y < MAPHEIGHT; y++)
-    {
+    clog << "cur:                       enemy:\n";
+    for (int y = 0; y < MAPHEIGHT; y++) {
         clog << "~~";
         for (int x = 0; x < MAPWIDTH; x++)
             clog << i2s[gb[curBotColor].get_tile(x, y) + 2];
@@ -38,7 +36,7 @@ void game_manager::printField()
 #endif
 }
 
-int game_manager::transfer()
+int game_manager::transfer() //返回赢家
 {
     int color1 = 0, color2 = 1;
     if (gb[color1].transCount == 0 && gb[color2].transCount == 0)
@@ -46,10 +44,18 @@ int game_manager::transfer()
 
     gb[color1].maxHeight += gb[color2].transCount;
     gb[color2].maxHeight += gb[color1].transCount;
-    if (gb[color1].maxHeight > MAPHEIGHT)
-        return color1;
-    if (gb[color2].maxHeight > MAPHEIGHT)
-        return color2;
+#define RANDOM_RET_IF_DRAW(die1, die2, r1, r2)\
+    switch( int(die1) | int(die2)  << 1) \
+    { \
+    case 0: break; \
+    case 1:  \
+        return(r2); \
+    case 2:  \
+        return(r1); \
+    default: \
+        return int(RAND() & 1); \
+    }
+    RANDOM_RET_IF_DRAW(gb[color1].maxHeight > MAPHEIGHT, gb[color2].maxHeight > MAPHEIGHT, color1, color2);
 
     for (int i = 0; i < MAPHEIGHT - gb[color2].transCount; i++)
         gb[color1].lines[i] = gb[color1].lines[i + gb[color2].transCount];
@@ -62,20 +68,28 @@ int game_manager::transfer()
         gb[color2].lines[i] = gb[color1].trans[i - MAPHEIGHT + gb[color1].transCount];
 
     return -1;
-    
-}
 
-void game_manager::init(int blockType, int _curBotColor) {
+}
+game_manager::game_manager(int blockType, int _curBotColor, float* wg1, float* wg2, options& opt)
+{
+
     curBotColor = _curBotColor;
     enemyColor = 1 - _curBotColor;
     nextTypeForColor[0] = nextTypeForColor[1] = (SHAPES) blockType;
     ++type_count[0][blockType], ++type_count[1][blockType];
+    gamePhenotypes[curBotColor] = initialize_phenotype(initialize_genotype(&opt));
+    gamePhenotypes[enemyColor] = initialize_phenotype(initialize_genotype(&opt));
+
+    copy(wg1, wg1 + opt.n_features_enabled, gamePhenotypes[curBotColor]->gen->feature_weights);
+
+    copy(wg2, wg2 + opt.n_features_enabled, gamePhenotypes[enemyColor]->gen->feature_weights);
+
 }
 
 void game_manager::recoverBot(int blockType, int x, int y, int o) {
     curTypeForColor[curBotColor] = nextTypeForColor[curBotColor];
     // 我当时把上一块落到了x y o
-    auto r = toxy2TXY((SHAPES)curTypeForColor[curBotColor], (ORI) o, x, y);
+    auto r = toxy2TXY((SHAPES) curTypeForColor[curBotColor], (ORI) o, x, y);
     gb[curBotColor].put_eliminate(get<0>(r), get<1>(r), get<2>(r));
     // 我给对方什么块来着
 }
@@ -88,41 +102,42 @@ void game_manager::recoverEnemy(int blockType, int x, int y, int o) {
     // 对方给我什么块来着？
 }
 
-void game_manager::recover(int blockTypeBot, int xBot, int yBot, int oBot,
-                           int blockTypeEnemy, int xEnemy, int yEnemy, int oEnemy) {
+int game_manager::recover(int blockTypeBot, int xBot, int yBot, int oBot,
+                          int blockTypeEnemy, int xEnemy, int yEnemy, int oEnemy) {
     recoverBot(blockTypeBot, xBot, yBot, oBot);
     recoverEnemy(blockTypeEnemy, xEnemy, yEnemy, oEnemy);
 
     type_count[enemyColor][blockTypeBot]++;
-    nextTypeForColor[enemyColor] = (SHAPES)blockTypeBot;
+    nextTypeForColor[enemyColor] = (SHAPES) blockTypeBot;
     type_count[curBotColor][blockTypeEnemy]++;
-    nextTypeForColor[curBotColor] = (SHAPES)blockTypeEnemy;
-    fixup();
+    nextTypeForColor[curBotColor] = (SHAPES) blockTypeEnemy;
+    return transfer();
 }
 
 int game_manager::make_decisions(int teamColor) {
     best_alt_g = {-1, -1, -1};
-    search_for_pos<3>(half_game(type_count[teamColor], gb[teamColor], nextTypeForColor[teamColor], gamePhenotypes[teamColor]), 0);
-    if(best_alt_g.o==-1) return -1;
-    return worst_for_enemy<1>(*this, 1-teamColor, nextTypeForColor[1-teamColor]);
+    search_for_pos<2>(
+            half_game(type_count[teamColor], gb[teamColor], nextTypeForColor[teamColor], gamePhenotypes[teamColor]), 0);
+    if (best_alt_g.o == -1) return -1;
+    return worst_for_enemy<1>(*this, 1 - teamColor, nextTypeForColor[1 - teamColor]);
 }
 
 int game_manager::auto_game() {
-    while(true){
-
+    while (true) {
         printField();
-
         int xbot, ybot, obot, xenemy, yenemy, oenemy;
-        int blockForEnemy=make_decisions(curBotColor);
-        if(blockForEnemy==-1) return enemyColor;
-        xbot=best_alt_g.x;
-        ybot=best_alt_g.y;
-        obot=best_alt_g.o;
-        int blockForCur=make_decisions(enemyColor);
-        if(blockForCur==-1) return curBotColor;
-        xenemy=best_alt_g.x;
-        yenemy=best_alt_g.y;
-        oenemy=best_alt_g.o;
-        recover(blockForEnemy,xbot,ybot,obot,blockForCur,xenemy,yenemy,oenemy);
+        int blockForEnemy = make_decisions(curBotColor);
+        xbot = best_alt_g.x;
+        ybot = best_alt_g.y;
+        obot = best_alt_g.o;
+        int blockForCur = make_decisions(enemyColor);
+        xenemy = best_alt_g.x;
+        yenemy = best_alt_g.y;
+        oenemy = best_alt_g.o;
+
+        RANDOM_RET_IF_DRAW(blockForEnemy == -1, blockForCur == -1, curBotColor, enemyColor);
+        int rsu_tr = recover(blockForEnemy, xbot, ybot, obot, blockForCur, xenemy, yenemy, oenemy);
+        if (rsu_tr > 0)
+            return rsu_tr;
     }
 }

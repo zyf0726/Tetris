@@ -74,7 +74,6 @@ phenotype* mate_individuals (phenotype* phenotype_1, phenotype* phenotype_2, str
     }
 
     if (mutate_genotype(offspring->gen, opt)) {
-        offspring->has_fitness = 0;
     }
 
     return offspring;

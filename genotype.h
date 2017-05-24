@@ -1,7 +1,6 @@
 #pragma once
 struct genotype {
     float * feature_weights;
-    int * feature_enabled;
 };
 void free_genotype (struct genotype* g);
 struct genotype* initialize_genotype (struct options* opt);

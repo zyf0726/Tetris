@@ -6,7 +6,6 @@
 #endif
 struct phenotype {
     int fitness;
-    int has_fitness;
     genotype* gen;
 };
 struct alternative
