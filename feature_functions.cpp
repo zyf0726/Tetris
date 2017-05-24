@@ -47,7 +47,7 @@ float f_column_heights (struct board * new_board, struct board * old_board, stru
     return height;
 }
 
-float f_column_difference (struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {
+float f_column_difference (struct board * new_board, struct board * , struct t_last_placement * ) {
     int difference = abs(column_height(new_board, current_column) - column_height(new_board, current_column + 1));
 
     current_column++;
@@ -134,6 +134,8 @@ float f_mean_height (struct board * new_board, struct board * old_board, struct 
 }
 
 #define DIFF(F, N, O, T) (F(N, O, T) - F(O, N, T))
+#define _DIFF2(F, G, N, O, T, OP) (F(N, O, T) OP G(N, O, T))
+#define DIFF2(F, G, N, O, T) _DIFF2(F, G, N, O, T, -)
 float f_v_max_height (struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {
     return DIFF(f_max_height, new_board, old_board, tlp);
 }
@@ -282,12 +284,8 @@ float f_cumulative_wells_dell (struct board * new_board, struct board * old_boar
     return cumulative_well_sum;
 }
 
-int series_sum (int n) {
-    if (n == 0) {
-        return 0;
-    } else {
+inline int series_sum (int n) {
         return n * (n + 1) / 2;
-    }
 }
 
 float f_cumulative_wells_fast (struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {
@@ -340,23 +338,20 @@ float f_min_height (struct board * new_board, struct board * old_board, struct t
 }
 
 float f_max_minus_mean_height (struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {
-    return call_feature(feature_index("--f-max-height"), new_board, old_board, tlp)
-        - call_feature(feature_index("--f-mean-height"), new_board, old_board, tlp);
+
+    return DIFF2(f_max_height, f_mean_height, new_board, old_board, tlp);
 }
 
 float f_mean_minus_min_height (struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {
-    return call_feature(feature_index("--f-mean-height"), new_board, old_board, tlp)
-        - call_feature(feature_index("--f-min-height"), new_board, old_board, tlp);
+    return DIFF2(f_mean_height, f_min_height, new_board, old_board, tlp);
 }
 
 float f_mean_hole_depth (struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {
-    return call_feature(feature_index("--f-hole-depths"), new_board, old_board, tlp)
-        / call_feature(feature_index("--f-n-adjacent-holes"), new_board, old_board, tlp);
+    return _DIFF2(f_hole_depths, f_n_adjacent_holes, new_board, old_board, tlp, /);
 }
 
 float f_max_height_difference (struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {
-    return call_feature(feature_index("--f-max-height"), new_board, old_board, tlp)
-        - call_feature(feature_index("--f-min-height"), new_board, old_board, tlp);
+    return DIFF2(f_max_height, f_min_height, new_board, old_board, tlp);
 }
 
 float f_n_adjacent_holes (struct board * new_board, struct board * old_board, struct t_last_placement * tlp) {

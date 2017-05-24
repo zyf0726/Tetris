@@ -80,7 +80,7 @@ phenotype** select_by_sigma_scaling (population* population, int n, options* opt
     average /= population->size;
 
     for (int i = 0; i < population->size; i++) {
-        square_deviations = pow(population->individuals[i]->fitness - average, 2);
+        square_deviations = powf(population->individuals[i]->fitness - average, 2);
     }
 
     std_deviation = sqrt(square_deviations / population->size);

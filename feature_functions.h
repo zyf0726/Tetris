@@ -6,7 +6,7 @@
 #endif
 struct feature {
     const char * name;
-    int weights;
+    int weights, dynamic;
     float (* function) (struct board *, struct board *, t_last_placement *);
 };
 

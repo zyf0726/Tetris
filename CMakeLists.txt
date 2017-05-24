@@ -5,8 +5,10 @@ set(CMAKE_CXX_STANDARD 11)
 add_executable(main shared.h game_board.cpp search.cpp main.cpp game_manager.cpp genotype.cpp phenotype.cpp
     random.cpp board.cpp tetromino.cpp feature_functions.cpp feature_helpers.cpp options.cpp)
 
-
+find_package(MPI)
 
 add_executable(training  shared.h selection.cpp population.cpp phenotype.cpp genotype.cpp
 random.cpp board.cpp tetromino.cpp feature_functions.cpp feature_helpers.cpp options.cpp tetris.cpp )
+target_include_directories(training PUBLIC
+        ${MPI_INCLUDE_PATHS})
 

@@ -27,6 +27,7 @@ feature features[N_FEATURES] = {
     }, {
         .name = "--f-landing-height",
         .weights = 1,
+        .dynamic = true,
         .function = &f_landing_height,
     }, {
         .name = "--f-cell-transitions",
@@ -47,22 +48,27 @@ feature features[N_FEATURES] = {
     }, {
         .name = "--f-v-max-height",
         .weights = 1,
+        .dynamic = true,
         .function = &f_v_max_height,
     }, {
         .name = "--f-v-n-holes",
         .weights = 1,
+                .dynamic = true,
         .function = &f_v_n_holes,
     }, {
         .name = "--f-v-height-differences",
         .weights = 1,
+                .dynamic = true,
         .function = &f_v_height_differences,
     }, {
         .name = "--f-v-mean-height",
         .weights = 1,
+                .dynamic = true,
         .function = &f_v_mean_height,
     }, {
         .name = "--f-removed-lines",
         .weights = 1,
+                .dynamic = true,
         .function = &f_removed_lines,
     }, {
         .name = "--f-weighted-blocks",
@@ -79,6 +85,7 @@ feature features[N_FEATURES] = {
     }, {
         .name = "--f-eroded-piece-cells",
         .weights = 1,
+                .dynamic = true,
         .function = &f_eroded_piece_cells,
     }, {
         .name = "--f-row-transitions",

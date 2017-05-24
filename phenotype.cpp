@@ -77,6 +77,7 @@ void write_phenotype(FILE *stream, phenotype *phenotype, options *opt)
     }
 }
 
+template<bool enable_dynamic, bool enable_static>
 float board_score(board *new_board, board *old_board, phenotype *phenotype, t_last_placement *tlp, options *opt)
 {
     float score = 0;
@@ -84,9 +85,12 @@ float board_score(board *new_board, board *old_board, phenotype *phenotype, t_la
     reset_feature_caches(opt);
     for (int i = 0; i < opt->n_features_enabled; i++)
         if (phenotype->gen->feature_enabled[i])
-            for (int a = 0; a < features[opt->enabled_f_indices[i]].weights; a++)
-                score += phenotype->gen->feature_weights[weight_i++] *
-                         call_feature(opt->enabled_f_indices[i], new_board, old_board, tlp);
+        {
+            const feature& pt = features[opt->enabled_f_indices[i]];
+            if (pt.dynamic && enable_dynamic || !pt.dynamic && enable_static)
+                for (int a = 0; a < pt.weights; a++)
+                    score += phenotype->gen->feature_weights[weight_i++] * call_feature(opt->enabled_f_indices[i], new_board, old_board, tlp);
+        }
     return score;
 }
 
@@ -186,7 +190,8 @@ alt_c_t _look_ahead(board *brd, phenotype *phenotype,  int Ty1, options* opt)
                             board cp(*brd);
                             cp.place(te, xx, yy);
                             cp.remove_lines(&tlp);
-                            alt.score = board_score(&cp, brd, phenotype, &tlp, opt);
+                            alt.static_score = board_score<false, true>(&cp, brd, phenotype, &tlp, opt);
+                            alt.dynamic_score = board_score<true, false>(&cp, brd, phenotype, &tlp, opt);
                             alt.b = cp;
                             free(tlp.lines_removed);
                             f.push_back(alt);
