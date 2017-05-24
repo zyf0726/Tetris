@@ -99,8 +99,8 @@ template<int MAX_DEPTH> SHAPES worst_for_enemy(const game_manager &m, int subjec
 }
 
 template float search_for_pos<2>(half_game g, int depth); //对敌方调用(..., -1)
-template SHAPES worst_for_enemy<1>(const game_manager &m, int subject, SHAPES last_type);
+template SHAPES worst_for_enemy<2>(const game_manager &m, int subject, SHAPES last_type);
 template float search_for_pos<1>(half_game g, int depth); //对敌方调用(..., -1)
-template SHAPES worst_for_enemy<0>(const game_manager &m, int subject, SHAPES last_type);
+template SHAPES worst_for_enemy<1>(const game_manager &m, int subject, SHAPES last_type);
 template float search_for_pos<0>(half_game g, int depth); //对敌方调用(..., -1)
-template SHAPES worst_for_enemy<-1>(const game_manager &m, int subject, SHAPES last_type);
+template SHAPES worst_for_enemy<0>(const game_manager &m, int subject, SHAPES last_type);

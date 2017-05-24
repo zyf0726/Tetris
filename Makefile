@@ -5,11 +5,10 @@ Submit: $(headers) $(imp_files) main.cpp
 	cat S.h $(headers) $(imp_files) main.cpp > Submit.cc
 	cat S_train.h $(headers) $(imp_files) tetris.cpp > Train.cc
 	cp  -f Submit.cc cmake-build-debug/
-	g++ -g -O2 -D_BOTZONE_ONLINE cmake-build-debug/Submit.cc -o Submit -std=c++11 -Wall -Wextra 
+	clang++ -g -O2 -D_BOTZONE_ONLINE cmake-build-debug/Submit.cc -o Submit -std=c++11 -Wall -Wextra 
 Train:  
 	cat S_train.h $(headers) $(imp_files) tetris.cpp > Train.cc
 	cp  -f Train.cc cmake-build-debug/
-	g++ -g -Ofast -march=native cmake-build-debug/Train.cc -o Train -std=c++11 -Wall -Wextra -lmpi
- 
+	clang++ -g -Ofast -march=native cmake-build-debug/Train.cc -o Train -std=c++11 -Wall -Wextra -lmpi -I/usr/lib/x86_64-linux-gnu/openmpi/include/
 clean:
 	rm -f Submit.cc Submit Train.cc Train

@@ -73,9 +73,11 @@ int game_manager::transfer() //返回赢家
 game_manager::game_manager(int blockType, int _curBotColor, float* wg1, float* wg2, options& opt)
 {
 
+    memset(type_count, 0, sizeof(type_count));
     curBotColor = _curBotColor;
     enemyColor = 1 - _curBotColor;
     nextTypeForColor[0] = nextTypeForColor[1] = (SHAPES) blockType;
+
     ++type_count[0][blockType], ++type_count[1][blockType];
     gamePhenotypes[curBotColor] = initialize_phenotype(initialize_genotype(&opt));
     gamePhenotypes[enemyColor] = initialize_phenotype(initialize_genotype(&opt));
@@ -119,7 +121,7 @@ template<int MAXDEPTH> int game_manager::make_decisions(int teamColor) {
     search_for_pos<MAXDEPTH>(
             half_game(type_count[teamColor], gb[teamColor], nextTypeForColor[teamColor], gamePhenotypes[teamColor]), 0);
     if (best_alt_g.o == -1) return -1;
-    return worst_for_enemy<MAXDEPTH - 1>(*this, 1 - teamColor, nextTypeForColor[1 - teamColor]);
+    return worst_for_enemy<MAXDEPTH>(*this, 1 - teamColor, nextTypeForColor[1 - teamColor]);
 }
 template int game_manager::make_decisions<2>(int teamColor);
 template int game_manager::make_decisions<1>(int teamColor);

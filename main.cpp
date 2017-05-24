@@ -32,8 +32,6 @@ bool PRINT_FLAG = false;
  */
 
 options opt = {};
-phenotype *global_phenotype;
-
 int main() {
 #ifndef SINGLEFILE
     freopen("in.txt", "r", stdin);
@@ -50,7 +48,7 @@ int main() {
     EF("--f-n-rows-with-holes");
 
 
-    float fwt[] = {5, -33, 9, -37, -76, -31, -.25f, -65};
+    float fwt[] = {5, -33, 9, -20, -76, -31, -2, -65};
     // 加速输入
     istream::sync_with_stdio(false);
     int turnID, blockType;

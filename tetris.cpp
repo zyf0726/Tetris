@@ -31,34 +31,7 @@
 #define RESULT_TAG       4
 #define SHUTDOWN_TAG     4
 
-struct options opt = {
-        .n_features_enabled    = 0,
-        .n_weights_enabled     = 0,
-
-        .verbose               = 0,
-        .population_size       = 50,
-        .tournament_group_size = 10,
-        .max_n_generations     = 100,
-        .crossover_points      = 2,
-        .elitism               = 2,
-        .no_log                = 0,
-        .no_change_duration    = 50,
-        .reset_volume          = 0,
-        .n_trials              = 10,
-        .print_board           = 0,
-        .n_piece_lookahead     = 0,
-        .randomization_range   = 100,
-        .mutation_range        = 100,
-
-        .feature_enable_rate               = 1.f / 6.f,
-        .mutation_rate                     = 0.995,
-        .crossover_rate                    = 0.5,
-        .tournament_group_random_selection = 0.1,
-        .log_directory = "/Users/prwang/CLionProjects/Tetris/logs",
-        .no_log  = false,
-        .sel = SUS,
-};
-
+options opt;
 char *program_name;
 
 int user_exit = 0;
@@ -154,6 +127,32 @@ clock_t start_time = clock();
 
 inline constexpr int C2(int a) { return a * (a - 1) / 2; }
 int main(int argc, char **argv) {
+
+ opt      .n_features_enabled    = 0,
+ opt      .n_weights_enabled     = 0,
+
+ opt      .verbose               = 0,
+ opt      .population_size       = 20,
+ opt      .tournament_group_size = 10,
+ opt      .max_n_generations     = 100,
+ opt      .crossover_points      = 2,
+ opt      .elitism               = 2,
+ opt      .no_log                = 0,
+ opt      .no_change_duration    = 50,
+ opt      .reset_volume          = 0,
+ opt      .n_trials              = 10,
+ opt      .print_board           = 0,
+ opt      .n_piece_lookahead     = 0,
+ opt      .randomization_range   = 100,
+ opt      .mutation_range        = 100,
+
+ opt      .feature_enable_rate               = 1.f / 6.f,
+ opt      .mutation_rate                     = 0.995,
+ opt      .crossover_rate                    = 0.5,
+ opt      .tournament_group_random_selection = 0.1,
+ opt      .log_directory = "/home/prwang/logs",
+ opt      .no_log  = false,
+ opt      .sel = SUS;
 
     int rank, is_master = false;
     initalize_rng(&opt);
