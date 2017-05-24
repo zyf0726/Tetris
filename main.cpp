@@ -63,16 +63,19 @@ int main() {
     SHAPES nextTypeForColor[2];
 
 
-    g.gamePhenotypes[0] = initialize_phenotype(initialize_genotype(&global_option));
-    g.gamePhenotypes[1] = initialize_phenotype(initialize_genotype(&global_option));
+    g.init(1,0);
+
+    g.gamePhenotypes[g.curBotColor] = initialize_phenotype(initialize_genotype(&global_option));
+    g.gamePhenotypes[g.enemyColor] = initialize_phenotype(initialize_genotype(&global_option));
     for(int i=0;i<global_option.n_features_enabled;i++)
         for(int j=0;j<2;j++)
             g.gamePhenotypes[j]->gen->feature_enabled[i]=1;
-    float fwt2[]={-43,-66,28,-20,-76,-17,-8,-85};
-    copy(fwt,fwt+8,g.gamePhenotypes[0]->gen->feature_weights);
-    copy(fwt2,fwt2+8,g.gamePhenotypes[1]->gen->feature_weights);
+    float fwt2[]={-43,-88,30,-20,-76,-17,-8,-85};
+    copy(fwt,fwt+8,g.gamePhenotypes[g.curBotColor]->gen->feature_weights);
+    copy(fwt2,fwt2+8,g.gamePhenotypes[g.enemyColor]->gen->feature_weights);
 
-    g.auto_game();
+
+    clog<<(g.auto_game()==g.enemyColor?"enemy win":"cur win")<<endl;
 
 
 

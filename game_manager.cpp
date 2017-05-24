@@ -20,14 +20,15 @@ void game_manager::printField()
             "##"
     };
 
+    clog<<"cur:                       enemy:\n";
     for (int y = 0; y < MAPHEIGHT; y++)
     {
         clog << "~~";
         for (int x = 0; x < MAPWIDTH; x++)
-            clog << i2s[gb[0].get_tile(x, y) + 2];
+            clog << i2s[gb[curBotColor].get_tile(x, y) + 2];
         clog << "~~";
         for (int x = 0; x < MAPWIDTH; x++)
-            clog << i2s[gb[1].get_tile(x, y) + 2];
+            clog << i2s[gb[enemyColor].get_tile(x, y) + 2];
         clog << "~~";
         clog << endl;
     }
@@ -101,13 +102,12 @@ void game_manager::recover(int blockTypeBot, int xBot, int yBot, int oBot,
 
 int game_manager::make_decisions(int teamColor) {
     best_alt_g = {-1, -1, -1};
-    search_for_pos<3>(half_game(type_count[teamColor], gb[teamColor], nextTypeForColor[teamColor], gamePhenotypes[1-teamColor]), 0);
+    search_for_pos<3>(half_game(type_count[teamColor], gb[teamColor], nextTypeForColor[teamColor], gamePhenotypes[teamColor]), 0);
     if(best_alt_g.o==-1) return -1;
     return worst_for_enemy<1>(*this, 1-teamColor, nextTypeForColor[1-teamColor]);
 }
 
 int game_manager::auto_game() {
-    init(0,0);
     while(true){
 
         printField();
