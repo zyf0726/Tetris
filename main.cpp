@@ -10,6 +10,7 @@
 
 int currBotColor;
 int enemyColor;
+bool PRINT_FLAG = false;
 
 /*
  Feature Value
@@ -85,7 +86,7 @@ int main() {
     // 遇事不决先输出（平台上编译不会输出）
     g.printField();
 
-    int blockForEnemy = g.make_decisions(g.curBotColor);
+    int blockForEnemy = g.make_decisions<2>(g.curBotColor);
     // 决策结束，输出结果
     cout << blockForEnemy << " " << best_alt_g.x << " " << best_alt_g.y << " " << best_alt_g.o << endl;
 

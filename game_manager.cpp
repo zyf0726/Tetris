@@ -114,23 +114,33 @@ int game_manager::recover(int blockTypeBot, int xBot, int yBot, int oBot,
     return transfer();
 }
 
-int game_manager::make_decisions(int teamColor) {
+template<int MAXDEPTH> int game_manager::make_decisions(int teamColor) {
     best_alt_g = {-1, -1, -1};
-    search_for_pos<2>(
+    search_for_pos<MAXDEPTH>(
             half_game(type_count[teamColor], gb[teamColor], nextTypeForColor[teamColor], gamePhenotypes[teamColor]), 0);
     if (best_alt_g.o == -1) return -1;
-    return worst_for_enemy<1>(*this, 1 - teamColor, nextTypeForColor[1 - teamColor]);
+    return worst_for_enemy<MAXDEPTH - 1>(*this, 1 - teamColor, nextTypeForColor[1 - teamColor]);
 }
+template int game_manager::make_decisions<2>(int teamColor);
+template int game_manager::make_decisions<1>(int teamColor);
+template int game_manager::make_decisions<0>(int teamColor);
 
-int game_manager::auto_game() {
-    while (true) {
-        printField();
+
+template<int MAXDEPTH> int game_manager::auto_game()
+{
+    int cnt = 0;
+    while (true)
+    {
+        if (PRINT_FLAG) {
+            printField();
+            fprintf(stderr, "%d\n", ++cnt);
+        }
         int xbot, ybot, obot, xenemy, yenemy, oenemy;
-        int blockForEnemy = make_decisions(curBotColor);
+        int blockForEnemy = make_decisions<MAXDEPTH>(curBotColor);
         xbot = best_alt_g.x;
         ybot = best_alt_g.y;
         obot = best_alt_g.o;
-        int blockForCur = make_decisions(enemyColor);
+        int blockForCur = make_decisions<MAXDEPTH>(enemyColor);
         xenemy = best_alt_g.x;
         yenemy = best_alt_g.y;
         oenemy = best_alt_g.o;
@@ -141,3 +151,6 @@ int game_manager::auto_game() {
             return rsu_tr;
     }
 }
+template int game_manager::auto_game<2>();
+template int game_manager::auto_game<1>();
+template int game_manager::auto_game<0>();

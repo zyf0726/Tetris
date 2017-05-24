@@ -1,5 +1,7 @@
 #pragma once
+#ifndef SINGLEFILE
 #include "phenotype.h"
+#endif
 struct phenotype** select_parent_pairs (struct population* ppl, struct options* opt);
 struct phenotype* select_by_tournament (struct population* ppl, struct options* opt);
 struct phenotype** select_with_cumulation (struct population* population, int n, float cumulation[], struct options* opt);

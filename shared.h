@@ -97,3 +97,4 @@ private:
     T data[max_size + 1];
     size_t real_size;
 };
+extern bool PRINT_FLAG;

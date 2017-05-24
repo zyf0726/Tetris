@@ -10,7 +10,7 @@
 
 int currBotColor;
 int enemyColor;
-
+bool PRINT_FLAG = true;
 /*
  Feature Value
 3. Holes -35
@@ -55,8 +55,7 @@ int main() {
 
 
 
-
-    clog << (g.auto_game() == g.enemyColor ? "enemy win" : "cur win") << endl;
+    clog << (g.auto_game<0>() == g.enemyColor ? "enemy win" : "cur win") << endl;
 
     return 0;
 }

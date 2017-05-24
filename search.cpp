@@ -59,14 +59,20 @@ template<int MAX_DEPTH> float search_for_pos(half_game g, int depth) //对敌方
     if (f.size()==0){
         return -FLT_MAX / 2;
     }
+    float ans = -FLT_MAX;
     if (depth >= MAX_DEPTH)
     {
         alternative best_alt = *f.begin();
-        return best_alt.static_score;
+        if (depth == OUTPUT_DEPTH)
+        {
+            for (const auto& x : f)
+                if(maxt1(ans, x.static_score + x.dynamic_score))
+                    best_alt=x;
+            best_alt_g=best_alt;
+        } return best_alt.static_score;
     } else
     {
         alternative best_alt{-1,-1,-1};
-        float ans = -FLT_MAX;
         if (depth != OUTPUT_DEPTH)
         {
             for (const auto& x : f) if (maxt1(ans, x.dynamic_score
@@ -94,3 +100,7 @@ template<int MAX_DEPTH> SHAPES worst_for_enemy(const game_manager &m, int subjec
 
 template float search_for_pos<2>(half_game g, int depth); //对敌方调用(..., -1)
 template SHAPES worst_for_enemy<1>(const game_manager &m, int subject, SHAPES last_type);
+template float search_for_pos<1>(half_game g, int depth); //对敌方调用(..., -1)
+template SHAPES worst_for_enemy<0>(const game_manager &m, int subject, SHAPES last_type);
+template float search_for_pos<0>(half_game g, int depth); //对敌方调用(..., -1)
+template SHAPES worst_for_enemy<-1>(const game_manager &m, int subject, SHAPES last_type);

@@ -1,3 +1,4 @@
+#ifndef SINGLEFILE
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -19,6 +20,7 @@
 #include "random.h"
 #include "selection.h"
 #include "tetromino.h"
+#endif
 
 #define PRINT_V(string, ...) if (opt.verbose) { printf(string, ##__VA_ARGS__); }
 
@@ -34,7 +36,7 @@ struct options opt = {
         .n_weights_enabled     = 0,
 
         .verbose               = 0,
-        .population_size       = 40,
+        .population_size       = 50,
         .tournament_group_size = 10,
         .max_n_generations     = 100,
         .crossover_points      = 2,
@@ -52,7 +54,7 @@ struct options opt = {
         .mutation_rate                     = 0.995,
         .crossover_rate                    = 0.5,
         .tournament_group_random_selection = 0.1,
-        .log_directory = "/Users/prwang/Tetris/",
+        .log_directory = "/Users/prwang/CLionProjects/Tetris/logs",
         .no_log  = false,
         .sel = SUS,
 };
@@ -143,7 +145,7 @@ int all_trials(int *trials, struct options *opt) {
     return -1;
 }
 
-
+bool PRINT_FLAG;
 void master_process();
 
 void satellite_process();
@@ -226,12 +228,9 @@ int main(int argc, char **argv) {
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    if (is_master) {
+    if (rank == MASTER_RANK)
         master_process();
-    } else {
-        satellite_process();
-    }
-
+    else satellite_process();
     MPI_Finalize();
 }
 
@@ -353,16 +352,17 @@ void master_process() {
             }
         }
 
+        fprintf(stderr, "It%d finished", i);
         if (!opt.no_log) {
+            fprintf(f, "------%d------\n", i);
             for (int a = 0; a < opt.population_size; a++) {
-                fprintf(f, "%d", children->individuals[a]->fitness);
-
-                if (a == opt.population_size - 1) {
-                    fprintf(f, "\n");
-                } else {
-                    fprintf(f, "\t");
-                }
+                fprintf(f, "%d\t", children->individuals[a]->fitness);
+                children->individuals[a]->gen->write(f, &opt);
             }
+            PRINT_FLAG = true;
+            game_manager g(RAND() % 7, 0, children->individuals[opt.population_size - opt.elitism]->gen->feature_weights,
+                           children->individuals[opt.population_size - opt.elitism + 1]->gen->feature_weights, opt);
+            g.auto_game<0>();
 
             fflush(f);
         }
@@ -415,9 +415,11 @@ void master_process() {
 }
 
 void satellite_process() {
-    while (1) {
+    int cnt = 0;
+    while (++cnt)
+    {
         int can_continue;
-
+        PRINT_FLAG = false;
         MPI_Status status;
 
         MPI_Send(&one, 1, MPI_INT, MASTER_RANK, CALC_PERM_TAG, MPI_COMM_WORLD);
@@ -437,7 +439,7 @@ void satellite_process() {
                 for (int i = 0; i < 7; ++i)
                 {
                     game_manager g(i, 0, wg1, wg2, opt);
-                    g.auto_game() == g.enemyColor ? ret.second++ : ret.first++;
+                    g.auto_game<0>() == g.enemyColor ? ret.second++ : ret.first++;
                 }
 
                 MPI_Send(&ret, 2, MPI_INT, MASTER_RANK, RESULT_TAG, MPI_COMM_WORLD);

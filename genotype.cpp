@@ -134,3 +134,9 @@ int mutate_genotype (genotype* g, options* opt) {
 
     return was_mutated;
 }
+void genotype::write(FILE* f, options* opt)
+{
+    for (int i = 0; i < opt->n_features_enabled; ++i)
+        fprintf(f, "%.5f ", feature_weights[i]);
+    fprintf(f, "\n");
+}

@@ -1,11 +1,10 @@
-#include <stdlib.h>
-#include <string.h>
-
+#ifndef SINGLEFILE
 #include "genotype.h"
 #include "options.h"
 #include "phenotype.h"
 #include "population.h"
 #include "random.h"
+#endif
 
 population* initialize_population_pool (int size) {
     population* p = (population*)malloc(sizeof(population));

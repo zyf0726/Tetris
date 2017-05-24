@@ -1,10 +1,10 @@
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
+#ifndef SINGLEFILE
+#include "shared.h"
 #include "population.h"
 #include "random.h"
 #include "selection.h"
 #include "options.h"
+#endif
 
 phenotype** select_parent_pairs (population* ppl, options* opt) {
     phenotype** pairs = (phenotype**)malloc(sizeof(phenotype*) * ppl->size * 2);

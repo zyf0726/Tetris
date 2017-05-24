@@ -23,8 +23,8 @@ struct game_manager {
     INLINE void recoverEnemy(int blockType, int x, int y, int o);
     INLINE int recover(int blockTypeBot, int xBot, int yBot, int oBot,
                         int blockTypeEnemy, int xEnemy, int yEnemy, int oEnemy);
-    INLINE int make_decisions(int teamColor);
-    INLINE int auto_game();
+    template<int MAXDEPTH> INLINE int make_decisions(int teamColor);
+    template<int MAXDEPTH>INLINE int auto_game();
     INLINE ~game_manager()
     {
         free_phenotype(gamePhenotypes[0]);
