@@ -75,15 +75,14 @@ template<int MAX_DEPTH> float search_for_pos(half_game g, int depth) //对敌方
         alternative best_alt{-1,-1,-1};
         if (depth != OUTPUT_DEPTH)
         {
-            for (const auto& x : f) if (maxt1(ans, x.dynamic_score
-                               + search_for_type<MAX_DEPTH>(half_game(g, x.b), depth + 1)))
+            for (const auto& x : f) if (maxt1(ans,  search_for_type<MAX_DEPTH>(half_game(g, x.b), depth + 1)))
                     best_alt = x;
             return ans;
 
         } else
         {
             for (const auto& x : f)
-                if(maxt1(ans, search_for_type<MAX_DEPTH>(half_game(g, x.b), depth + 1)))
+                if(maxt1(ans, x.dynamic_score + search_for_type<MAX_DEPTH>(half_game(g, x.b), depth + 1)))
                     best_alt=x;
             best_alt_g=best_alt;
             return ans;

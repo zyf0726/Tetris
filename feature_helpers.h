@@ -1,7 +1,7 @@
 #pragma once
 #ifndef SINGLEFILE
-
 #include "board.h"
+#include "options.h"
 
 #endif
 #define POSSIBLE_LINES 65536 // 2^16

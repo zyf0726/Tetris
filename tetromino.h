@@ -77,7 +77,6 @@ struct t_last_placement {
 
 INLINE void shift_lines(uint16_t lines[], int position, ctet tr);
 
-int random_tetromino(struct options *opt);
 
 using CA = __cord[];
 inline tuple<__cord, int> __toxy2Txy(SHAPES t, ORI o, int x, int y) {

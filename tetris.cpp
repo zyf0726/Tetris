@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <signal.h>
-#include <mpi.h>
+#include <mpi/mpi.h>
 #include <unistd.h>
 
 #include "board.h"
@@ -151,7 +151,6 @@ INLINE void master_init()
 {
     vector<pair<int, int> > schu(n_workers);
     mint(opt.crossover_points, opt.n_features_enabled);
-    FILE *f;
     char time_format[50];
     char run_log_directory[200];
     char run_log_data_file[261];
@@ -202,7 +201,6 @@ INLINE void master_init()
 
 inline void master_pre()
 {
-
     for (int a = 0; a < opt.N; a++)
         free_phenotype(parents->in[a]);
     swap_populations(&children, &parents);
@@ -214,9 +212,18 @@ inline void master_pre()
     free(parent_pairs);
 
     float *ptr = gene_buffer;
+    int cnt = 0;
+    fprintf(stderr, "--");
     for (auto x : *children)
         for (int i = 0; i < opt.n_features_enabled; ++i)
+        {
+            fprintf(stderr, "%d %ld %ld\n", ++cnt, ptr - gene_buffer, sizeof(gene_buffer));
+            if (!x) exit(3);
+            if (!x->gen) exit(4);
+            if (!x->gen->feature_weights) exit(5);
             *ptr++ = x->gen->feature_weights[i];
+        }
+    fprintf(stderr, "---");
 }
 
 inline void master_post(int itera)
@@ -261,7 +268,7 @@ int main(int argc, char **argv)
     opt.n_weights_enabled = 0,
 
     opt.verbose = 0,
-    opt.N = 64,
+    opt.N = 12,
     opt.tournament_group_size = 10,
     opt.max_n_generations = 1000,
     opt.crossover_points = 2,
@@ -279,7 +286,7 @@ int main(int argc, char **argv)
     opt.mutation_rate = 0.995,
     opt.crossover_rate = 0.5,
     opt.tournament_group_random_selection = 0.1,
-    opt.log_directory = "/Users/admin",
+    opt.log_directory = "/home/prwang",
     opt.no_log = false,
     opt.sel = SUS;
 
