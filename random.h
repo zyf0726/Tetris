@@ -1,7 +1,5 @@
 #pragma once
-
-int l_rand (int a, int b, struct options * );
-int b_rand (struct options * );
-float f_rand (struct options * );
-void initalize_rng (struct options * );
+int l_rand (int a, int b );
+int b_rand();
+float f_rand();
 

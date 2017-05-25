@@ -1,4 +1,5 @@
 #ifndef SINGLEFILE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -20,6 +21,7 @@
 #include "random.h"
 #include "selection.h"
 #include "tetromino.h"
+
 #endif
 
 #define PRINT_V(string, ...) if (opt.verbose) { printf(string, ##__VA_ARGS__); }
@@ -31,6 +33,12 @@
 #define RESULT_TAG       4
 #define SHUTDOWN_TAG     4
 
+enum tags
+{
+    ROUND_OVER_TAG = 8,
+
+};
+
 options opt;
 char *program_name;
 
@@ -40,7 +48,8 @@ int user_exit = 0;
 int zero = 0;
 int one = 1;
 
-void print_help_text() {
+void print_help_text()
+{
     printf(
             "usage: %s [options]\n"
                     "Options:\n"
@@ -98,19 +107,24 @@ void print_help_text() {
             program_name
     );
 
-    for (int i = 0; i < N_FEATURES; i++) {
+    for (int i = 0; i < N_FEATURES; i++)
+    {
         printf("  %s\n", features[i].name);
     }
 }
 
-void sigint_handle(int signal) {
+void sigint_handle(int signal)
+{
     printf("Interrupting..\n");
     user_exit = 1;
 }
 
-int all_trials(int *trials, struct options *opt) {
-    for (int a = 0; a < opt->population_size - opt->elitism; a++) {
-        if (trials[a] < opt->n_trials) {
+int all_trials(int *trials, struct options *opt)
+{
+    for (int a = 0; a < opt->N - opt->elitism; a++)
+    {
+        if (trials[a] < opt->n_trials)
+        {
             return a;
         }
     }
@@ -119,97 +133,156 @@ int all_trials(int *trials, struct options *opt) {
 }
 
 bool PRINT_FLAG;
-void master_process();
-
-void satellite_process();
-
-clock_t start_time = clock();
 
 inline constexpr int C2(int a) { return a * (a - 1) / 2; }
-int main(int argc, char **argv) {
 
- opt      .n_features_enabled    = 0,
- opt      .n_weights_enabled     = 0,
 
- opt      .verbose               = 0,
- opt      .population_size       = 20,
- opt      .tournament_group_size = 10,
- opt      .max_n_generations     = 100,
- opt      .crossover_points      = 2,
- opt      .elitism               = 2,
- opt      .no_log                = 0,
- opt      .no_change_duration    = 50,
- opt      .reset_volume          = 0,
- opt      .n_trials              = 10,
- opt      .print_board           = 0,
- opt      .n_piece_lookahead     = 0,
- opt      .randomization_range   = 100,
- opt      .mutation_range        = 100,
+population *parents(0), *children(0);
+int n_workers;
+const int MAXN = 500, MAXF = MAXN * N_FEATURES;
 
- opt      .feature_enable_rate               = 1.f / 6.f,
- opt      .mutation_rate                     = 0.995,
- opt      .crossover_rate                    = 0.5,
- opt      .tournament_group_random_selection = 0.1,
- opt      .log_directory = "/home/prwang/logs",
- opt      .no_log  = false,
- opt      .sel = SUS;
+pair<int, int> C2ij[MAXN * MAXN];
 
-    int rank, is_master = false;
-    initalize_rng(&opt);
+float gene_buffer[MAXF];
+int fitness_buffer[MAXN];
+FILE *f(0);
 
-    program_name = argv[0];
+INLINE void master_init()
+{
+    vector<pair<int, int> > schu(n_workers);
+    mint(opt.crossover_points, opt.n_features_enabled);
+    FILE *f;
+    char time_format[50];
+    char run_log_directory[200];
+    char run_log_data_file[261];
 
-    int log_directory_defined = 0;
+    if (!opt.no_log)
+    {
+        time_t timer;
+        struct tm *tm_info;
+        time(&timer);
+        tm_info = localtime(&timer);
 
-    for (int i = 1; i < argc; i++) {
+        strftime(time_format, 50, "%Y-%m-%d-%H%M%S", tm_info);
 
-        if (strcmp(argv[i], "-v") == 0 ||
-            strcmp(argv[i], "--verbose") == 0) {
-            opt.verbose = 1;
-        }
-        else if (strcmp(argv[i], "--master") == 0)
+        if (snprintf(run_log_directory, 200, "%s/%s", opt.log_directory, time_format) >= 200)
         {
-            is_master = true;
-        } else if (strcmp(argv[i], "--population-size") == 0) {
-            opt.population_size = atoi(argv[++i]);
-        } else if (strcmp(argv[i], "--tournament-group-size") == 0) {
-            opt.tournament_group_size = atoi(argv[++i]);
-        } else if (strcmp(argv[i], "--tournament-group-random-selection") == 0) {
-            opt.tournament_group_random_selection = atof(argv[++i]);
-        } else if (strcmp(argv[i], "--max-n-generations") == 0) {
-            opt.max_n_generations = atoi(argv[++i]);
-        } else if (strcmp(argv[i], "--mutation-rate") == 0) {
-            opt.mutation_rate = atof(argv[++i]);
-        } else if (strcmp(argv[i], "--crossover-rate") == 0) {
-            opt.crossover_rate = atof(argv[++i]);
-        } else if (strcmp(argv[i], "--crossover-points") == 0) {
-            opt.crossover_points = atoi(argv[++i]);
-        } else if (strcmp(argv[i], "--selection") == 0) {
-            i++;
-            if (strcmp(argv[i], "TOURNAMENT") == 0) {
-                opt.sel = TOURNAMENT;
-            } else if (strcmp(argv[i], "SUS") == 0) {
-                opt.sel = SUS;
-            } else if (strcmp(argv[i], "SIGMA") == 0) {
-                opt.sel = SIGMA;
-            } else {
-                printf("Unknown option for selection '%s'.\n", argv[i]);
-                throw 233;
-            }
-        } else if (strcmp(argv[i], "--no-change-duration") == 0) {
-            opt.no_change_duration = atoi(argv[++i]);
-        } else if (strcmp(argv[i], "--reset-volume") == 0) {
-            opt.reset_volume = atoi(argv[++i]);
-        } else if (strcmp(argv[i], "--n-trials") == 0) {
-            opt.n_trials = atoi(argv[++i]);
-        } else if (strcmp(argv[i], "--n-piece-lookahead") == 0) {
-            opt.n_piece_lookahead = atoi(argv[++i]);
-        } else if (strcmp(argv[i], "--randomization-range") == 0) {
-            opt.randomization_range = atoi(argv[++i]);
-        } else if (strcmp(argv[i], "--mutation-range") == 0) {
-            opt.mutation_range = atoi(argv[++i]);
+            printf("Unable to allocate run log directory. Terminating.\n");
+            throw 233;
+        }
+
+        mkdir(run_log_directory, 0755);
+
+        if (snprintf(run_log_data_file, 261, "%s/%s", run_log_directory, "sol.dat") >= 261)
+        {
+            printf("Unable to allocate data log path. Terminating.\n");
+            throw 233;
+        }
+
+        f = fopen(run_log_data_file, "a");
+        if (!f)
+        {
+            puts(run_log_data_file);
+            assert(0);
         }
     }
+
+    children = initialize_population_pool(opt.N);
+    parents = initialize_population_pool(opt.N);
+
+    for (int i = 0; i < opt.N; i++)
+    {
+        children->in[i] = initialize_phenotype(initialize_genotype(&opt));
+        parents->in[i] = initialize_phenotype(initialize_genotype(&opt));
+
+        randomize_genotype(children->in[i]->gen, &opt);
+    }
+    PRINT_V("A random population has been initialized.\n\n");
+}
+
+inline void master_pre()
+{
+
+    for (int a = 0; a < opt.N; a++)
+        free_phenotype(parents->in[a]);
+    swap_populations(&children, &parents);
+    phenotype **parent_pairs = select_parent_pairs(parents, &opt);
+    for (int a = 0; a < opt.N - opt.elitism; a++)
+        children->in[a] = mate_individuals(
+                parent_pairs[a * 2 + 0],
+                parent_pairs[a * 2 + 1], &opt);
+    free(parent_pairs);
+
+    float *ptr = gene_buffer;
+    for (auto x : *children)
+        for (int i = 0; i < opt.n_features_enabled; ++i)
+            *ptr++ = x->gen->feature_weights[i];
+}
+
+inline void master_post(int itera)
+{
+    if (opt.elitism)
+    {
+        sort(parents->in, parents->in + parents->size,
+             [](const phenotype *a, const phenotype *b) { return a->fitness < b->fitness; });
+        for (int a = opt.N - opt.elitism; a < opt.N; a++)
+        {
+            (children->in[a] = parents->in[a])->fitness = 0;
+            parents->in[a] = NULL;
+        }
+    }
+
+    fprintf(stderr, "It%d finished %lld\n", itera, f);
+    if (!opt.no_log)
+    {
+        fprintf(f, "------%d------\n", itera);
+        for (int a = 0; a < opt.N; a++)
+        {
+            fprintf(f, "%d\t", children->in[a]->fitness);
+            children->in[a]->gen->write(f, &opt);
+        }
+        PRINT_FLAG = true;
+        game_manager g(RAND() % 7, 0, children->in[opt.N - opt.elitism]->gen->feature_weights,
+                       children->in[opt.N - opt.elitism + 1]->gen->feature_weights, opt);
+        g.auto_game<0>();
+
+        fflush(f);
+    }
+
+}
+
+
+int sp_si, c_begin, c_end;
+
+int main(int argc, char **argv)
+{
+
+    opt.n_features_enabled = 0,
+    opt.n_weights_enabled = 0,
+
+    opt.verbose = 0,
+    opt.N = 64,
+    opt.tournament_group_size = 10,
+    opt.max_n_generations = 1000,
+    opt.crossover_points = 2,
+    opt.elitism = 2,
+    opt.no_log = 0,
+    opt.no_change_duration = 50,
+    opt.reset_volume = 0,
+    opt.n_trials = 10,
+    opt.print_board = 0,
+    opt.n_piece_lookahead = 0,
+    opt.randomization_range = 100,
+    opt.mutation_range = 100,
+
+    opt.feature_enable_rate = 1.f / 6.f,
+    opt.mutation_rate = 0.995,
+    opt.crossover_rate = 0.5,
+    opt.tournament_group_random_selection = 0.1,
+    opt.log_directory = "/Users/admin",
+    opt.no_log = false,
+    opt.sel = SUS;
+
 
     initialize_feature_helpers(&opt);
 #define EF(x) enable_feature(feature_index(x), &opt);
@@ -223,230 +296,51 @@ int main(int argc, char **argv) {
     EF("--f-n-rows-with-holes");
 
 
+    for (int a = 0, cnt = 0; a < opt.N; ++a)
+        for (int b = a + 1; b < opt.N; ++b)
+            C2ij[cnt++] = make_pair(a, b);
 
     MPI_Init(&argc, &argv);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    if (rank == MASTER_RANK)
-        master_process();
-    else satellite_process();
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &n_workers);
+    if (n_workers <= 1)
+    {
+        fprintf(stderr, "n_worker must be more than 2");
+        throw 233;
+    }
+    sp_si = C2(opt.N) / (n_workers - 1);
+#define IFMA if (rank == MASTER_RANK)
+
+    c_begin = (n_workers - 1 - rank) * sp_si;
+    c_end = min(c_begin + sp_si, C2(opt.N));
+
+    signal(SIGINT, sigint_handle);
+    IFMA master_init();
+    for (int i = 0; (i < opt.max_n_generations || opt.max_n_generations == 0) && !user_exit; i++)
+    {
+        IFMA master_pre();
+        fill(fitness_buffer, fitness_buffer + opt.N, 0);
+        MPI_Bcast(gene_buffer, opt.N * opt.n_features_enabled, MPI_FLOAT, MASTER_RANK, MPI_COMM_WORLD);
+        static int fitness_buffer_tmp[MAXN];
+        fill(fitness_buffer_tmp, fitness_buffer_tmp + opt.N, 0);
+        for (pair<int, int> *i = C2ij + c_begin; i != C2ij + c_end; ++i)
+        {
+            float *kw1 = gene_buffer + i->first * opt.n_features_enabled,
+                    *kw2 = gene_buffer + i->second * opt.n_features_enabled;
+            for (int t = 0; t < 7; ++t)
+            {
+                game_manager g(t, 0, kw1, kw2, opt);
+                fitness_buffer[g.auto_game<0>() == g.enemyColor ? i->second : i->first]++;
+            }
+        }
+
+        MPI_Reduce(fitness_buffer_tmp, fitness_buffer, opt.N, MPI_INT, MPI_SUM, MASTER_RANK, MPI_COMM_WORLD);
+
+        IFMA master_post(i);
+    }
+
     MPI_Finalize();
 }
 
-void master_process() {
-    int n_workers;
-    MPI_Comm_size(MPI_COMM_WORLD, &n_workers);
-    vector<pair<int, int> > schu(n_workers);
-
-    mint(opt.crossover_points, opt.n_features_enabled);
-    FILE *f;
-    char time_format[50];
-    char run_log_directory[200];
-    char run_log_data_file[261];
-    char run_log_solution_file[262];
-
-    if (!opt.no_log) {
-        time_t timer;
-        struct tm *tm_info;
-        time(&timer);
-        tm_info = localtime(&timer);
-
-        strftime(time_format, 50, "%Y-%m-%d-%H%M%S", tm_info);
-
-        if (snprintf(run_log_directory, 200, "%s/%s", opt.log_directory, time_format) >= 200) {
-            printf("Unable to allocate run log directory. Terminating.\n");
-            throw 233;
-        }
-
-        mkdir(run_log_directory, 0755);
-
-        if (snprintf(run_log_data_file, 261, "%s/%s", run_log_directory, "fitness.dat") >= 261) {
-            printf("Unable to allocate data log path. Terminating.\n");
-            throw 233;
-        }
-
-        if (snprintf(run_log_solution_file, 261, "%s/%s", run_log_directory, "solution.dat") >= 262) {
-            printf("Unable to allocate solution log path. Terminating.\n");
-            throw 233;
-        }
-
-        PRINT_V("Results will be logged to %s.\n", run_log_data_file);
-
-        f = fopen(run_log_data_file, "a");
-    }
-
-    struct population *children = initialize_population_pool(opt.population_size);
-    struct population *parents = initialize_population_pool(opt.population_size);
-
-    for (int i = 0; i < opt.population_size; i++) {
-        children->individuals[i] = initialize_phenotype(initialize_genotype(&opt));
-        parents->individuals[i] = initialize_phenotype(initialize_genotype(&opt));
-
-        randomize_genotype(children->individuals[i]->gen, &opt);
-    }
-
-    PRINT_V("A random population has been initialized.\n\n");
-
-    signal(SIGINT, sigint_handle);
-
-    struct phenotype *winner = initialize_phenotype(initialize_genotype(&opt));
-    winner->fitness = -1;
-    int N = opt.population_size - opt.elitism;
-    vector<pair<int, int> > C2ij; C2ij.reserve(C2(N));
-    for (int a = 0; a < N; ++a)
-        for (int b = a + 1; b < N; ++b)
-            C2ij.push_back(make_pair(a, b));
-    for (int i = 0; (i < opt.max_n_generations || opt.max_n_generations == 0) && !user_exit; i++) {
-        PRINT_V("Simulating generation %d.\n", i + 1);
-        for (int a = 0; a < opt.population_size; a++)
-            free_phenotype(parents->individuals[a]);
-        swap_populations(&children, &parents);
-        phenotype **parent_pairs = select_parent_pairs(parents, &opt);
-        for (int a = 0; a < opt.population_size - opt.elitism; a++)
-            children->individuals[a] = mate_individuals(
-                    parent_pairs[a * 2 + 0],
-                    parent_pairs[a * 2 + 1],
-                    &opt);
-        free(parent_pairs);
-        int curSched = 0, curFinished = 0;
-        while (curFinished < C2(N))
-        {
-            pair<int, int> request;
-            MPI_Status status;
-            MPI_Recv(&request, 2, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG,
-                    MPI_COMM_WORLD, &status);
-
-            if (status.MPI_TAG == CALC_PERM_TAG) {
-                if (curSched >= C2(N)) {
-                    MPI_Send(
-                            &zero, 1, MPI_INT, status.MPI_SOURCE, CALC_PERM_TAG,
-                            MPI_COMM_WORLD);
-                } else {
-                    pair<int, int> p = C2ij[curSched++];
-                    schu[status.MPI_SOURCE] = p;
-                    MPI_Send( &one, 1, MPI_INT, status.MPI_SOURCE, CALC_PERM_TAG,
-                            MPI_COMM_WORLD);
-                    MPI_Send( children->individuals[p.first]->gen->feature_weights,
-                            opt.n_features_enabled, MPI_FLOAT, status.MPI_SOURCE,
-                            FEAT_WEIGHTS_TAG, MPI_COMM_WORLD);
-                    MPI_Send( children->individuals[p.second]->gen->feature_weights,
-                            opt.n_features_enabled, MPI_FLOAT, status.MPI_SOURCE,
-                            FEAT_WEIGHTS_TAG, MPI_COMM_WORLD);
-                }
-            } else if (status.MPI_TAG == RESULT_TAG) {
-                pair<int, int> match0  = schu[status.MPI_SOURCE];
-                children->individuals[match0.first]->fitness += request.first;
-                children->individuals[match0.second]->fitness += request.second;
-                curFinished++;
-            }
-        }
-
-        if (opt.elitism) {
-            sort(parents->individuals, parents->individuals + parents->size,
-                 [](const phenotype *a, const phenotype *b) { return a->fitness < b->fitness; });
-            for (int a = 0; a < opt.elitism; a++) {
-                children->individuals[opt.population_size - opt.elitism + a] = parents->individuals[
-                        opt.population_size - opt.elitism + a];
-                parents->individuals[opt.population_size - opt.elitism + a] = NULL;
-            }
-        }
-
-        fprintf(stderr, "It%d finished", i);
-        if (!opt.no_log) {
-            fprintf(f, "------%d------\n", i);
-            for (int a = 0; a < opt.population_size; a++) {
-                fprintf(f, "%d\t", children->individuals[a]->fitness);
-                children->individuals[a]->gen->write(f, &opt);
-            }
-            PRINT_FLAG = true;
-            game_manager g(RAND() % 7, 0, children->individuals[opt.population_size - opt.elitism]->gen->feature_weights,
-                           children->individuals[opt.population_size - opt.elitism + 1]->gen->feature_weights, opt);
-            g.auto_game<0>();
-
-            fflush(f);
-        }
-
-        struct phenotype generational_winner = {.fitness = -1};
-
-        for (int a = 0; a < opt.population_size; a++) {
-            if (children->individuals[a]->fitness > generational_winner.fitness) {
-                generational_winner = *children->individuals[a];
-            }
-        }
-
-        if (generational_winner.fitness > winner->fitness) {
-            free_phenotype(winner);
-            winner = copy_phenotype(&generational_winner, &opt);
-        }
-
-        PRINT_V("The best phenotype has a fitness value of %d.\n", generational_winner.fitness);
-
-        if (opt.verbose) {
-            write_phenotype(stdout, &generational_winner, &opt);
-        }
-    }
-
-    if (!opt.no_log) {
-        fclose(f);
-
-        f = fopen(run_log_solution_file, "a");
-        write_phenotype(f, winner, &opt);
-        fclose(f);
-    }
-    if (opt.verbose) {
-
-        double seconds = (double) (clock() - start_time) / CLOCKS_PER_SEC;
-
-        printf("Execution finished after %.2f seconds.\n", seconds);
-    }
-
-    for (int i = 1; i < n_workers; i++) {
-        MPI_Status status;
-
-        MPI_Recv(
-                &one, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG,
-                MPI_COMM_WORLD, &status);
-
-        MPI_Send(
-                &one, 1, MPI_INT, status.MPI_SOURCE, SHUTDOWN_TAG,
-                MPI_COMM_WORLD);
-    }
-}
-
-void satellite_process() {
-    int cnt = 0;
-    while (++cnt)
-    {
-        int can_continue;
-        PRINT_FLAG = false;
-        MPI_Status status;
-
-        MPI_Send(&one, 1, MPI_INT, MASTER_RANK, CALC_PERM_TAG, MPI_COMM_WORLD);
-
-        MPI_Recv(&can_continue, 1, MPI_INT, MASTER_RANK, MPI_ANY_TAG,
-                MPI_COMM_WORLD, &status);
-
-        if (status.MPI_TAG == CALC_PERM_TAG) {
-            if (can_continue)
-            {
-                float wg1[opt.n_features_enabled], wg2[opt.n_features_enabled];
-                MPI_Recv(wg1, opt.n_features_enabled, MPI_FLOAT, MASTER_RANK, FEAT_WEIGHTS_TAG,
-                        MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                MPI_Recv(wg2, opt.n_features_enabled, MPI_FLOAT, MASTER_RANK, FEAT_WEIGHTS_TAG,
-                         MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                pair<int, int> ret(0, 0);
-                for (int i = 0; i < 7; ++i)
-                {
-                    game_manager g(i, 0, wg1, wg2, opt);
-                    g.auto_game<0>() == g.enemyColor ? ret.second++ : ret.first++;
-                }
-
-                MPI_Send(&ret, 2, MPI_INT, MASTER_RANK, RESULT_TAG, MPI_COMM_WORLD);
-            } else {
-                sleep(1);
-            }
-        } else if (status.MPI_TAG == SHUTDOWN_TAG) {
-            break;
-        }
-    }
-}

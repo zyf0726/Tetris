@@ -6,7 +6,8 @@
 #include "options.h"
 #endif
 
-phenotype** select_parent_pairs (population* ppl, options* opt) {
+
+phenotype** select_parent_pairs (population* ppl, const options* opt) {
     phenotype** pairs = (phenotype**)malloc(sizeof(phenotype*) * ppl->size * 2);
 
     if (opt->sel == TOURNAMENT) {
@@ -23,14 +24,14 @@ phenotype** select_parent_pairs (population* ppl, options* opt) {
     return pairs;
 }
 
-phenotype* select_by_tournament (population* ppl, options* opt) {
+phenotype* select_by_tournament (population* ppl, const options* opt) {
     population* tournament_group = sample_population(ppl, opt->tournament_group_size, opt);
     phenotype* selected_phenotype;
 
-    if (f_rand(opt) > opt->tournament_group_random_selection) {
+    if (f_rand() > opt->tournament_group_random_selection) {
         selected_phenotype = select_best_individual(tournament_group);
     } else {
-        selected_phenotype = tournament_group->individuals[0];
+        selected_phenotype = tournament_group->in[0];
     }
 
     free_population_pool(tournament_group);
@@ -38,49 +39,49 @@ phenotype* select_by_tournament (population* ppl, options* opt) {
     return selected_phenotype;
 }
 
-phenotype** select_with_cumulation (population* population, int n, float cumulation[], options* opt) {
+phenotype** select_with_cumulation (population* population, int n, float cumulation[], const options* opt) {
     phenotype** selection = (phenotype**)malloc(sizeof(phenotype*) * n);
 
     float sum      = cumulation[population->size - 1];
     float distance = (float) sum / (float) n;
-    float start    = (float) (f_rand(opt) * sum) / (float) n;
+    float start    = (float) (f_rand() * sum) / (float) n;
 
     for (int i = 0, a = 0; i < n; i++) {
         while (cumulation[a] < start + i * distance) {
             a++;
         }
 
-        selection[i] = population->individuals[a];
+        selection[i] = population->in[a];
     }
 
     return selection;
 }
 
-phenotype** select_by_sus (population* population, int n, options* opt) {
+phenotype** select_by_sus (population* population, int n, const options* opt) {
     float cumulation[population->size];
 
     for (int i = 0; i < population->size; i++) {
         if (i == 0) {
-            cumulation[i] = population->individuals[i]->fitness;
+            cumulation[i] = population->in[i]->fitness;
         } else {
-            cumulation[i] = cumulation[i - 1] + population->individuals[i]->fitness;
+            cumulation[i] = cumulation[i - 1] + population->in[i]->fitness;
         }
     }
 
     return select_with_cumulation(population, n, cumulation, opt);
 }
 
-phenotype** select_by_sigma_scaling (population* population, int n, options* opt) {
+phenotype** select_by_sigma_scaling (population* population, int n, const options* opt) {
     float average = 0, std_deviation, square_deviations = 0;
 
     for (int i = 0; i < population->size; i++) {
-        average += population->individuals[i]->fitness;
+        average += population->in[i]->fitness;
     }
 
     average /= population->size;
 
     for (int i = 0; i < population->size; i++) {
-        square_deviations = powf(population->individuals[i]->fitness - average, 2);
+        square_deviations = powf(population->in[i]->fitness - average, 2);
     }
 
     std_deviation = sqrt(square_deviations / population->size);
@@ -94,9 +95,9 @@ phenotype** select_by_sigma_scaling (population* population, int n, options* opt
     } else {
         for (int i = 0; i < population->size; i++) {
             if (i == 0) {
-                cumulation[i] = 1 + (population->individuals[i]->fitness - average) / (2 * std_deviation);
+                cumulation[i] = 1 + (population->in[i]->fitness - average) / (2 * std_deviation);
             } else {
-                cumulation[i] = cumulation[i - 1] + 1 + (population->individuals[i]->fitness - average) / (2 * std_deviation);
+                cumulation[i] = cumulation[i - 1] + 1 + (population->in[i]->fitness - average) / (2 * std_deviation);
             }
         }
     }

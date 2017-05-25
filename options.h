@@ -10,7 +10,7 @@ struct options {
     int n_weights_enabled;
 
     int verbose;
-    int population_size;
+    int N;
     int tournament_group_size;
     int max_n_generations;
     int crossover_points;

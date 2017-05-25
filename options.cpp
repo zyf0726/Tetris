@@ -11,5 +11,5 @@ void enable_feature (int feature_i, struct options * opt) {
 
     opt->feature_enabled[feature_i] = 1;
     opt->enabled_f_indices[opt->n_features_enabled++] = feature_i;
-    opt->n_weights_enabled += features[feature_i].weights;
+    opt->n_weights_enabled += 1;
 }

@@ -79,12 +79,8 @@ game_manager::game_manager(int blockType, int _curBotColor, float* wg1, float* w
     nextTypeForColor[0] = nextTypeForColor[1] = (SHAPES) blockType;
 
     ++type_count[0][blockType], ++type_count[1][blockType];
-    gamePhenotypes[curBotColor] = initialize_phenotype(initialize_genotype(&opt));
-    gamePhenotypes[enemyColor] = initialize_phenotype(initialize_genotype(&opt));
-
-    copy(wg1, wg1 + opt.n_features_enabled, gamePhenotypes[curBotColor]->gen->feature_weights);
-
-    copy(wg2, wg2 + opt.n_features_enabled, gamePhenotypes[enemyColor]->gen->feature_weights);
+    gamePhenotypes[curBotColor] = init_from_weight(wg1, opt);
+    gamePhenotypes[enemyColor] = init_from_weight(wg2, opt);
 
 }
 

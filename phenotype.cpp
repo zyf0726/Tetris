@@ -10,7 +10,7 @@
 #endif
 
 
-phenotype *copy_phenotype(phenotype *ori, options *opt)
+phenotype *copy_phenotype(phenotype *ori, const options *opt)
 {
     phenotype *Copy = (phenotype *) malloc(sizeof(phenotype));
 
@@ -29,6 +29,12 @@ phenotype *initialize_phenotype(genotype *g)
 
     return p;
 }
+phenotype* init_from_weight(float* fwt, const options& opt)
+{
+    phenotype *p = initialize_phenotype(initialize_genotype(&opt));
+    copy(fwt, fwt + opt.n_features_enabled, p->gen->feature_weights);
+    return p;
+}
 
 void free_phenotype(phenotype *phenotype)
 {
@@ -39,106 +45,29 @@ void free_phenotype(phenotype *phenotype)
     }
 }
 
-int compare_phenotypes(const void *p_1, const void *p_2)
+
+inline void write_phenotype(float* ptr, genotype *gen, const options *opt)
 {
-    phenotype *phenotype_1 = *(phenotype **) p_1;
-    phenotype *phenotype_2 = *(phenotype **) p_2;
-
-    return (phenotype_1->fitness > phenotype_2->fitness) - (phenotype_1->fitness < phenotype_2->fitness);
-}
-
-void write_phenotype(FILE *stream, phenotype *phenotype, options *opt)
-{
-    int max_feature_length = 0;
-
     for (int i = 0; i < opt->n_features_enabled; i++)
-    {
-        if (strlen(features[opt->enabled_f_indices[i]].name) > max_feature_length)
-        {
-            max_feature_length = (int)strlen(features[opt->enabled_f_indices[i]].name);
-        }
-    }
-
-    int weight_i = 0;
-
-    for (int i = 0; i < opt->n_features_enabled; i++)
-    {
-            for (int a = 0; a < features[opt->enabled_f_indices[i]].weights; a++)
-            {
-                fprintf(stream, "%-*s % .2f\n",
-                        max_feature_length,
-                        features[opt->enabled_f_indices[i]].name,
-                        phenotype->gen->feature_weights[weight_i++]);
-        }
-    }
+        *ptr++ = gen->feature_weights[i];
 }
 
 template<bool enable_dynamic, bool enable_static>
-float board_score(board *new_board, board *old_board, phenotype *phenotype, t_last_placement *tlp, options *opt)
+float board_score(board *new_board, board *old_board, phenotype *phenotype, t_last_placement *tlp, const options *opt)
 {
     float score = 0;
-    int weight_i = 0;
     reset_feature_caches(opt);
     for (int i = 0; i < opt->n_features_enabled; i++)
         {
             const feature& pt = features[opt->enabled_f_indices[i]];
             if ((pt.dynamic && enable_dynamic)
                 || (!pt.dynamic && enable_static))
-                for (int a = 0; a < pt.weights; a++)
-                    score += phenotype->gen->feature_weights[weight_i++] * call_feature(opt->enabled_f_indices[i], new_board, old_board, tlp);
+                    score += phenotype->gen->feature_weights[i]
+                             * call_feature(opt->enabled_f_indices[i], new_board, old_board, tlp);
         }
     return score;
 }
 
-/*
-int phenotype_fitness (phenotype * phenotype, options* opt) {
-    int fitness = 0;
-
-    board brd;
-
-    int next_tetrominos[opt->n_piece_lookahead + 1];
-
-    for (int i = 0; i < opt->n_piece_lookahead + 1; i++) {
-        int random_t = l_rand(0, 7, opt);
-
-        N_TETROMINO(&next_tetrominos[i], random_t);
-    }
-
-    while (1) {
-        // Place the next tetromino on the board. If the placement was unsuccessful, exit the loop.
-        if (continue_board(&brd, phenotype, next_tetrominos, opt) == 1) {
-            break;
-        }
-
-        // Remove lines and add to the current fitness value.
-        fitness += brd.remove_lines( NULL);
-
-        // Fill the lookahead with a new tetromino.
-        for (int i = 0; i < opt->n_piece_lookahead; i++) {
-            next_tetrominos[i] = next_tetrominos[i + 1];
-        }
-
-        int random_t = l_rand(0, 7, opt);
-
-        N_TETROMINO(&next_tetrominos[opt->n_piece_lookahead], random_t);
-
-        if (opt->print_board) {
-            print_board(stdout, &brd);
-        }
-    }
-
-    return fitness;
-}
-float average_phenotype_fitness (phenotype * pt, options* opt) {
-    float sum = 0;
-
-    for (int i = 0; i < opt->n_trials; i++) {
-        sum += phenotype_fitness(pt, opt);
-    }
-
-    return sum / opt->n_trials;
-}
-*/
 void output_state(ctet te, int __state[BOARD_HEIGHT + 5][BOARD_WIDTH + 4])
 {
 #define ST(y, x) (__state[(y) + 4][(x) + 4])
@@ -149,7 +78,7 @@ void output_state(ctet te, int __state[BOARD_HEIGHT + 5][BOARD_WIDTH + 4])
 }
 
 
-alt_c_t _look_ahead(board *brd, phenotype *phenotype,  int Ty1, options* opt)
+alt_c_t _look_ahead(board *brd, phenotype *phenotype,  int Ty1, const options* opt)
 {
     alt_c_t f;
     int tet_offset_all, tet_base;

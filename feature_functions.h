@@ -6,7 +6,7 @@
 #endif
 struct feature {
     const char * name;
-    int weights, dynamic;
+    int  dynamic;
     float (* function) (struct board *, struct board *, t_last_placement *);
 };
 
@@ -17,8 +17,6 @@ float (* feature_function(int feature_i)) (board *, board *, t_last_placement *)
 
 float f_max_height            (board * new_board, board * old_board, t_last_placement * tlp);
 float f_n_holes               (board * new_board, board * old_board, t_last_placement * tlp);
-float f_column_heights        (board * new_board, board * old_board, t_last_placement * tlp);
-float f_column_difference     (board * new_board, board * old_board, t_last_placement * tlp);
 float f_landing_height        (board * new_board, board * old_board, t_last_placement * tlp);
 float f_cell_transitions      (board * new_board, board * old_board, t_last_placement * tlp);
 float f_deep_well_sum         (board * new_board, board * old_board, t_last_placement * tlp);

@@ -24,13 +24,14 @@ using namespace std;
 constexpr int MAPWIDTH =  10;
 constexpr int  MAPHEIGHT =  20;
 
-#define N_FEATURES 32
+#define N_FEATURES 30
 
 #define BOARD_WIDTH 10
 #define BOARD_HEIGHT 20
 
 struct __cord { int x, y; };
 inline __cord operator +(const __cord& a, const __cord& b) { return {a.x + b.x, a.y + b.y}; }
+
 
 
 enum SHAPES
