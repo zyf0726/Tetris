@@ -14,7 +14,7 @@ struct board {
     uint16_t lines[BOARD_HEIGHT];
     INLINE board();
     int remove_lines (t_last_placement * tlp);
-
+    void print();
     int get_tile (int x, int y);
     INLINE void place(ctet tr, int x, int y)
     {

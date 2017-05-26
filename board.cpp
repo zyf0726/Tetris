@@ -164,3 +164,28 @@ void read_board (struct board * board) {
         }
     }
 }*/
+
+void board::print() {
+#ifndef _BOTZONE_ONLINE
+    static const char *i2s[] = {
+            "~~",
+            "~~",
+            "  ",
+            "[]",
+            "##"
+    };
+
+    cerr << "cur:                       enemy:\n";
+    for (int y = 0; y < MAPHEIGHT; y++) {
+        cerr << "~~";
+        for (int x = 0; x < MAPWIDTH; x++)
+            cerr << i2s[get_tile(x, y) + 2];
+
+        cerr << "~~";
+        cerr << endl;
+    }
+    for (int i = 0; i < 43; i++)
+        cerr << "~~";
+    cerr << endl;
+#endif
+}

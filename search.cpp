@@ -48,7 +48,7 @@ template<int MAX_DEPTH> float search_for_type(half_game g, int depth)
     {
         float ans_t = search_for_pos<MAX_DEPTH> (half_game(g, x), depth + 1);
         if (depth == OUTPUT_DEPTH) mint(ans_g[x], ans_t);
-        mint(ans1, ans_t);
+        maxt(ans1, ans_t);
     }
     return ans1;
 }; //depth == 0 : output;
