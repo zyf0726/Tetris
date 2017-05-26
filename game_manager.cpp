@@ -112,16 +112,27 @@ int game_manager::recover(int blockTypeBot, int xBot, int yBot, int oBot,
     return transfer();
 }
 
-template<int MAXDEPTH> int game_manager::make_decisions(int teamColor) {
+template<int MAXDEPTH> int game_manager::make_decisions(int player) {
     best_alt_g = {-1, -1, -1};
     search_for_pos<MAXDEPTH>(
-            half_game(type_count[teamColor], gb[teamColor], nextTypeForColor[teamColor], gamePhenotypes[teamColor]), 0);
+            half_game(type_count[player], gb[player], nextTypeForColor[player], gamePhenotypes[player]), 0);
     if (best_alt_g.o == -1) return -1;
-    return worst_for_enemy<MAXDEPTH>(*this, 1 - teamColor, nextTypeForColor[1 - teamColor]);
+
+    for (int i = 0; i < 7; ++i) best_for_type[i] = -FLT_MAX, type_ok[i] = false;
+    search_for_pos<MAXDEPTH>(
+            half_game(type_count[1 - player], gb[1 - player], nextTypeForColor[player], gamePhenotypes[player]), -1);
+    int ty; float tc = FLT_MAX;
+    for (int i = 0; i < 7; ++i) if (type_ok[i] && best_for_type[i] < tc)
+        {
+            tc = best_for_type[i];
+            ty = i;
+        }
+    return shape_order[ty];
+
 }
-template int game_manager::make_decisions<2>(int teamColor);
-template int game_manager::make_decisions<1>(int teamColor);
-template int game_manager::make_decisions<0>(int teamColor);
+template int game_manager::make_decisions<2>(int player);
+template int game_manager::make_decisions<1>(int player);
+template int game_manager::make_decisions<0>(int player);
 
 
 template<int MAXDEPTH> int game_manager::auto_game()
@@ -134,17 +145,17 @@ template<int MAXDEPTH> int game_manager::auto_game()
             fprintf(stderr, "%d\n", ++cnt);
         }
         int xbot, ybot, obot, xenemy, yenemy, oenemy;
-        int blockForEnemy = make_decisions<MAXDEPTH>(curBotColor);
+        int enm_blk = make_decisions<MAXDEPTH>(curBotColor);
         xbot = best_alt_g.x;
         ybot = best_alt_g.y;
         obot = best_alt_g.o;
-        int blockForCur = make_decisions<MAXDEPTH>(enemyColor);
+        int cur_blk = make_decisions<MAXDEPTH>(enemyColor);
         xenemy = best_alt_g.x;
         yenemy = best_alt_g.y;
         oenemy = best_alt_g.o;
 
-        RANDOM_RET_IF_DRAW(blockForEnemy == -1, blockForCur == -1, curBotColor, enemyColor);
-        int rsu_tr = recover(blockForEnemy, xbot, ybot, obot, blockForCur, xenemy, yenemy, oenemy);
+        RANDOM_RET_IF_DRAW(enm_blk == -1, cur_blk == -1, curBotColor, enemyColor);
+        int rsu_tr = recover(enm_blk, xbot, ybot, obot, cur_blk, xenemy, yenemy, oenemy);
         if (rsu_tr > 0)
             return rsu_tr;
     }
