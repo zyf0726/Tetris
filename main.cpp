@@ -10,7 +10,6 @@
 
 int currBotColor;
 int enemyColor;
-bool PRINT_FLAG = false;
 
 /*
  Feature Value
@@ -48,7 +47,6 @@ int main() {
     EF("--f-n-rows-with-holes");
 
 
-    float fwt[] = {5, -33, 9, -20, -76, -31, -2, -65};
     // 加速输入
     istream::sync_with_stdio(false);
     int turnID, blockType;
@@ -59,7 +57,7 @@ int main() {
     // 先读入第一回合，得到自己的颜色
     // 双方的第一块肯定是一样的
     cin >> blockType >> currBotColor;
-    game_manager g(blockType, currBotColor, fwt, fwt, opt);
+    game_manager g(blockType, currBotColor, glb_fwt, glb_fwt, opt);
 
     // 然后分析以前每回合的输入输出，并恢复状态
     // 循环中，color 表示当前这一行是 color 的行为

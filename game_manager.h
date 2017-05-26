@@ -18,13 +18,13 @@ struct game_manager {
 
     INLINE int transfer();
     INLINE void printField();
-    INLINE game_manager(int blockType, int _curBotColor, float*, float*, options&);
+    INLINE game_manager(int blockType, int _curBotColor, const float*, const float*, options&);
     INLINE void recoverBot(int blockType, int x, int y, int o);
     INLINE void recoverEnemy(int blockType, int x, int y, int o);
     INLINE int recover(int blockTypeBot, int xBot, int yBot, int oBot,
                         int blockTypeEnemy, int xEnemy, int yEnemy, int oEnemy);
     template<int MAXDEPTH> INLINE int make_decisions(int teamColor);
-    template<int MAXDEPTH>INLINE int auto_game();
+    template<int MAXDEPTH, bool PRINT_FLAG = false>INLINE int auto_game();
     INLINE ~game_manager()
     {
         free_phenotype(gamePhenotypes[0]);

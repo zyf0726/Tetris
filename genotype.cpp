@@ -8,6 +8,7 @@
 #include "random.h"
 #include "feature_functions.h"
 #include "feature_helpers.h"
+#include "shared.h"
 #endif
 
 void free_genotype (genotype* g) {
@@ -32,7 +33,7 @@ genotype* copy_genotype (genotype* gt, const options* opt) {
 
 void randomize_genotype (genotype* g, const options* opt) {
     for (int i = 0; i < opt->n_weights_enabled; i++) {
-        g->feature_weights[i] = l_rand(- opt->randomization_range / 2 - 1, opt->randomization_range / 2 + 1);
+        g->feature_weights[i] = glb_fwt[i] + l_rand(- opt->randomization_range / 20 - 1, opt->randomization_range / 20 + 1);
     }
 
 }
@@ -102,24 +103,11 @@ genotype* crossover_genotypes (genotype* g_1, genotype* g_2, const  options* opt
     return g;
 }
 
-int mutate_genotype (genotype* g, const options* opt) {
-    int was_mutated = 0,
-        previous_value;
-
-    for (int i = 0; i < opt->n_features_enabled; i++) {
-            if (f_rand() > opt->mutation_rate) {
-                previous_value = g->feature_weights[i];
-
-                g->feature_weights[i] += l_rand(- opt->mutation_range / 2 - 1, opt->mutation_range / 2 + 1);
-
-                if (g->feature_weights[i] != previous_value ) {
-                    was_mutated = 1;
-                }
-            }
-
-        }
-
-    return was_mutated;
+void mutate_genotype (genotype* g, const options* opt)
+{
+    normal_distribution<double> nd(0, opt->mutation_stdev);
+    for (int i = 0; i < opt->n_features_enabled; i++)
+            g->feature_weights[i] += nd(RAND);
 }
 void genotype::write(FILE* f, const options* opt)
 {

@@ -70,7 +70,7 @@ int game_manager::transfer() //返回赢家
     return -1;
 
 }
-game_manager::game_manager(int blockType, int _curBotColor, float* wg1, float* wg2, options& opt)
+game_manager::game_manager(int blockType, int _curBotColor, const float* wg1, const float* wg2, options& opt)
 {
 
     memset(type_count, 0, sizeof(type_count));
@@ -124,7 +124,7 @@ template int game_manager::make_decisions<1>(int teamColor);
 template int game_manager::make_decisions<0>(int teamColor);
 
 
-template<int MAXDEPTH> int game_manager::auto_game()
+template<int MAXDEPTH, bool PRINT_FLAG> int game_manager::auto_game()
 {
     int cnt = 0;
     while (true)
@@ -152,3 +152,4 @@ template<int MAXDEPTH> int game_manager::auto_game()
 template int game_manager::auto_game<2>();
 template int game_manager::auto_game<1>();
 template int game_manager::auto_game<0>();
+template int game_manager::auto_game<0, true>();

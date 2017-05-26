@@ -33,6 +33,7 @@ struct __cord { int x, y; };
 inline __cord operator +(const __cord& a, const __cord& b) { return {a.x + b.x, a.y + b.y}; }
 
 
+constexpr float glb_fwt[] = {5, -33, 9, -20, -76, -31, -2, -65};
 
 enum SHAPES
 {
@@ -98,4 +99,3 @@ private:
     T data[max_size + 1];
     size_t real_size;
 };
-extern bool PRINT_FLAG;

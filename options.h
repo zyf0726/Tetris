@@ -14,7 +14,6 @@ struct options {
     int tournament_group_size;
     int max_n_generations;
     int crossover_points;
-    int elitism;
     int no_log;
     int no_change_duration;
     int reset_volume;
@@ -22,10 +21,8 @@ struct options {
     int print_board;
     int n_piece_lookahead;
     int randomization_range;
-    int mutation_range;
+    float mutation_stdev;
 
-    float feature_enable_rate;
-    float mutation_rate;
     float crossover_rate;
     float tournament_group_random_selection;
 

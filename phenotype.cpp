@@ -29,7 +29,7 @@ phenotype *initialize_phenotype(genotype *g)
 
     return p;
 }
-phenotype* init_from_weight(float* fwt, const options& opt)
+phenotype* init_from_weight(const float* fwt, const options& opt)
 {
     phenotype *p = initialize_phenotype(initialize_genotype(&opt));
     copy(fwt, fwt + opt.n_features_enabled, p->gen->feature_weights);

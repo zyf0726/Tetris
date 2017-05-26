@@ -24,4 +24,4 @@ void write_phenotype (FILE * stream, phenotype * phenotype, const options * opt)
 template<bool enable_dynamic = false, bool enable_static = true> float board_score (board * new_board, board * old_board, phenotype* phenotype, t_last_placement * tlp, options * opt);
 using  alt_c_t = insert_sort_container<alternative, MAX_SOLUTIONS>;
 alt_c_t  _look_ahead(board *brd, phenotype *phenotype,  int Ty1, const options* opt);
-phenotype* init_from_weight(float* fwt, const options& opt);
+phenotype* init_from_weight(const float* fwt, const options& opt);

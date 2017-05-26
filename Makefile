@@ -9,6 +9,6 @@ Submit: $(headers) $(imp_files) main.cpp
 Train:  
 	cat S_train.h $(headers) $(imp_files) tetris.cpp > Train.cc
 	cp  -f Train.cc cmake-build-debug/
-	mpic++ -g -Og -march=native  cmake-build-debug/Train.cc -o Train -std=c++11 -Wall -Wextra  -fno-inline
+	mpic++ -g -Ofast -funroll-loops -march=native  cmake-build-debug/Train.cc -o Train -std=c++11 -Wall -Wextra
 clean:
 	rm -f Submit.cc Submit Train.cc Train

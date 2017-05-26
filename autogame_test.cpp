@@ -10,7 +10,6 @@
 
 int currBotColor;
 int enemyColor;
-bool PRINT_FLAG = true;
 /*
  Feature Value
 3. Holes -35
