@@ -86,18 +86,14 @@ game_manager::game_manager(int blockType, int _curBotColor, const float* wg1, co
 
 void game_manager::recoverBot(int blockType, int x, int y, int o) {
     curTypeForColor[curBotColor] = nextTypeForColor[curBotColor];
-    // 我当时把上一块落到了x y o
     auto r = toxy2TXY((SHAPES) curTypeForColor[curBotColor], (ORI) o, x, y);
     gb[curBotColor].put_eliminate(get<0>(r), get<1>(r), get<2>(r));
-    // 我给对方什么块来着
 }
 
 void game_manager::recoverEnemy(int blockType, int x, int y, int o) {
     curTypeForColor[enemyColor] = nextTypeForColor[enemyColor];
-    // 对方当时把上一块落到了 x y o！
     auto r = toxy2TXY((SHAPES) curTypeForColor[enemyColor], (ORI) o, x, y);
     gb[enemyColor].put_eliminate(get<0>(r), get<1>(r), get<2>(r));
-    // 对方给我什么块来着？
 }
 
 int game_manager::recover(int blockTypeBot, int xBot, int yBot, int oBot,
@@ -121,13 +117,13 @@ template<int MAXDEPTH> int game_manager::make_decisions(int player) {
     for (int i = 0; i < 7; ++i) best_for_type[i] = -FLT_MAX, type_ok[i] = false;
     search_for_pos<MAXDEPTH>(
             half_game(type_count[1 - player], gb[1 - player], nextTypeForColor[player], gamePhenotypes[player]), -1);
-    int ty; float tc = FLT_MAX;
+    int ty = -1; float tc = FLT_MAX;
     for (int i = 0; i < 7; ++i) if (type_ok[i] && best_for_type[i] < tc)
         {
             tc = best_for_type[i];
             ty = i;
         }
-    return shape_order[ty];
+    return ty >= 0 ? shape_order[ty] : first_type(type_count[1 - player]);
 
 }
 template int game_manager::make_decisions<2>(int player);

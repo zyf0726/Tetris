@@ -25,3 +25,4 @@ extern alternative best_alt_g;
 template<int MAX_DEPTH> INLINE float search_for_type(half_game g, int depth); //depth == 0 : output;
 template<int MAX_DEPTH> INLINE float search_for_pos(half_game g, int depth);
 
+int first_type(const int* type_count);

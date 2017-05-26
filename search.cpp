@@ -31,22 +31,25 @@ INLINE half_game::half_game(const half_game &ori, const board &newgb)
     curPhenotype=ori.curPhenotype;
 }
 constexpr int OUTPUT_DEPTH = 0;
+int first_type(const int* type_count)
+{
+    auto x = minmax_element(type_count, type_count + 7);
+    int m(*x.first), M(*x.second);
+    for (int i = 0; i < 7; ++i)
+        if (type_count[i] < M || m > M - 2)
+            return i;
+}
 template<int MAX_DEPTH> float search_for_type(half_game g, int depth)
 {
     float ans1 = FLT_MAX;
     auto x = minmax_element(g.type_count, g.type_count + 7);
     int m(*x.first), M(*x.second);
-    vector<int> ret; ret.reserve(7);
     for (int i = 0; i < 7; ++i)
         if (g.type_count[i] < M || m > M - 2)
     {
-        float ans_t = search_for_pos<MAX_DEPTH> (half_game(g, i), depth + 1);
-        if (depth == OUTPUT_DEPTH)
-        {
-            type_ok[i] = true;
-            maxt(best_for_type[i], ans_t);
-        }
-        mint(ans1, ans_t);
+        if (depth == OUTPUT_DEPTH) type_ok[i] = true;
+        mint(ans1, search_for_pos<MAX_DEPTH> (half_game(g, i), depth + 1));
+        if (depth == OUTPUT_DEPTH) maxt(best_for_type[i], ans1);
     }
     return ans1;
 }; //depth == 0 : output;

@@ -181,7 +181,7 @@ int main(int argc, char **argv)
     opt.crossover_rate = 0.5,
     opt.tournament_group_random_selection = 0.1,
     opt.log_directory = "/Users/admin/logs",
-    opt.sel = SUS;
+    opt.sel = TOURNAMENT;
 
 
     initialize_feature_helpers(&opt);
