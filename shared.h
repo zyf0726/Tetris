@@ -33,7 +33,9 @@ struct __cord { int x, y; };
 inline __cord operator +(const __cord& a, const __cord& b) { return {a.x + b.x, a.y + b.y}; }
 
 
-constexpr float glb_fwt[] = {5, -33, 9, -20, -76, -31, -2, -65};
+
+constexpr float glb_fwt[]  = { -178.07137,-38.35275,140.04813,-59.56950,-261.47995,-57.72197,-2.89646,-95.83169 };
+//= {5, -33, 9, -20, -76, -31, -2, -65};
 
 enum SHAPES
 {

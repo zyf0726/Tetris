@@ -167,7 +167,7 @@ int main(int argc, char **argv)
     opt.n_weights_enabled = 0,
 
     opt.verbose = 1,
-    opt.N = 4,
+    opt.N = 50,
     opt.tournament_group_size = 10,
     opt.max_n_generations = 1000,
     opt.crossover_points = 2,
@@ -177,7 +177,7 @@ int main(int argc, char **argv)
     opt.print_board = 0,
     opt.n_piece_lookahead = 0,
     opt.randomization_range = 100,
-    opt.mutation_stdev = 10,
+    opt.mutation_stdev = .1,
     opt.crossover_rate = 0.5,
     opt.tournament_group_random_selection = 0.1,
     opt.log_directory = "/Users/admin/logs",

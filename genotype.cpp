@@ -105,9 +105,8 @@ genotype* crossover_genotypes (genotype* g_1, genotype* g_2, const  options* opt
 
 void mutate_genotype (genotype* g, const options* opt)
 {
-    normal_distribution<double> nd(0, opt->mutation_stdev);
     for (int i = 0; i < opt->n_features_enabled; i++)
-            g->feature_weights[i] += nd(RAND);
+        g->feature_weights[i] += (normal_distribution<double>(0, opt->mutation_stdev * fabs(g->feature_weights[i])))(RAND);
 }
 void genotype::write(FILE* f, const options* opt)
 {
