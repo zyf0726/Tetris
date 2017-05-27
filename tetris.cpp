@@ -192,7 +192,7 @@ int main(int argc, char **argv)
     EF("--f-row-transitions");
     EF("--f-column-transitions");
     EF("--f-cumulative-wells-fast");
-    EF("--f-max-height");
+    EF("--f-hole-depths");
     EF("--f-n-rows-with-holes");
 
 

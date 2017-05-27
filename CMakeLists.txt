@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS_RELEASE -D_BOTZONE_ONLINE)
 add_executable(main shared.h game_board.cpp search.cpp main.cpp game_manager.cpp genotype.cpp phenotype.cpp
     random.cpp board.cpp tetromino.cpp feature_functions.cpp feature_helpers.cpp options.cpp)
 
-add_executable(autogame_test shared.h game_board.cpp search.cpp autogame_test.cpp game_manager.cpp genotype.cpp phenotype.cpp
+add_executable(autogame_test shared.h game_board.cpp search.cpp game_manager.cpp genotype.cpp phenotype.cpp
         random.cpp board.cpp tetromino.cpp feature_functions.cpp feature_helpers.cpp options.cpp)
 find_package(MPI)
 
