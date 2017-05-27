@@ -36,15 +36,6 @@ int main() {
     freopen("in.txt", "r", stdin);
 #endif
     initialize_feature_helpers(&opt);
-#define EF(x) enable_feature(feature_index(x), &opt);
-    EF("--f-n-holes");
-    EF("--f-landing-height");
-    EF("--f-eroded-piece-cells");
-    EF("--f-row-transitions");
-    EF("--f-column-transitions");
-    EF("--f-cumulative-wells-fast");
-    EF("--f-hole-depths");
-    EF("--f-n-rows-with-holes");
 
 
     // 加速输入

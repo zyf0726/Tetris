@@ -74,7 +74,7 @@ FILE *f(0);
 INLINE void master_init()
 {
     vector<pair<int, int> > schu(n_workers);
-    mint(opt.crossover_points, opt.n_features_enabled);
+    mint(opt.crossover_points, N_FE);
     char time_format[50];
     char run_log_directory[200];
     char run_log_data_file[261];
@@ -112,10 +112,10 @@ INLINE void master_init()
 
     for (int i = 0; i < opt.N; i++)
     {
-        children->in[i] = initialize_phenotype(initialize_genotype(&opt));
-        parents->in[i] = initialize_phenotype(initialize_genotype(&opt));
+        children->in[i] = initialize_phenotype();
+        parents->in[i] = initialize_phenotype();
 
-        randomize_genotype(children->in[i]->gen, &opt);
+        randomize_genotype(&children->in[i]->gen, &opt);
     }
     PRINT_V("A random population has been initialized.\n\n");
 }
@@ -135,8 +135,8 @@ inline void master_pre()
 
     float *ptr = gene_buffer;
     for (auto x : *children)
-        for (int i = 0; i < opt.n_features_enabled; ++i)
-            *ptr++ = x->gen->feature_weights[i];
+        for (int i = 0; i < N_FE; ++i)
+            *ptr++ = x->gen.feature_weights[i];
     PRINT_V("pre done.\n\n");
 }
 
@@ -148,10 +148,10 @@ inline void master_post(int itera)
         for (int a = 0; a < opt.N; a++)
         {
             fprintf(f, "%d\t", children->in[a]->fitness = fitness_buffer[a]);
-            children->in[a]->gen->write(f, &opt);
+            children->in[a]->gen.write(f, &opt);
         }
-        game_manager g(RAND() % 7, 0, children->in[RAND() % opt.N]->gen->feature_weights,
-                       children->in[RAND() % opt.N]->gen->feature_weights, opt);
+        game_manager g(RAND() % 7, 0, children->in[RAND() % opt.N]->gen.feature_weights,
+                       children->in[RAND() % opt.N]->gen.feature_weights, opt);
         g.auto_game<0, true>();
         fflush(f);
     fprintf(stderr, "time = %fs", MPI_Wtime() - elps);
@@ -162,9 +162,6 @@ int sp_si, c_begin, c_end;
 
 int main(int argc, char **argv)
 {
-
-    opt.n_features_enabled = 0,
-    opt.n_weights_enabled = 0,
 
     opt.verbose = 1,
     opt.N = 50,
@@ -185,15 +182,6 @@ int main(int argc, char **argv)
 
 
     initialize_feature_helpers(&opt);
-#define EF(x) enable_feature(feature_index(x), &opt);
-    EF("--f-n-holes");
-    EF("--f-landing-height");
-    EF("--f-eroded-piece-cells");
-    EF("--f-row-transitions");
-    EF("--f-column-transitions");
-    EF("--f-cumulative-wells-fast");
-    EF("--f-hole-depths");
-    EF("--f-n-rows-with-holes");
 
 
     for (int a = 0, cnt = 0; a < opt.N; ++a)
@@ -223,14 +211,14 @@ int main(int argc, char **argv)
         IFMA master_pre();
         fill(fitness_buffer, fitness_buffer + opt.N, 0);
         IFMA PRINT_V("bcast begin.\n\n");
-        MPI_Bcast(gene_buffer, opt.N * opt.n_features_enabled, MPI_FLOAT, MASTER_RANK, MPI_COMM_WORLD);
+        MPI_Bcast(gene_buffer, opt.N * N_FE, MPI_FLOAT, MASTER_RANK, MPI_COMM_WORLD);
         IFMA PRINT_V("bcast done. cal begin\n\n");
         static int fitness_buffer_tmp[MAXN];
         fill(fitness_buffer_tmp, fitness_buffer_tmp + opt.N, 0);
         for (pair<int, int> *i = C2ij + c_begin; i != C2ij + c_end; ++i)
         {
-            float *kw1 = gene_buffer + i->first * opt.n_features_enabled,
-                    *kw2 = gene_buffer + i->second * opt.n_features_enabled;
+            float *kw1 = gene_buffer + i->first * N_FE,
+                    *kw2 = gene_buffer + i->second * N_FE;
             for (int t = 0; t < 7; ++t)
             {
                 game_manager g(t, 0, kw1, kw2, opt);

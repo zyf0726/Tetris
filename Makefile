@@ -1,5 +1,5 @@
 headers = shared.h options.h tetromino.h board.h  random.h feature_functions.h feature_helpers.h genotype.h phenotype.h game_board.h game_manager.h search.h main.h  selection.h population.h 
-imp_files =  board.cpp feature_functions.cpp feature_helpers.cpp game_board.cpp game_manager.cpp genotype.cpp options.cpp phenotype.cpp random.cpp search.cpp  tetromino.cpp population.cpp selection.cpp
+imp_files =  board.cpp feature_functions.cpp feature_helpers.cpp game_board.cpp game_manager.cpp genotype.cpp  phenotype.cpp random.cpp search.cpp  tetromino.cpp population.cpp selection.cpp
 ALL: Submit Train
 Submit: $(headers) $(imp_files) main.cpp
 	cat S.h $(headers) $(imp_files) main.cpp > Submit.cc

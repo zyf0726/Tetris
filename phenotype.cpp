@@ -15,24 +15,20 @@ phenotype *copy_phenotype(phenotype *ori, const options *opt)
     phenotype *Copy = (phenotype *) malloc(sizeof(phenotype));
 
     *Copy = *ori;
-    Copy->gen = copy_genotype(ori->gen, opt);
 
     return Copy;
 }
 
-phenotype *initialize_phenotype(genotype *g)
+phenotype *initialize_phenotype()
 {
     phenotype *p = (phenotype *) malloc(sizeof(phenotype));
-
     p->fitness = 0;
-    p->gen = g;
-
     return p;
 }
 phenotype* init_from_weight(const float* fwt, const options& opt)
 {
-    phenotype *p = initialize_phenotype(initialize_genotype(&opt));
-    copy(fwt, fwt + opt.n_features_enabled, p->gen->feature_weights);
+    phenotype *p = initialize_phenotype();
+    copy(fwt, fwt + N_FE, p->gen.feature_weights);
     return p;
 }
 
@@ -40,32 +36,21 @@ void free_phenotype(phenotype *phenotype)
 {
     if (phenotype != NULL)
     {
-        free_genotype(phenotype->gen);
         free(phenotype);
     }
 }
 
 
-inline void write_phenotype(float* ptr, genotype *gen, const options *opt)
+inline float score_dyn(board *new_board, board *old_board, phenotype *phenotype, t_last_placement *tlp)
 {
-    for (int i = 0; i < opt->n_features_enabled; i++)
-        *ptr++ = gen->feature_weights[i];
-}
-
-template<bool enable_dynamic, bool enable_static>
-float board_score(board *new_board, board *old_board, phenotype *phenotype, t_last_placement *tlp, const options *opt)
+#define FN(f, i) f(new_board,old_board,tlp) * phenotype->gen.feature_weights[i]
+    return FN(f_landing_height, 1) + FN(f_eroded_piece_cells, 2);
+};
+inline float score_sta(board *new_board, board *old_board, phenotype *phenotype, t_last_placement *tlp)
 {
-    float score = 0;
-    reset_feature_caches(opt);
-    for (int i = 0; i < opt->n_features_enabled; i++)
-        {
-            const feature& pt = features[opt->enabled_f_indices[i]];
-            if ((pt.dynamic && enable_dynamic)
-                || (!pt.dynamic && enable_static))
-                    score += phenotype->gen->feature_weights[i]
-                             * call_feature(opt->enabled_f_indices[i], new_board, old_board, tlp);
-        }
-    return score;
+    return FN(f_n_holes, 0) +  FN(f_row_transitions, 3) + FN(f_column_transitions, 4)
+           + FN(f_cumulative_wells_fast, 5) + FN(f_hole_depths, 6) + FN(f_n_rows_with_holes, 7);
+#undef FN
 }
 
 void output_state(ctet te, int __state[BOARD_HEIGHT + 5][BOARD_WIDTH + 4])
@@ -115,8 +100,8 @@ alt_c_t _look_ahead(board *brd, phenotype *phenotype,  int Ty1, const options* o
                             board cp(*brd);
                             cp.place(te, xx, yy);
                             cp.remove_lines(&tlp);
-                            alt.static_score = board_score<false, true>(&cp, brd, phenotype, &tlp, opt);
-                            alt.dynamic_score = board_score<true, false>(&cp, brd, phenotype, &tlp, opt);
+                            alt.static_score = score_sta(&cp, brd, phenotype, &tlp);
+                            alt.dynamic_score = score_dyn(&cp, brd, phenotype, &tlp);
                             alt.b = cp;
                             free(tlp.lines_removed);
                             f.push_back(alt);

@@ -34,9 +34,8 @@ inline __cord operator +(const __cord& a, const __cord& b) { return {a.x + b.x, 
 
 
 
-constexpr float glb_fwt[]  ={
--171.79663,-4.74666,123.25094,-104.96412,-38.18864,-51.44960,-79.61923,-286.10596
-};
+constexpr float glb_fwt[]  ={ -171.79663,-4.74666,123.25094,-104.96412,-38.18864,-51.44960,-79.61923,-286.10596 };
+constexpr int N_FE = sizeof(glb_fwt) / sizeof(float);
 //= {5, -33, 9, -20, -76, -31, -2, -65};
 
 enum SHAPES

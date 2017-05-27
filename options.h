@@ -4,10 +4,7 @@
 #endif
 
 struct options {
-    int feature_enabled[N_FEATURES];
     int enabled_f_indices[N_FEATURES];
-    int n_features_enabled;
-    int n_weights_enabled;
 
     int verbose;
     int N;
@@ -32,5 +29,4 @@ struct options {
 
 };
 
-INLINE void enable_feature (int feature_i, struct options * opt);
 
