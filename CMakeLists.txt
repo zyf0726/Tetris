@@ -3,7 +3,6 @@ project(Tetris)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS_DEBUG -g3)
 set(CMAKE_CXX_FLAGS_RELEASE -D_BOTZONE_ONLINE)
-#set(CMAKE_BUILD_TYPE RELEASE)
 add_executable(main shared.h game_board.cpp search.cpp main.cpp game_manager.cpp genotype.cpp phenotype.cpp
     random.cpp board.cpp tetromino.cpp feature_functions.cpp feature_helpers.cpp options.cpp)
 

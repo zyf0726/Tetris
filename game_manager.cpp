@@ -116,7 +116,7 @@ template<int MAXDEPTH> int game_manager::make_decisions(int player) {
 
     for (int i = 0; i < 7; ++i) best_for_type[i] = -FLT_MAX, type_ok[i] = false;
     search_for_pos<MAXDEPTH>(
-            half_game(type_count[1 - player], gb[1 - player], nextTypeForColor[player], gamePhenotypes[player]), -1);
+            half_game(type_count[1 - player], gb[1 - player], nextTypeForColor[1 - player], gamePhenotypes[player]), -1);
     int ty = -1; float tc = FLT_MAX;
     for (int i = 0; i < 7; ++i) if (type_ok[i] && best_for_type[i] < tc)
         {
