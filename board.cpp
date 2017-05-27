@@ -61,7 +61,7 @@ void board::remove_line(int line)
     lines[0] = EMPTY_LINE;
 }
 
-int board::get_tile(int x, int y)
+int board::get_tile(int x, int y) const
 {
     return !!(lines[y] & CELL_MASKS(x));
 }
@@ -165,7 +165,7 @@ void read_board (struct board * board) {
     }
 }*/
 
-void board::print() {
+void board::print() const {
 #ifndef _BOTZONE_ONLINE
     static const char *i2s[] = {
             "~~",

@@ -48,8 +48,9 @@ template<int MAX_DEPTH> float search_for_type(half_game g, int depth)
         if (g.type_count[i] < M || m > M - 2)
     {
         if (depth == OUTPUT_DEPTH) type_ok[i] = true;
-        mint(ans1, search_for_pos<MAX_DEPTH> (half_game(g, i), depth + 1));
-        if (depth == OUTPUT_DEPTH) maxt(best_for_type[i], ans1);
+        float ans_this = search_for_pos<MAX_DEPTH> (half_game(g, i), depth + 1);
+        mint(ans1, ans_this);
+        if (depth == OUTPUT_DEPTH) maxt(best_for_type[i], ans_this);
     }
     return ans1;
 }; //depth == 0 : output;
@@ -70,7 +71,8 @@ template<int MAX_DEPTH> float search_for_pos(half_game g, int depth) //对敌方
                 if(maxt1(ans, x.static_score + x.dynamic_score))
                     best_alt=x;
             best_alt_g=best_alt;
-        } return best_alt.static_score;
+        }
+        return best_alt.static_score;
     } else
     {
         alternative best_alt{-1,-1,-1};
